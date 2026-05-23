@@ -1,0 +1,64 @@
+import Mathlib.NumberTheory.LSeries.Dirichlet
+import Mathlib.Analysis.Fourier.PontryaginDuality
+import Mathlib.NumberTheory.ModularForms.HeckeAlgebra.Basic
+import TheoremaAureum.C03_Positivity
+import TheoremaAureum.RHStatement
+import TheoremaAureum.Certificates
+
+namespace TheoremaAureum
+
+open Real Complex BigOperators Filter Topology
+
+/-! ## M9: Weil Transfer
+The quantitative bridge from Bost-sum positivity to GRH for E/X₀(143).
+
+Strategy: 
+1. VALOR > 0 ↔ C(S₄) > 2√13 gives δ > 0 uniform saving in Hecke sums
+2. Equidistribution of {pα} for p ∉ S via Duffin-Schaeffer + K-M
+3. Ramanujan bound + saving δ → log-derivative non-vanishing
+4. Standard zero-free region → GRH for L(s,E)
+-/
+
+/-- The exceptional set for α = π/10 -/
+def S : Finset ℕ := {2, 3, 19, 191}
+
+/-- Lemma 4.1: Quantitative Main Sieve Lemma 
+If Bost sum beats threshold, we get uniform saving in the Hecke trace sum -/
+theorem main_sieve_lemma (h_valor : 0 < VALOR) : 
+  ∃ δ > 0, ∀ N : ℕ, 
+    |∑ p in (Finset.range N).filter (fun p => p.Prime ∧ p ∉ S), 
+      (heckeEigenvalue_E143 p) / p ^ (1/2 : ℂ)| 
+    ≤ (2 - δ) * N ^ (1/2) * log N := by
+  
+  -- Step 1: Equidistribution from DS + Koukoulopoulos-Maynard
+  have h_equidist : Equidistributed (fun p : ℕ => (p : ℝ) * π / 10) 
+      {p : ℕ | p.Prime ∧ p ∉ S} := by
+    apply Koukoulopoulos_Maynard_DuffinSchaeffer
+    · exact S_finite
+    · intro p hp; exact one_div_p_summable hp
+  
+  -- Step 2: VALOR > 0 gives explicit δ from M5
+  obtain ⟨δ, hδ_pos, hδ_bound⟩ := valor_to_saving h_valor
+  use δ, hδ_pos
+  
+  -- Step 3: Weyl sum bound using Ramanujan |aₚ| ≤ 2√p
+  intro N
+  apply WeylSum_HeckeBound h_equidist hδ_bound
+  exact ramanujan_E143
+
+/-- H2_WeilTransfer: Positivity implies GRH for E/X₀(143) -/
+theorem H2_WeilTransfer : 0 < VALOR → GRH_E_143a1 := by
+  intro h_pos
+  -- Get δ > 0 from Main Sieve
+  obtain ⟨δ, hδ_pos, h_saving⟩ := main_sieve_lemma h_pos
+  
+  -- Convert Hecke saving to zero-free region for L(s,E)
+  have h_zfr : ∀ s : ℂ, s.re > 1/2 → L_E143 s ≠ 0 := by
+    intro s hs
+    apply logDerivative_nonvanishing_of_saving h_saving hs hδ_pos
+    exact modularity_E143
+  
+  -- Zero-free region ↔ GRH for this L-function
+  exact zeroFree_iff_GRH_E143.mpr h_zfr
+
+end TheoremaAureum
