@@ -105,6 +105,13 @@ Set `STRICT_LEAN_CHECK=1` when invoking the script manually to require an actual
 
 **Full mathlib build:** run `lake exe cache get && lake build` to compile with real `riemannZeta`/`riemannXi` semantics (requires ~2 GB download of prebuilt mathlib oleans). The structural proof above is correct without it.
 
+## Release v1.8-BC (honest scope)
+
+- Frozen spine: M1–M10 + M13 (BC–CM, h = 1). Lean `main_theorem` axiom debt = [].
+- `README.md` is the public-facing summary; `CITATION.cff` carries `doi: TODO-DOI` until Zenodo mints the v1.8-BC release.
+- `README.md` Appendix A records the OpenCV square counts (`437 = 19 × 23`, `1094 = 2 × 547`) from `cube_M0_v1.jpg` / `cube_M0_v2.jpg` as **observations only**. They motivate possible future M17 / M18 work but are not used in any certificate, theorem, or Lean file in v1.8-BC.
+- No `sorry` and no `axiom` is allowed in `lean-proof/`. The CI drift guard (`scripts/check-lean-proof.sh`, strict mode in the `lean-proof` workflow) enforces this on every merge.
+
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details

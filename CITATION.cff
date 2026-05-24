@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Theorema Aureum v143 — Certificate Ledger (v1.8-BC)"
+abstract: >-
+  Machine-checkable certificate chain (M1–M10 + M13) for the Riemann Hypothesis
+  pipeline routed through GRH for X_0(143) and the X_0(N) family, accompanied
+  by a Lean 4 formalization whose main theorem carries axiom debt = [] (no
+  axioms, no sorry). Release v1.8-BC adds the M13 Bost–Connes for h=1 CM
+  fields certificate and ships an observation-only appendix on geometric
+  probes of the 600-cell projection.
+type: software
+authors:
+  - family-names: Fox
+    given-names: David J.
+version: "1.8-BC"
+date-released: "2026-05-24"
+license: "MIT"
+repository-code: "https://github.com/entangled-technologies/theorema-aureum-143"
+doi: "TODO-DOI"
+keywords:
+  - Riemann Hypothesis
+  - GRH
+  - Lean 4
+  - formal proof
+  - modular curves
+  - X_0(N)
+  - Bost-Connes
+  - CM fields
+  - certificate chain
