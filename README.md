@@ -82,5 +82,6 @@ python scripts/gematria/gematria_cube.py attached_assets/cube_M0_v2.jpg
 
 ## Citation
 
-See `CITATION.cff`. The DOI field is `TODO-DOI` until Zenodo mints the v1.8-BC
-release; update `CITATION.cff` in a follow-up commit once the DOI is issued.
+See `CITATION.cff`. v1.8-BC lives on Replit as the public, in-house source of
+truth — no DOI field is carried in the citation file. If a DOI is needed
+later (e.g. for an external archive), add it then.

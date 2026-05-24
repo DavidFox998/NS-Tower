@@ -15,8 +15,7 @@ authors:
 version: "1.8-BC"
 date-released: "2026-05-24"
 license: "MIT"
-repository-code: "https://github.com/entangled-technologies/theorema-aureum-143"
-doi: "TODO-DOI"
+repository-code: "https://replit.com/@entangled-technologies/theorema-aureum-143"
 keywords:
   - Riemann Hypothesis
   - GRH
