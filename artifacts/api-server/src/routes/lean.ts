@@ -22,6 +22,17 @@ const REPO_ROOT = resolveRepoRoot();
 const VERIFY_PATH = path.join(REPO_ROOT, "lean-proof", "VERIFY.txt");
 const REGENERATE_SCRIPT = path.join(REPO_ROOT, "lean-proof", "regenerate.sh");
 const REBUILD_TIMEOUT_MS = 5 * 60 * 1000;
+const REBUILD_COOLDOWN_MS = 60 * 1000;
+
+let lastRebuildFinishedAt = 0;
+
+function checkRebuildCooldown(): { ok: true } | { ok: false; retryAfterMs: number } {
+  const elapsed = Date.now() - lastRebuildFinishedAt;
+  if (lastRebuildFinishedAt > 0 && elapsed < REBUILD_COOLDOWN_MS) {
+    return { ok: false, retryAfterMs: REBUILD_COOLDOWN_MS - elapsed };
+  }
+  return { ok: true };
+}
 
 interface ParsedVerification {
   toolchain: string;
@@ -154,6 +165,16 @@ router.post("/lean/verify/rebuild/stream", (req, res) => {
     return;
   }
 
+  const cooldown = checkRebuildCooldown();
+  if (!cooldown.ok) {
+    const retryAfterSec = Math.ceil(cooldown.retryAfterMs / 1000);
+    res.setHeader("Retry-After", String(retryAfterSec));
+    res.status(429).json({
+      error: `Lean rebuilds are rate-limited. Please wait ${retryAfterSec}s before triggering another.`,
+    });
+    return;
+  }
+
   if (!existsSync(REGENERATE_SCRIPT)) {
     req.log.error({ path: REGENERATE_SCRIPT }, "regenerate.sh not found");
     res.status(500).json({ error: `regenerate.sh not found at ${REGENERATE_SCRIPT}` });
@@ -246,6 +267,7 @@ router.post("/lean/verify/rebuild/stream", (req, res) => {
     clearTimeout(timer);
     clearInterval(heartbeat);
     rebuildInFlight = false;
+    lastRebuildFinishedAt = Date.now();
 
     // Flush trailing partial lines
     if (stdoutBuf.length > 0) {
@@ -326,33 +348,15 @@ router.post("/lean/verify/rebuild/stream", (req, res) => {
 router.post("/lean/verify/rebuild", (req, res) => {
   const start = Date.now();
 
-  const expectedToken = process.env["LEAN_REBUILD_TOKEN"];
-  if (!expectedToken || expectedToken.length === 0) {
-    req.log.warn("Rebuild blocked: LEAN_REBUILD_TOKEN not configured");
-    res.status(503).json({
+  const auth = checkRebuildAuth(req);
+  if (!auth.ok) {
+    res.status(auth.status).json({
       ok: false,
       exitCode: -1,
       stdout: "",
       stderr: "",
       durationMs: 0,
-      error:
-        "Lean rebuild is disabled on this server: LEAN_REBUILD_TOKEN is not configured. Set the secret to enable referee-driven rebuilds.",
-      verification: null,
-    });
-    return;
-  }
-
-  const provided = extractBearerToken(req.headers["authorization"]);
-  if (!provided || !timingSafeEqual(provided, expectedToken)) {
-    req.log.warn({ hasHeader: Boolean(provided) }, "Rebuild blocked: bad token");
-    res.status(401).json({
-      ok: false,
-      exitCode: -1,
-      stdout: "",
-      stderr: "",
-      durationMs: 0,
-      error:
-        "Unauthorized: a valid referee rebuild token is required (Authorization: Bearer <token>).",
+      error: auth.error,
       verification: null,
     });
     return;
@@ -366,6 +370,22 @@ router.post("/lean/verify/rebuild", (req, res) => {
       stderr: "",
       durationMs: 0,
       error: "A Lean rebuild is already in progress. Please wait for it to finish before triggering another.",
+      verification: null,
+    });
+    return;
+  }
+
+  const cooldown = checkRebuildCooldown();
+  if (!cooldown.ok) {
+    const retryAfterSec = Math.ceil(cooldown.retryAfterMs / 1000);
+    res.setHeader("Retry-After", String(retryAfterSec));
+    res.status(429).json({
+      ok: false,
+      exitCode: -1,
+      stdout: "",
+      stderr: "",
+      durationMs: 0,
+      error: `Lean rebuilds are rate-limited. Please wait ${retryAfterSec}s before triggering another.`,
       verification: null,
     });
     return;
@@ -436,6 +456,7 @@ router.post("/lean/verify/rebuild", (req, res) => {
     responded = true;
     clearTimeout(timer);
     rebuildInFlight = false;
+    lastRebuildFinishedAt = Date.now();
     const durationMs = Date.now() - start;
 
     invalidateCache();

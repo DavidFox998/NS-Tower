@@ -432,7 +432,12 @@ export default function DashboardPage() {
                   onClick={() => {
                     void startRebuild();
                   }}
-                  disabled={isRebuilding}
+                  disabled={isRebuilding || !rebuildToken}
+                  title={
+                    !rebuildToken
+                      ? "Set a referee rebuild token to enable this action."
+                      : undefined
+                  }
                   className="inline-flex items-center gap-2 px-3 py-1.5 border border-green-500/50 bg-green-500/10 font-mono text-xs uppercase tracking-wider text-green-700 dark:text-green-400 hover:bg-green-500/20 disabled:opacity-60 disabled:cursor-not-allowed"
                   data-testid="button-rebuild-lean-log"
                 >
