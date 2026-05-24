@@ -1,4 +1,4 @@
-# Entangled Industries — The Morning Star Project
+# Entangled Technologies — The Morning Star Project
 
 Volume I: **Theorema Aureum 143 — Certificate Ledger.** A machine-proof certificate dashboard tracking the M1→M9 cryptographic proof chain (plus the Miegakure 600-cell visualization) for the Riemann Hypothesis pipeline routed through GRH for X_0(143) and the X_0(N) family at N ∈ {143, 199, 311}.
 

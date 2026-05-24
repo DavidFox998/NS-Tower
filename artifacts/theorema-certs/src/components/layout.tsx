@@ -12,7 +12,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <aside className="w-full md:w-64 border-r border-border bg-sidebar flex-shrink-0 flex flex-col">
         <div className="p-6 border-b border-border">
           <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.18em] mb-1">
-            Entangled Industries
+            Entangled Technologies
           </div>
           <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider mb-3">
             presents

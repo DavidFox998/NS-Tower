@@ -171,7 +171,7 @@ export default function MiegakurePage() {
       </Card>
 
       <div className="text-[10px] font-mono text-muted-foreground text-center pt-2">
-        Entangled Industries · 600-cell rendered live from H₄ root coordinates over ℚ(√5)
+        Entangled Technologies · 600-cell rendered live from H₄ root coordinates over ℚ(√5)
       </div>
     </div>
   );
