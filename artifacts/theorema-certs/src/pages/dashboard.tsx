@@ -37,6 +37,7 @@ const REBUILD_REFEREE_NAME_STORAGE_KEY = "lean-rebuild-referee-name";
 const REFEREE_NAME_PATTERN = /^[A-Za-z0-9 _.\-]{1,64}$/;
 
 const STALE_THRESHOLD_DAYS = 30;
+const REBUILD_COOLDOWN_MS = 60 * 1000;
 
 function formatAge(ageDays: number | undefined): string {
   if (ageDays === undefined || Number.isNaN(ageDays)) return "unknown";
@@ -94,7 +95,10 @@ async function streamRebuild(
   refereeName: string,
   onLine: (line: RebuildLogLine) => void,
   signal: AbortSignal,
-): Promise<{ kind: "result"; payload: RebuildResultPayload } | { kind: "error"; error: string; status?: number }> {
+): Promise<
+  | { kind: "result"; payload: RebuildResultPayload }
+  | { kind: "error"; error: string; status?: number; retryAfterMs?: number }
+> {
   let response: Response;
   try {
     const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
@@ -118,7 +122,13 @@ async function streamRebuild(
     } catch {
       // ignore
     }
-    return { kind: "error", error: detail, status: response.status };
+    let retryAfterMs: number | undefined;
+    const retryAfterHeader = response.headers.get("Retry-After");
+    if (retryAfterHeader) {
+      const sec = Number(retryAfterHeader);
+      if (Number.isFinite(sec) && sec > 0) retryAfterMs = sec * 1000;
+    }
+    return { kind: "error", error: detail, status: response.status, retryAfterMs };
   }
 
   if (!response.body) {
@@ -221,6 +231,8 @@ export default function DashboardPage() {
   const [lockoutClearError, setLockoutClearError] = useState<string | null>(null);
   const [pendingClearIp, setPendingClearIp] = useState<string | null>(null);
   const [rebuildOutcome, setRebuildOutcome] = useState<RebuildOutcome | null>(null);
+  const [cooldownUntilMs, setCooldownUntilMs] = useState<number | null>(null);
+  const [cooldownRemainingMs, setCooldownRemainingMs] = useState<number>(0);
   const [showTokenInput, setShowTokenInput] = useState(false);
   const [isRebuilding, setIsRebuilding] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
@@ -296,6 +308,28 @@ export default function DashboardPage() {
     return () => window.clearInterval(id);
   }, [showCancelConfirm, rebuildStartedAt]);
 
+  useEffect(() => {
+    if (cooldownUntilMs == null) {
+      setCooldownRemainingMs(0);
+      return;
+    }
+    const tick = () => {
+      const remaining = cooldownUntilMs - Date.now();
+      if (remaining <= 0) {
+        setCooldownRemainingMs(0);
+        setCooldownUntilMs(null);
+      } else {
+        setCooldownRemainingMs(remaining);
+      }
+    };
+    tick();
+    const id = window.setInterval(tick, 250);
+    return () => window.clearInterval(id);
+  }, [cooldownUntilMs]);
+
+  const cooldownActive = cooldownRemainingMs > 0;
+  const cooldownSecondsLeft = Math.ceil(cooldownRemainingMs / 1000);
+
   const startRebuild = async () => {
     if (!rebuildToken) {
       setShowTokenInput(true);
@@ -336,6 +370,7 @@ export default function DashboardPage() {
           durationMs: r.durationMs,
           exitCode: r.exitCode,
         });
+        setCooldownUntilMs(Date.now() + REBUILD_COOLDOWN_MS);
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: getGetLeanVerificationQueryKey() }),
           queryClient.invalidateQueries({ queryKey: getGetLeanRebuildHistoryQueryKey() }),
@@ -349,6 +384,9 @@ export default function DashboardPage() {
           durationMs: 0,
           exitCode: -1,
         });
+        if (outcome.status === 429 && outcome.retryAfterMs && outcome.retryAfterMs > 0) {
+          setCooldownUntilMs(Date.now() + outcome.retryAfterMs);
+        }
       }
     } finally {
       setIsRebuilding(false);
@@ -637,11 +675,13 @@ export default function DashboardPage() {
                   onClick={() => {
                     void startRebuild();
                   }}
-                  disabled={isRebuilding || !rebuildToken}
+                  disabled={isRebuilding || !rebuildToken || cooldownActive}
                   title={
                     !rebuildToken
                       ? "Set a referee rebuild token to enable this action."
-                      : undefined
+                      : cooldownActive
+                        ? `Cooldown active — available in ${cooldownSecondsLeft}s`
+                        : undefined
                   }
                   className="inline-flex items-center gap-2 px-3 py-1.5 border border-green-500/50 bg-green-500/10 font-mono text-xs uppercase tracking-wider text-green-700 dark:text-green-400 hover:bg-green-500/20 disabled:opacity-60 disabled:cursor-not-allowed"
                   data-testid="button-rebuild-lean-log"
@@ -649,7 +689,11 @@ export default function DashboardPage() {
                   <RefreshCw
                     className={`w-3 h-3 ${isRebuilding ? "animate-spin" : ""}`}
                   />
-                  {isRebuilding ? "Rebuilding…" : "Rebuild Lean log"}
+                  {isRebuilding
+                    ? "Rebuilding…"
+                    : cooldownActive
+                      ? `Available in ${cooldownSecondsLeft}s`
+                      : "Rebuild Lean log"}
                 </button>
                 {isRebuilding ? (
                   <button
