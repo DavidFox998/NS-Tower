@@ -22,8 +22,12 @@
                                   `{propext, Classical.choice, Quot.sound}`,
                                   no research-grade axioms. (Verified by
                                   `scripts/check-towers.sh`.)
-  - `RiemannVonMangoldt_statement` — **statement only.** No proof.
-                                     Closing it is open mathlib-scale work.
+  - `RiemannVonMangoldt_setCounting_statement` — **statement only.**
+                                     No proof. The *set-counting* (i.e.
+                                     multiplicity-free) variant of the
+                                     classical Riemann–von Mangoldt formula.
+                                     Closing it — or its multiplicity-aware
+                                     analogue — is open mathlib-scale work.
 
   Imports the real `riemannZeta` from mathlib v4.12.0 so the
   statements actually mention the analytic object, not a `Prop := True`
@@ -97,20 +101,30 @@ theorem N_monotone_in_sigma {σ₁ σ₂ : ℝ} (h : σ₁ ≤ σ₂) (T : ℝ)
     N σ₂ T ≤ N σ₁ T :=
   Set.ncard_le_ncard (zerosBox_subset h T) hfin
 
-/-- **Statement** of the Riemann–von Mangoldt zero-counting formula.
+/-- **Statement** of the *set-counting* analogue of the Riemann–von
+    Mangoldt zero-counting formula.
 
-    Standard form (see e.g. Titchmarsh, *Theory of the Riemann
+    Classical form (see e.g. Titchmarsh, *Theory of the Riemann
     Zeta-Function*, §9.4): there exists a constant `C > 0` such that
     for all `T ≥ 2`,
 
       `|N(0, T) − (T / 2π) · log(T / 2π) + T / 2π| ≤ C · log T`.
 
+    **Honest deviation from Titchmarsh.** Our `N σ T` is
+    `Set.ncard (zerosBox σ T)` — it counts *distinct* zeros and ignores
+    multiplicity. The classical statement counts zeros with multiplicity
+    (well-defined because the nontrivial zeros are isolated). Under
+    the (also classical, also open in mathlib) fact that all nontrivial
+    zeros in the rectangle are simple, the two statements coincide; we
+    do not assume that here. The constant `C` is required to be
+    strictly positive, matching the classical statement.
+
     **Statement only. Do NOT close with `True.intro`, `trivial`,
-    `sorry`, or any tautology.** Proving this is an open
-    mathlib-scale project; closing it honestly would be a real
-    contribution, and is the natural successor goal to this file. -/
-def RiemannVonMangoldt_statement : Prop :=
-  ∃ C : ℝ, ∀ T : ℝ, 2 ≤ T →
+    `sorry`, or any tautology.** Proving this — or its multiplicity-
+    aware analogue — is an open mathlib-scale project, and is the
+    natural successor goal to this file. -/
+def RiemannVonMangoldt_setCounting_statement : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∀ T : ℝ, 2 ≤ T →
     |((N 0 T : ℝ)) - (T / (2 * Real.pi)) * Real.log (T / (2 * Real.pi))
         + T / (2 * Real.pi)|
       ≤ C * Real.log T

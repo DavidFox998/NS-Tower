@@ -39,7 +39,9 @@ Status legend:
   the trivial monotonicity lemma `N_monotone_in_sigma` with axiom
   footprint contained in mathlib's classical core
   `{propext, Classical.choice, Quot.sound}` (no `sorryAx`, no
-  user-declared axioms), and pins `RiemannVonMangoldt_statement : Prop`
+  user-declared axioms), and pins
+  `RiemannVonMangoldt_setCounting_statement : Prop` (the multiplicity-free
+  variant of the classical Titchmarsh §9.4 statement, with `0 < C`)
   as a named target for a future plan. The lemma is conditional on
   finiteness of the larger box (the Riemann–von Mangoldt-adjacent
   fact that is itself not yet in mathlib v4.12.0) — discharging
