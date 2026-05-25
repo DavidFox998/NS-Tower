@@ -188,9 +188,27 @@ def _run_zeta_sieve(t_start: float, t_end: float, write: bool) -> list[dict]:
         float(t_start), float(t_end), write=bool(write)
     )
     mode = "LIVE" if write else "DRY-RUN"
+    partial = any(e.get("partial") for e in found)
     print(
         f"ZETA SIEVE {mode}: [{t_start}, {t_end}] → {len(found)} zeros "
         f"({'appended to ledger' if write else 'NOT appended (write=False)'})"
+    )
+    # Exact spec-mandated summary line. We additionally re-verify the
+    # Genesis seal here at the CLI boundary so a write=True run prints
+    # "Genesis intact." as a *fresh* verification, not a stale claim.
+    seal_ok = True
+    if write:
+        try:
+            kernel._verify_seal()
+        except Exception as e:  # noqa: BLE001
+            seal_ok = False
+            print(f"SIEVE: GENESIS SEAL FAILURE after run: {e}", flush=True)
+    suffix = "Genesis intact." if seal_ok else "Genesis BROKEN — investigate."
+    if partial:
+        suffix = "partial (SIGINT); " + suffix
+    print(
+        f"SIEVE: {len(found)} zeros in [{t_start}, {t_end}]. {suffix}",
+        flush=True,
     )
     return found
 

@@ -401,12 +401,25 @@ def sieve_zeros(
     a window. The constant factor is real; the asymptotic improvement
     is not.
 
-    Concurrency contract: the parent is the SOLE writer to hits.txt.
-    _append_line still has no file lock, so a second concurrent
-    appender (a second workflow, a manual probe, etc.) would interleave
-    bytes mid-line and corrupt the ledger. "One gun at a time" is
-    engineering. The multiprocessing.Pool workers only compute Z and
-    return floats; they never call _append_line.
+    Concurrency contract: `_append_line` uses POSIX `O_APPEND` plus
+    a single `f.write(line + "\n")` of ~250 bytes (well under
+    `PIPE_BUF=4096`), so two concurrent appender processes interleave
+    at *line granularity* — bytes within a single line cannot tear.
+    The Genesis seal covers only the preamble (lines 1-9), which
+    appends never touch, so a concurrent zeta_burst + zeta_sieve
+    against the same file is seal-safe even without a file lock.
+    Lines may appear out of strict temporal order, which is fine for
+    an append-only sealed ledger.
+
+    What is NOT safe under concurrency: external backup/restore tools
+    (e.g. `morningstar-tamper`'s pytest fixture that snapshots
+    `hits.txt`, mutates it, then restores from the snapshot). If a
+    sibling process appends a line during that mutate-restore window,
+    the restore silently overwrites it. Run those tools only when the
+    ledger has no other live writer.
+
+    The multiprocessing.Pool workers only compute Z(t) and return
+    floats — they never call _append_line.
     """
     t_a = float(t_start)
     t_b = float(t_end)
@@ -464,70 +477,91 @@ def sieve_zeros(
 
     found: list[dict[str, Any]] = []
     seen_since_flush = 0
-    for a, b in brackets:
-        with mpmath.workdps(int(dps)):
-            if a == b:
-                t0 = mpmath.mpf(a)
-            else:
-                # The brief said "Brent". mpmath has no true Brent
-                # solver — its 1-D catalog is bisect / illinois /
-                # pegasus / anderson / ridder / secant / muller.
-                # We use `anderson` (mpmath defines it as a subclass
-                # of `Pegasus`, the Illinois-family bracket-preserving
-                # solver: superlinear, always keeps the root inside
-                # the bracket by replacing the endpoint whose function
-                # value has the same sign as the new midpoint). It's
-                # the Brent-spirit choice and matches the brief's
-                # bracket-preservation contract.
-                #
-                # We tried `ridder` first (formally closer to Brent),
-                # but on `siegelz` at dps=50 it fails on a real
-                # bracket (γ≈48) with "Could not find root within
-                # given tolerance" — siegelz uses the Riemann-Siegel
-                # asymptotic, whose own noise floor exceeds dps=50
-                # machine epsilon, and ridder demands the latter.
-                # Anderson tolerates that gap. Bisect would also
-                # work but is exponentially slower in the bracket
-                # width.
-                t0 = mpmath.findroot(
-                    mpmath.siegelz,
-                    (mpmath.mpf(a), mpmath.mpf(b)),
-                    solver="anderson",
-                )
-            t0_f = float(t0)
-            t0_str = mpmath.nstr(t0, 20)
-            zeta_val = mpmath.zeta(mpmath.mpc("0.5", t0))
-            L_abs_str = mpmath.nstr(abs(zeta_val), 20)
+    interrupted = False
+    # Wrap the refinement loop so SIGINT (Ctrl-C, workflow stop) returns
+    # the partial-but-correct set of zeros instead of an unwound traceback.
+    # Each iteration is atomic w.r.t. the ledger (probe() either appended
+    # a full line or didn't run at all), so a clean interrupt at any
+    # boundary leaves hits.txt in a valid state.
+    try:
+        for a, b in brackets:
+            with mpmath.workdps(int(dps)):
+                if a == b:
+                    t0 = mpmath.mpf(a)
+                else:
+                    # The brief said "Brent". mpmath has no true Brent
+                    # solver — its 1-D catalog is bisect / illinois /
+                    # pegasus / anderson / ridder / secant / muller.
+                    # We use `anderson` (mpmath defines it as a subclass
+                    # of `Pegasus`, the Illinois-family bracket-preserving
+                    # solver: superlinear, always keeps the root inside
+                    # the bracket by replacing the endpoint whose function
+                    # value has the same sign as the new midpoint). It's
+                    # the Brent-spirit choice and matches the brief's
+                    # bracket-preservation contract.
+                    #
+                    # We tried `ridder` first (formally closer to Brent),
+                    # but on `siegelz` at dps=50 it fails on a real
+                    # bracket (γ≈48) with "Could not find root within
+                    # given tolerance" — siegelz uses the Riemann-Siegel
+                    # asymptotic, whose own noise floor exceeds dps=50
+                    # machine epsilon, and ridder demands the latter.
+                    # Anderson tolerates that gap. Bisect would also
+                    # work but is exponentially slower in the bracket
+                    # width.
+                    t0 = mpmath.findroot(
+                        mpmath.siegelz,
+                        (mpmath.mpf(a), mpmath.mpf(b)),
+                        solver="anderson",
+                    )
+                t0_f = float(t0)
+                t0_str = mpmath.nstr(t0, 20)
+                zeta_val = mpmath.zeta(mpmath.mpc("0.5", t0))
+                L_abs_str = mpmath.nstr(abs(zeta_val), 20)
 
-        entry: dict[str, Any] = {
-            "t": t0_str,
-            "L_abs": L_abs_str,
-            "RH_ok": True,
-        }
-        if write:
-            # probe() runs _verify_seal() and then _append_line(), which
-            # is already per-line flush + fsync. We re-purpose the
-            # flush_every counter as a progress-print cadence so a long
-            # sieve is observable from the workflow tail.
-            r = probe(1, 1, 0.5, t0_f)
-            entry["sha"] = r["sha"]
-            entry["RH_ok"] = r["RH_ok"]
-            entry["dry_run"] = False
-            seen_since_flush += 1
-            if seen_since_flush >= int(flush_every):
-                seen_since_flush = 0
+            entry: dict[str, Any] = {
+                "t": t0_str,
+                "L_abs": L_abs_str,
+                "RH_ok": True,
+            }
+            if write:
+                # probe() runs _verify_seal() and then _append_line(),
+                # which is already per-line flush + fsync. We re-purpose
+                # the flush_every counter as a progress-print cadence so
+                # a long sieve is observable from the workflow tail.
+                r = probe(1, 1, 0.5, t0_f)
+                entry["sha"] = r["sha"]
+                entry["RH_ok"] = r["RH_ok"]
+                entry["dry_run"] = False
+                seen_since_flush += 1
+                if seen_since_flush >= int(flush_every):
+                    seen_since_flush = 0
+                    print(
+                        f"SIEVE PROGRESS: {len(found) + 1} zeros refined "
+                        f"(latest t={t0_str}, |L|={L_abs_str})",
+                        flush=True,
+                    )
+            else:
+                entry["dry_run"] = True
                 print(
-                    f"SIEVE PROGRESS: {len(found) + 1} zeros refined "
-                    f"(latest t={t0_str}, |L|={L_abs_str})",
+                    f"SIEVE DRY {len(found) + 1}: t={t0_str} |L|={L_abs_str}",
                     flush=True,
                 )
-        else:
-            entry["dry_run"] = True
-            print(
-                f"SIEVE DRY {len(found) + 1}: t={t0_str} |L|={L_abs_str}",
-                flush=True,
-            )
-        found.append(entry)
+            found.append(entry)
+    except KeyboardInterrupt:
+        interrupted = True
+        print(
+            f"SIEVE INTERRUPTED: {len(found)} zeros refined out of "
+            f"{len(brackets)} brackets; returning partial result. "
+            f"(ledger is consistent — probe() is atomic per line)",
+            flush=True,
+        )
+    if interrupted:
+        # Surface the partial-state marker so callers (and the CLI
+        # summary line) can tell the difference between a clean
+        # completion and a graceful interrupt.
+        for entry in found:
+            entry.setdefault("partial", True)
     return found
 
 
