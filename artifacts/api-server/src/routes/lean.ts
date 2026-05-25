@@ -35,6 +35,7 @@ interface RebuildHistoryEntry {
   ok: boolean;
   error: string | null;
   streamed: boolean;
+  refereeName: string | null;
 }
 
 const REBUILD_HISTORY_CAPACITY = 20;
@@ -51,6 +52,7 @@ async function recordRebuildAttempt(
       ok: entry.ok,
       error: entry.error,
       streamed: entry.streamed,
+      refereeName: entry.refereeName,
     });
 
     // Trim to capacity: delete rows older than the Nth most recent.
@@ -83,6 +85,7 @@ async function listRebuildHistory(): Promise<RebuildHistoryEntry[]> {
     ok: r.ok,
     error: r.error,
     streamed: r.streamed,
+    refereeName: r.refereeName,
   }));
 }
 
@@ -193,8 +196,49 @@ function timingSafeEqual(a: string, b: string): boolean {
 }
 
 type RebuildAuthResult =
-  | { ok: true }
+  | { ok: true; refereeName: string | null }
   | { ok: false; status: number; error: string; retryAfterSec?: number };
+
+const REFEREE_NAME_PATTERN = /^[A-Za-z0-9 _.\-]{1,64}$/;
+
+function sanitizeRefereeName(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (!REFEREE_NAME_PATTERN.test(trimmed)) return null;
+  return trimmed;
+}
+
+interface NamedToken {
+  name: string;
+  token: string;
+}
+
+let namedTokensCache: { raw: string | undefined; tokens: NamedToken[] } = {
+  raw: undefined,
+  tokens: [],
+};
+
+function getNamedTokens(): NamedToken[] {
+  const raw = process.env["LEAN_REBUILD_TOKENS"];
+  if (raw === namedTokensCache.raw) return namedTokensCache.tokens;
+  const tokens: NamedToken[] = [];
+  if (raw && raw.trim().length > 0) {
+    for (const pair of raw.split(",")) {
+      const trimmed = pair.trim();
+      if (!trimmed) continue;
+      const colon = trimmed.indexOf(":");
+      if (colon <= 0 || colon === trimmed.length - 1) continue;
+      const name = trimmed.slice(0, colon).trim();
+      const token = trimmed.slice(colon + 1).trim();
+      if (!name || !token) continue;
+      if (!REFEREE_NAME_PATTERN.test(name)) continue;
+      tokens.push({ name, token });
+    }
+  }
+  namedTokensCache = { raw, tokens };
+  return tokens;
+}
 
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_MS = 15 * 60 * 1000;
@@ -287,20 +331,45 @@ function checkRebuildAuth(req: import("express").Request): RebuildAuthResult {
     };
   }
 
-  const expectedToken = process.env["LEAN_REBUILD_TOKEN"];
-  if (!expectedToken || expectedToken.length === 0) {
-    req.log.warn("Rebuild blocked: LEAN_REBUILD_TOKEN not configured");
+  const sharedToken = process.env["LEAN_REBUILD_TOKEN"];
+  const namedTokens = getNamedTokens();
+  const hasShared = Boolean(sharedToken && sharedToken.length > 0);
+  if (!hasShared && namedTokens.length === 0) {
+    req.log.warn(
+      "Rebuild blocked: neither LEAN_REBUILD_TOKEN nor LEAN_REBUILD_TOKENS is configured",
+    );
     return {
       ok: false,
       status: 503,
       error:
-        "Lean rebuild is disabled on this server: LEAN_REBUILD_TOKEN is not configured. Set the secret to enable referee-driven rebuilds.",
+        "Lean rebuild is disabled on this server: neither LEAN_REBUILD_TOKEN nor LEAN_REBUILD_TOKENS is configured. Set one to enable referee-driven rebuilds.",
     };
   }
   const provided = extractBearerToken(req.headers["authorization"]);
-  if (!provided || !timingSafeEqual(provided, expectedToken)) {
+  if (!provided) {
     recordAuthFailure(ip, req.log);
-    req.log.warn({ ip, hasHeader: Boolean(provided) }, "Rebuild blocked: bad token");
+    req.log.warn({ ip, hasHeader: false }, "Rebuild blocked: bad token");
+    return {
+      ok: false,
+      status: 401,
+      error:
+        "Unauthorized: a valid referee rebuild token is required (Authorization: Bearer <token>).",
+    };
+  }
+  let matchedName: string | null = null;
+  for (const nt of namedTokens) {
+    if (timingSafeEqual(provided, nt.token)) {
+      matchedName = nt.name;
+      break;
+    }
+  }
+  let isSharedMatch = false;
+  if (matchedName === null && hasShared && timingSafeEqual(provided, sharedToken!)) {
+    isSharedMatch = true;
+  }
+  if (matchedName === null && !isSharedMatch) {
+    recordAuthFailure(ip, req.log);
+    req.log.warn({ ip, hasHeader: true }, "Rebuild blocked: bad token");
     return {
       ok: false,
       status: 401,
@@ -309,7 +378,17 @@ function checkRebuildAuth(req: import("express").Request): RebuildAuthResult {
     };
   }
   clearAuthFailures(ip);
-  return { ok: true };
+  let refereeName: string | null;
+  if (matchedName !== null) {
+    // Named tokens are authoritative — ignore any X-Referee-Name header
+    // so a referee can't impersonate another by spoofing the header.
+    refereeName = matchedName;
+  } else {
+    const header = req.headers["x-referee-name"];
+    const headerValue = Array.isArray(header) ? header[0] : header;
+    refereeName = sanitizeRefereeName(headerValue);
+  }
+  return { ok: true, refereeName };
 }
 
 function applyAuthFailureHeaders(
@@ -570,6 +649,7 @@ router.post("/lean/verify/rebuild/stream", (req, res) => {
         durationMs,
         error: payload.error,
         streamed: true,
+        refereeName: auth.refereeName,
       },
       "Lean rebuild attempted",
     );
@@ -582,6 +662,7 @@ router.post("/lean/verify/rebuild/stream", (req, res) => {
         ok: payload.ok,
         error: payload.error,
         streamed: true,
+        refereeName: auth.refereeName,
       },
       req.log,
     );
@@ -800,6 +881,7 @@ router.post("/lean/verify/rebuild", (req, res) => {
         exitCode: payload.exitCode,
         durationMs,
         error: payload.error,
+        refereeName: auth.refereeName,
       },
       "Lean rebuild attempted",
     );
@@ -812,6 +894,7 @@ router.post("/lean/verify/rebuild", (req, res) => {
         ok: payload.ok,
         error: payload.error,
         streamed: false,
+        refereeName: auth.refereeName,
       },
       req.log,
     );

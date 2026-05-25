@@ -30,6 +30,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
 const REBUILD_TOKEN_STORAGE_KEY = "lean-rebuild-token";
+const REBUILD_REFEREE_NAME_STORAGE_KEY = "lean-rebuild-referee-name";
+const REFEREE_NAME_PATTERN = /^[A-Za-z0-9 _.\-]{1,64}$/;
 
 const STALE_THRESHOLD_DAYS = 30;
 
@@ -86,14 +88,17 @@ const REBUILD_CANCEL_URL = `${import.meta.env.BASE_URL}api/lean/verify/rebuild/c
 
 async function streamRebuild(
   token: string,
+  refereeName: string,
   onLine: (line: RebuildLogLine) => void,
   signal: AbortSignal,
 ): Promise<{ kind: "result"; payload: RebuildResultPayload } | { kind: "error"; error: string; status?: number }> {
   let response: Response;
   try {
+    const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+    if (refereeName) headers["X-Referee-Name"] = refereeName;
     response = await fetch(REBUILD_STREAM_URL, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers,
       signal,
     });
   } catch (err) {
@@ -177,6 +182,8 @@ export default function DashboardPage() {
   const { data: rebuildHistory } = useGetLeanRebuildHistory();
   const queryClient = useQueryClient();
   const [rebuildToken, setRebuildToken] = useState<string>("");
+  const [refereeName, setRefereeName] = useState<string>("");
+  const [refereeNameError, setRefereeNameError] = useState<string | null>(null);
   const lockoutsAuthHeader = rebuildToken
     ? { Authorization: `Bearer ${rebuildToken}` }
     : undefined;
@@ -253,6 +260,7 @@ export default function DashboardPage() {
     try {
       const outcome = await streamRebuild(
         rebuildToken,
+        refereeName,
         (line) => setRebuildLogLines((prev) => [...prev, line]),
         controller.signal,
       );
@@ -309,9 +317,13 @@ export default function DashboardPage() {
     setShowCancelConfirm(false);
     setIsCancelling(true);
     try {
+      const cancelHeaders: Record<string, string> = {
+        Authorization: `Bearer ${rebuildToken}`,
+      };
+      if (refereeName) cancelHeaders["X-Referee-Name"] = refereeName;
       const res = await fetch(REBUILD_CANCEL_URL, {
         method: "POST",
-        headers: { Authorization: `Bearer ${rebuildToken}` },
+        headers: cancelHeaders,
       });
       if (!res.ok) {
         let detail = `HTTP ${res.status}`;
@@ -352,6 +364,10 @@ export default function DashboardPage() {
     try {
       const stored = window.localStorage.getItem(REBUILD_TOKEN_STORAGE_KEY);
       if (stored) setRebuildToken(stored);
+      const storedName = window.localStorage.getItem(
+        REBUILD_REFEREE_NAME_STORAGE_KEY,
+      );
+      if (storedName) setRefereeName(storedName);
     } catch {
       // ignore (private mode, etc.)
     }
@@ -696,15 +712,41 @@ export default function DashboardPage() {
                       type="password"
                       value={rebuildToken}
                       onChange={(e) => setRebuildToken(e.target.value)}
-                      placeholder="Bearer token (LEAN_REBUILD_TOKEN)"
+                      placeholder="Bearer token (LEAN_REBUILD_TOKEN or one of LEAN_REBUILD_TOKENS)"
                       className="font-mono text-xs px-2 py-1 bg-background border border-border focus:outline-none focus:border-primary"
                       data-testid="input-rebuild-token"
+                      autoComplete="off"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1 flex-1 min-w-[12rem]">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                      Referee name (optional)
+                    </span>
+                    <input
+                      type="text"
+                      value={refereeName}
+                      onChange={(e) => {
+                        setRefereeName(e.target.value);
+                        setRefereeNameError(null);
+                      }}
+                      placeholder="e.g. Alice (shared-token audit label)"
+                      maxLength={64}
+                      className="font-mono text-xs px-2 py-1 bg-background border border-border focus:outline-none focus:border-primary"
+                      data-testid="input-referee-name"
                       autoComplete="off"
                     />
                   </label>
                   <button
                     type="button"
                     onClick={() => {
+                      const trimmedName = refereeName.trim();
+                      if (trimmedName && !REFEREE_NAME_PATTERN.test(trimmedName)) {
+                        setRefereeNameError(
+                          "Referee name must be 1–64 chars: letters, digits, spaces, _.- only.",
+                        );
+                        return;
+                      }
+                      setRefereeName(trimmedName);
                       try {
                         if (rebuildToken) {
                           window.localStorage.setItem(
@@ -714,9 +756,20 @@ export default function DashboardPage() {
                         } else {
                           window.localStorage.removeItem(REBUILD_TOKEN_STORAGE_KEY);
                         }
+                        if (trimmedName) {
+                          window.localStorage.setItem(
+                            REBUILD_REFEREE_NAME_STORAGE_KEY,
+                            trimmedName,
+                          );
+                        } else {
+                          window.localStorage.removeItem(
+                            REBUILD_REFEREE_NAME_STORAGE_KEY,
+                          );
+                        }
                       } catch {
                         // ignore
                       }
+                      setRefereeNameError(null);
                       setShowTokenInput(false);
                     }}
                     className="px-3 py-1 border border-border bg-background font-mono text-[11px] uppercase tracking-wider hover:bg-muted"
@@ -724,10 +777,22 @@ export default function DashboardPage() {
                   >
                     Save
                   </button>
+                  {refereeNameError ? (
+                    <p
+                      className="basis-full font-mono text-[11px] text-red-700 dark:text-red-400"
+                      data-testid="text-referee-name-error"
+                    >
+                      {refereeNameError}
+                    </p>
+                  ) : null}
                   <p className="basis-full font-mono text-[11px] text-muted-foreground">
-                    Stored in your browser only. The server must have
-                    <code className="mx-1">LEAN_REBUILD_TOKEN</code>
-                    set for rebuilds to be accepted.
+                    Stored in your browser only. The server accepts either a
+                    shared <code className="mx-1">LEAN_REBUILD_TOKEN</code>
+                    (in which case the referee name is sent as
+                    <code className="mx-1">X-Referee-Name</code> for audit) or a
+                    named token from <code className="mx-1">LEAN_REBUILD_TOKENS</code>
+                    (format <code>name1:tok1,name2:tok2</code>), where the name
+                    is taken from the token itself.
                   </p>
                 </div>
               ) : null}
@@ -785,6 +850,20 @@ export default function DashboardPage() {
                         </span>
                         <span className="text-muted-foreground md:w-16">
                           {entry.streamed ? "stream" : "sync"}
+                        </span>
+                        <span
+                          className={`md:w-40 truncate ${
+                            entry.refereeName
+                              ? "text-foreground"
+                              : "text-muted-foreground italic"
+                          }`}
+                          title={
+                            entry.refereeName ??
+                            "anonymous (no referee name supplied)"
+                          }
+                          data-testid={`text-rebuild-history-referee-${i}`}
+                        >
+                          by {entry.refereeName ?? "anonymous"}
                         </span>
                         {entry.error ? (
                           <span

@@ -120,6 +120,16 @@ export interface LeanRebuildHistoryEntry {
   error?: string | null;
   /** True if this attempt was made via the streaming SSE endpoint */
   streamed: boolean;
+  /**
+     * Identity of the referee who triggered this rebuild. With named
+  tokens (`LEAN_REBUILD_TOKENS=alice:tok1,bob:tok2`), this is the
+  token's owner name. With the shared `LEAN_REBUILD_TOKEN`, this
+  is the sanitized value of the optional `X-Referee-Name`
+  request header (or `null` if not provided).
+
+     * @nullable
+     */
+  refereeName?: string | null;
 }
 
 export interface LeanRebuildHistory {

@@ -177,7 +177,8 @@ export const GetLeanRebuildHistoryResponse = zod.object({
   "exitCode": zod.number().describe('Exit code of the rebuild script (or -1 if it could not be spawned)'),
   "ok": zod.boolean().describe('True iff the rebuild exited 0 and VERIFY.txt was refreshed'),
   "error": zod.string().nullish().describe('High-level error message when the rebuild failed'),
-  "streamed": zod.boolean().describe('True if this attempt was made via the streaming SSE endpoint')
+  "streamed": zod.boolean().describe('True if this attempt was made via the streaming SSE endpoint'),
+  "refereeName": zod.string().nullish().describe('Identity of the referee who triggered this rebuild. With named\ntokens (`LEAN_REBUILD_TOKENS=alice:tok1,bob:tok2`), this is the\ntoken\'s owner name. With the shared `LEAN_REBUILD_TOKEN`, this\nis the sanitized value of the optional `X-Referee-Name`\nrequest header (or `null` if not provided).\n')
 })).describe('Most recent attempts first'),
   "capacity": zod.number().describe('Maximum number of attempts retained in memory')
 })

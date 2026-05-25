@@ -10,6 +10,7 @@ export const leanRebuildHistoryTable = pgTable(
     ok: boolean("ok").notNull(),
     error: text("error"),
     streamed: boolean("streamed").notNull(),
+    refereeName: text("referee_name"),
   },
   (table) => ({
     timestampIdx: index("lean_rebuild_history_timestamp_idx").on(table.timestamp),
