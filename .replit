@@ -28,6 +28,10 @@ args = "kernel-numerics"
 task = "workflow.run"
 args = "morningstar-tamper"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "zeta-burst-101-10000"
+
 [[workflows.workflow]]
 name = "lean-proof"
 author = "agent"
@@ -60,6 +64,17 @@ args = "python -m pytest tests/test_morningstar.py -q"
 
 [workflows.workflow.metadata]
 isValidation = true
+
+[[workflows.workflow]]
+name = "zeta-burst-101-10000"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python lab.py -c \"zeta_burst(101, 10000)\""
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [agent]
 stack = "PNPM_WORKSPACE"
