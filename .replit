@@ -20,6 +20,10 @@ author = "agent"
 task = "workflow.run"
 args = "lean-proof"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "kernel-numerics"
+
 [[workflows.workflow]]
 name = "lean-proof"
 author = "agent"
@@ -30,6 +34,17 @@ isValidation = true
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "STRICT_LEAN_CHECK=1 ./scripts/check-lean-proof.sh"
+
+[[workflows.workflow]]
+name = "kernel-numerics"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m pytest tests/test_kernel.py -q"
+
+[workflows.workflow.metadata]
+isValidation = true
 
 [agent]
 stack = "PNPM_WORKSPACE"

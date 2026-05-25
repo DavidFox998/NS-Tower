@@ -180,6 +180,7 @@ L-function evaluation.
 
 ## MorningStar-Lab tests
 
+- `python -m pytest tests/test_kernel.py -q` (registered as the `kernel-numerics` validation) pins the mpmath L-function backend numerics for `kernel.probe()`: tag `MPMATH_ZETA` with `|L|<1e-6` at the first nontrivial ζ zero, `|ζ(2) - π²/6| < 1e-10`, tag `MPMATH_DIRICHLET_TRIVIAL` for `(h=1, N=19, s=0.5)` matching `ζ(0.5)·(1 - 19^{-0.5})`, and tag `NEEDS_SAGE` with `reason=h>=2_out_of_scope_for_mpmath_backend` for `h=2`. Each test monkeypatches `kernel.HITS` to a `tmp_path` file so the real append-only ledger is untouched.
 - `python -m pytest tests/test_morningstar.py -q` runs the Genesis-seal tamper-evidence suite. It asserts that `scripts/check-genesis-seal.py` exits non-zero on byte-flips, line-swaps, and pre-marker insertions in `data/hits.txt`; that the unmodified file still passes; that `lean_bridge._guard` refuses rendered Lean containing `axiom `, `sorry`, or `admit `; that `_genesis_integers` never lifts non-numeric lines like `axiom foo` into emitted Lean; and that `kernel.probe()` raises before appending when the Genesis preamble is tampered. A pytest fixture backs up and restores `data/hits.txt` so a mid-test crash cannot leave the ledger corrupted.
 
 ## Pointers
