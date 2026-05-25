@@ -745,4 +745,35 @@ describe("rebuild cooldown surfaces Retry-After (429) even with a valid token", 
     // Only the first (successful) rebuild was persisted.
     expect(insertedRows).toHaveLength(1);
   });
+
+  it("rejects a second streamed rebuild within the cooldown window (different IP, same token)", async () => {
+    process.env["LEAN_REBUILD_TOKEN"] = "shared";
+    spawnHandler = (child) => {
+      child.stdout.emit("data", Buffer.from("done\n"));
+      child.emit("close", 0, null);
+    };
+    const first = await openStream({
+      ip: "11.11.11.11",
+      authorization: "Bearer shared",
+    });
+    expect(first.status).toBe(200);
+    // Drain the first stream to completion so rebuildInFlight clears.
+    const firstEvents = await consumeSse(first);
+    expect(firstEvents.find((e) => e.event === "result")?.data.ok).toBe(true);
+    expect(insertedRows).toHaveLength(1);
+
+    const second = await openStream({
+      ip: "12.12.12.12",
+      authorization: "Bearer shared",
+    });
+    expect(second.status).toBe(429);
+    expect(second.headers.get("content-type")).toMatch(/json/);
+    const retryAfter = Number(second.headers.get("retry-after"));
+    expect(retryAfter).toBeGreaterThan(0);
+    const body = await second.json();
+    expect(body.error).toMatch(/rate-limited/i);
+
+    // No history row was inserted for the rejected second attempt.
+    expect(insertedRows).toHaveLength(1);
+  });
 });
