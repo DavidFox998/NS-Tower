@@ -1653,14 +1653,14 @@ export default function DashboardPage() {
             const isStale =
               ledgerIntegrity?.status === "ok" && ledgerIntegrity?.stale === true;
             const thresholdSec = ledgerIntegrity?.staleThresholdSeconds ?? null;
-            const thresholdLabel =
-              thresholdSec != null
-                ? thresholdSec >= 3600
-                  ? `${Math.round(thresholdSec / 3600)}h`
-                  : thresholdSec >= 60
-                    ? `${Math.round(thresholdSec / 60)}m`
-                    : `${thresholdSec}s`
-                : null;
+            const fmtAge = (sec: number | null | undefined): string | null => {
+              if (sec == null) return null;
+              if (sec >= 86400) return `${Math.round(sec / 86400)}d`;
+              if (sec >= 3600) return `${Math.round(sec / 3600)}h`;
+              if (sec >= 60) return `${Math.round(sec / 60)}m`;
+              return `${sec}s`;
+            };
+            const thresholdLabel = fmtAge(thresholdSec);
             return (
               <p
                 className={`text-xs font-mono ${
@@ -1694,6 +1694,75 @@ export default function DashboardPage() {
                     data-testid="badge-ledger-stale"
                   >
                     STALE — verifier may have stopped
+                  </span>
+                ) : null}
+              </p>
+            );
+          })()}
+
+          {(() => {
+            // Task #96: checkpoint-sidecar staleness. Distinct from
+            // `stale` (verifier-not-running) — this flags that the
+            // committed known-good prefix hasn't been re-rolled in too
+            // long, so tamper coverage of the live ledger is shrinking.
+            if (!ledgerIntegrity) return null;
+            const cpStale = ledgerIntegrity.checkpointStale === true;
+            const cpAge = ledgerIntegrity.checkpointAgeSeconds ?? null;
+            const cpThr =
+              ledgerIntegrity.checkpointStaleThresholdSeconds ?? null;
+            const cov = ledgerIntegrity.checkpointCoverageRatio ?? null;
+            const fmt = (sec: number | null): string | null => {
+              if (sec == null) return null;
+              if (sec >= 86400) return `${Math.round(sec / 86400)}d`;
+              if (sec >= 3600) return `${Math.round(sec / 3600)}h`;
+              if (sec >= 60) return `${Math.round(sec / 60)}m`;
+              return `${sec}s`;
+            };
+            const ageLabel = fmt(cpAge) ?? "unknown";
+            const thrLabel = fmt(cpThr);
+            const covPct =
+              cov != null ? `${(cov * 100).toFixed(1)}%` : null;
+            return (
+              <p
+                className={`text-xs font-mono ${
+                  cpStale
+                    ? "border border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400 px-3 py-2"
+                    : "text-muted-foreground"
+                }`}
+                data-testid="text-ledger-checkpoint-age"
+                data-checkpoint-stale={cpStale ? "true" : "false"}
+                title={
+                  ledgerIntegrity.checkpointLastModified
+                    ? `checkpoint last re-rolled at ${ledgerIntegrity.checkpointLastModified}`
+                    : "checkpoint sidecar is missing or unreadable"
+                }
+              >
+                checkpoint re-rolled:{" "}
+                <span className={cpStale ? "" : "text-foreground"}>
+                  {ageLabel === "unknown" ? "never" : `${ageLabel} ago`}
+                </span>
+                {thrLabel ? (
+                  <span
+                    className="ml-2 text-muted-foreground"
+                    data-testid="text-ledger-checkpoint-threshold"
+                  >
+                    (stale &gt; {thrLabel})
+                  </span>
+                ) : null}
+                {covPct ? (
+                  <span
+                    className="ml-2 text-muted-foreground"
+                    data-testid="text-ledger-checkpoint-coverage"
+                  >
+                    coverage {covPct}
+                  </span>
+                ) : null}
+                {cpStale ? (
+                  <span
+                    className="ml-2 font-bold uppercase tracking-wider"
+                    data-testid="badge-ledger-checkpoint-stale"
+                  >
+                    CHECKPOINT STALE — re-roll the sealed prefix
                   </span>
                 ) : null}
               </p>

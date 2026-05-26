@@ -133,4 +133,48 @@ export interface LedgerIntegrityStatus {
   running" from "the verifier ran and the ledger is broken".
    */
   stale?: boolean;
+  /**
+     * ISO-8601 mtime of `data/hits.txt.checkpoint`. Null when the
+  checkpoint file is missing or unstatable.
+
+     * @nullable
+     */
+  checkpointLastModified?: Date | null;
+  /**
+     * Server-computed age of the checkpoint sidecar (now minus
+  mtime), whole seconds. Null when the checkpoint is missing.
+
+     * @nullable
+     */
+  checkpointAgeSeconds?: number | null;
+  /**
+     * `checkpointSize / liveSize` clamped to [0,1]. The known-good
+  sealed prefix as a fraction of the live ledger. Shrinks as
+  appends accumulate without the committed checkpoint being
+  re-rolled. Null when either size is unknown or the live
+  ledger is empty.
+
+     * @nullable
+     */
+  checkpointCoverageRatio?: number | null;
+  /** Configured threshold in seconds beyond which the
+  checkpoint sidecar itself is considered stale (not
+  re-rolled in too long). Sourced from
+  `LEDGER_CHECKPOINT_STALE_THRESHOLD_SECONDS` (default
+  2,592,000 = 30 days). Distinct from `staleThresholdSeconds`,
+  which only flags the verifier loop.
+   */
+  checkpointStaleThresholdSeconds?: number;
+  /** Task #96. True when `checkpointAgeSeconds` is null
+  (checkpoint missing) OR exceeds
+  `checkpointStaleThresholdSeconds`. Means the committed
+  known-good prefix hasn't been re-rolled in too long, so
+  tamper coverage of the live ledger is shrinking. Distinct
+  from `stale` (which means the verifier itself hasn't run);
+  the dashboard surfaces them as two separate warnings so
+  operators don't confuse "nobody has verified the ledger
+  lately" with "the verifier ran fine but the sealed prefix
+  is far behind the live file".
+   */
+  checkpointStale?: boolean;
 }

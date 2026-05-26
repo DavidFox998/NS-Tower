@@ -46,17 +46,45 @@ interface LedgerIntegrityStatus {
   lastCheckedAt: string | null;
   staleThresholdSeconds: number;
   stale: boolean;
+  checkpointLastModified: string | null;
+  checkpointAgeSeconds: number | null;
+  checkpointCoverageRatio: number | null;
+  checkpointStaleThresholdSeconds: number;
+  checkpointStale: boolean;
 }
 
 const DEFAULT_STALE_THRESHOLD_SECONDS = 3600;
+// Task #96: how old the committed checkpoint sidecar
+// (`data/hits.txt.checkpoint`) may get before we flag the operator
+// that the known-good prefix is no longer being re-rolled. Default
+// 30 days — long enough to allow normal append-only workflow, short
+// enough that a months-long stall surfaces before tamper coverage
+// shrinks too far.
+const DEFAULT_CHECKPOINT_STALE_THRESHOLD_SECONDS = 2_592_000;
+
+function resolvePositiveSeconds(
+  raw: string | undefined,
+  fallback: number,
+): number {
+  if (raw == null) return fallback;
+  const trimmed = raw.trim();
+  if (trimmed === "") return fallback;
+  const n = Number(trimmed);
+  if (!Number.isFinite(n) || n <= 0) return fallback;
+  return Math.floor(n);
+}
 
 function resolveStaleThresholdSeconds(raw: string | undefined): number {
-  if (raw == null) return DEFAULT_STALE_THRESHOLD_SECONDS;
-  const trimmed = raw.trim();
-  if (trimmed === "") return DEFAULT_STALE_THRESHOLD_SECONDS;
-  const n = Number(trimmed);
-  if (!Number.isFinite(n) || n <= 0) return DEFAULT_STALE_THRESHOLD_SECONDS;
-  return Math.floor(n);
+  return resolvePositiveSeconds(raw, DEFAULT_STALE_THRESHOLD_SECONDS);
+}
+
+function resolveCheckpointStaleThresholdSeconds(
+  raw: string | undefined,
+): number {
+  return resolvePositiveSeconds(
+    raw,
+    DEFAULT_CHECKPOINT_STALE_THRESHOLD_SECONDS,
+  );
 }
 
 function resolveRepoRoot(): string {
@@ -102,6 +130,7 @@ export interface LedgerRouterOptions {
    */
   secretPath?: string;
   staleThresholdSeconds?: number;
+  checkpointStaleThresholdSeconds?: number;
 }
 
 export type { LedgerIntegrityStatus, FailureMode };
@@ -328,6 +357,14 @@ export function createLedgerChecker(opts: LedgerRouterOptions): LedgerChecker {
     opts.staleThresholdSeconds != null && Number.isFinite(opts.staleThresholdSeconds) && opts.staleThresholdSeconds > 0
       ? Math.floor(opts.staleThresholdSeconds)
       : resolveStaleThresholdSeconds(process.env.LEDGER_STALE_THRESHOLD_SECONDS);
+  const CHECKPOINT_STALE_THRESHOLD_SECONDS =
+    opts.checkpointStaleThresholdSeconds != null &&
+    Number.isFinite(opts.checkpointStaleThresholdSeconds) &&
+    opts.checkpointStaleThresholdSeconds > 0
+      ? Math.floor(opts.checkpointStaleThresholdSeconds)
+      : resolveCheckpointStaleThresholdSeconds(
+          process.env.LEDGER_CHECKPOINT_STALE_THRESHOLD_SECONDS,
+        );
   const SIDECAR_SECRET = loadOrCreateSecret(SECRET_PATH, defaultLogger);
   const persisted = readPersistedState(
     LAST_OK_PATH,
@@ -354,9 +391,76 @@ export function createLedgerChecker(opts: LedgerRouterOptions): LedgerChecker {
     return { lastOkAgeSeconds: ageSeconds, stale: ageSeconds > STALE_THRESHOLD_SECONDS };
   }
 
+  function computeCheckpointMetrics(
+    checkedAtIso: string,
+    liveSize: number | null,
+  ): {
+    checkpointLastModified: string | null;
+    checkpointAgeSeconds: number | null;
+    checkpointCoverageRatio: number | null;
+    checkpointStale: boolean;
+    checkpointSize: number | null;
+  } {
+    let checkpointLastModified: string | null = null;
+    let checkpointAgeSeconds: number | null = null;
+    let checkpointSize: number | null = null;
+    try {
+      if (existsSync(CHECKPOINT)) {
+        const st = statSync(CHECKPOINT);
+        checkpointLastModified = st.mtime.toISOString();
+        const nowMs = Date.parse(checkedAtIso);
+        const mtimeMs = st.mtime.getTime();
+        if (Number.isFinite(nowMs) && Number.isFinite(mtimeMs)) {
+          checkpointAgeSeconds = Math.max(
+            0,
+            Math.floor((nowMs - mtimeMs) / 1000),
+          );
+        }
+      }
+    } catch {
+      /* best-effort */
+    }
+    const tuple = readCheckpointTuple(CHECKPOINT);
+    if (tuple) checkpointSize = tuple.size;
+    let checkpointCoverageRatio: number | null = null;
+    if (
+      checkpointSize != null &&
+      liveSize != null &&
+      liveSize > 0
+    ) {
+      checkpointCoverageRatio = Math.min(1, checkpointSize / liveSize);
+    }
+    const checkpointStale =
+      checkpointAgeSeconds == null ||
+      checkpointAgeSeconds > CHECKPOINT_STALE_THRESHOLD_SECONDS;
+    return {
+      checkpointLastModified,
+      checkpointAgeSeconds,
+      checkpointCoverageRatio,
+      checkpointStale,
+      checkpointSize,
+    };
+  }
+
   function buildStatus(): LedgerIntegrityStatus {
+    const result = buildStatusInner();
+    // Recompute coverage with the final liveSize so the coverage ratio
+    // reflects the actual on-disk file, not the placeholder we seeded
+    // before stat'ing the ledger.
+    const m = computeCheckpointMetrics(result.checkedAt, result.liveSize);
+    return {
+      ...result,
+      checkpointLastModified: m.checkpointLastModified,
+      checkpointAgeSeconds: m.checkpointAgeSeconds,
+      checkpointCoverageRatio: m.checkpointCoverageRatio,
+      checkpointStale: m.checkpointStale,
+    };
+  }
+
+  function buildStatusInner(): LedgerIntegrityStatus {
     const checkedAt = new Date().toISOString();
     const { lastOkAgeSeconds, stale } = computeStaleness(checkedAt);
+    const cpInit = computeCheckpointMetrics(checkedAt, null);
     const base: LedgerIntegrityStatus = {
       status: "ok",
       failureMode: null,
@@ -375,7 +479,13 @@ export function createLedgerChecker(opts: LedgerRouterOptions): LedgerChecker {
       lastCheckedAt,
       staleThresholdSeconds: STALE_THRESHOLD_SECONDS,
       stale,
+      checkpointLastModified: cpInit.checkpointLastModified,
+      checkpointAgeSeconds: cpInit.checkpointAgeSeconds,
+      checkpointCoverageRatio: cpInit.checkpointCoverageRatio,
+      checkpointStaleThresholdSeconds: CHECKPOINT_STALE_THRESHOLD_SECONDS,
+      checkpointStale: cpInit.checkpointStale,
     };
+
 
     // Always update lastCheckedAt — we ran a check regardless of outcome.
     lastCheckedAt = checkedAt;

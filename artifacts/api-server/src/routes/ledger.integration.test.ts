@@ -511,6 +511,69 @@ describe("GET /api/ledger/integrity", () => {
     try { unlinkSync(secretPath); } catch { /* ignore */ }
   });
 
+  it("surfaces checkpoint coverage and flags checkpointStale=true when the sidecar mtime exceeds the threshold (task #96)", async () => {
+    // Healthy ledger with a checkpoint that we then back-date so its
+    // mtime is older than a 1-second threshold. The integrity check
+    // itself stays `ok`; the dashboard hint flips to checkpointStale.
+    const sealed = "line1\nline2\nline3\n";
+    const { size, sha } = writeHits(sealed);
+    writeCheckpoint(size, sha);
+    // Append more bytes so coverage < 1.
+    writeFileSync(hitsPath, sealed + "appended-line\n");
+    // Back-date the checkpoint mtime to 10 minutes ago.
+    const { utimesSync } = await import("node:fs");
+    const past = new Date(Date.now() - 600_000);
+    utimesSync(checkpointPath, past, past);
+
+    const lastOkPath = path.join(tmpDir, "hits.txt.cpstale.lastok");
+    const secretPath = `${lastOkPath}.key`;
+    try { unlinkSync(lastOkPath); } catch { /* ignore */ }
+    try { unlinkSync(secretPath); } catch { /* ignore */ }
+
+    const app = express();
+    app.use(
+      "/api",
+      createLedgerRouter({
+        hitsPath,
+        checkpointPath,
+        lastOkPath,
+        secretPath,
+        checkpointStaleThresholdSeconds: 1,
+      }),
+    );
+    const srv = http.createServer(app);
+    await new Promise<void>((resolve) => srv.listen(0, "127.0.0.1", resolve));
+    const port = (srv.address() as AddressInfo).port;
+    const r = await (
+      await fetch(`http://127.0.0.1:${port}/api/ledger/integrity`)
+    ).json() as any;
+    expect(r.status).toBe("ok");
+    expect(r.checkpointStaleThresholdSeconds).toBe(1);
+    expect(r.checkpointAgeSeconds).toBeGreaterThan(1);
+    expect(r.checkpointStale).toBe(true);
+    expect(r.checkpointLastModified).toBe(past.toISOString());
+    // Coverage should be < 1 since live ledger grew past the checkpoint.
+    expect(r.checkpointCoverageRatio).toBeGreaterThan(0);
+    expect(r.checkpointCoverageRatio).toBeLessThan(1);
+
+    await new Promise<void>((resolve, reject) =>
+      srv.close((err) => (err ? reject(err) : resolve())),
+    );
+    try { unlinkSync(lastOkPath); } catch { /* ignore */ }
+    try { unlinkSync(secretPath); } catch { /* ignore */ }
+  });
+
+  it("reports checkpointStale=true when the checkpoint sidecar is missing", async () => {
+    writeHits("line1\nline2\n");
+    // No checkpoint written.
+    const r = await getStatus();
+    expect(r.json.status).toBe("missing");
+    expect(r.json.checkpointAgeSeconds).toBeNull();
+    expect(r.json.checkpointLastModified).toBeNull();
+    expect(r.json.checkpointStale).toBe(true);
+    expect(r.json.checkpointCoverageRatio).toBeNull();
+  });
+
   it("reports stale=true with lastOkAgeSeconds=null when no successful check has ever been recorded", async () => {
     // Fresh router pointing at a sidecar that does not exist, with the
     // ledger broken so no ok check fires.
