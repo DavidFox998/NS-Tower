@@ -887,6 +887,38 @@ BRICKS=(
   "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.cluster_decomposition_proven"
   "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.spectral_gap_from_clustering"
   "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.vacuum_gap_positive_theorem"
+  # ---- Batch 14 (2026-05-26) — +15 bricks across 3 same files, zero
+  # cross-imports. Track 1: uniform IR bound on
+  # Spectral/OperatorV2.lean (`Hamiltonian_IR_gap_uniform` stays
+  # schema; `MassGap_continuum` stays schema per tripwire;
+  # `continuum_limit_exists` + `first_excitation_continuum` real;
+  # `spectrum_discrete_below_2Δ` schema). Track 2: break the
+  # conditional on NS/EnergyV2.lean (`Enstrophy_bound_unconditional`
+  # is the explicitly-hardest schema; `Global_regularity_proven`
+  # stays schema per tripwire; `BKM_implies_strong_L3_bound` +
+  # `Ladyzhenskaya_inequality` + `Serrin_criterion_L3` real on
+  # zero only). Track 3: prove clustering on YM/Spectrum.lean
+  # (`clustering_for_YM3` is the explicitly-hardest schema;
+  # `MassGap_YM4_proven` stays schema per tripwire;
+  # `OS_reconstruction_from_H` schema; `reflection_positivity_check`
+  # + `correlation_decay_from_gap` real). All three towers stay
+  # Status: Open. No Clay claim — Δ > 0 for SU(3) 4D is NOT proven
+  # in any of these files.
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.Hamiltonian_IR_gap_uniform"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.continuum_limit_exists"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.MassGap_continuum"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.first_excitation_continuum"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.spectrum_discrete_below_2Δ"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Enstrophy_bound_unconditional"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.BKM_implies_strong_L3_bound"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Ladyzhenskaya_inequality"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Serrin_criterion_L3"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Global_regularity_proven"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.OS_reconstruction_from_H"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.reflection_positivity_check"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.correlation_decay_from_gap"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.clustering_for_YM3"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.MassGap_YM4_proven"
 )
 
 VERIFIER_DIR="$(mktemp -d)"

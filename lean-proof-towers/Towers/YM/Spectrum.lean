@@ -689,6 +689,103 @@ either direction. YM tower stays Open. -/
 def vacuum_gap_positive_theorem : Prop :=
   Exponential_clustering_schema ↔ vacuum_gap_positive_schema
 
+/-! ### Batch 14 (2026-05-26) — Track 3: prove clustering
+
+Five bricks on the **OS reconstruction → clustering → mass-gap** track.
+Names verbatim per the Batch 14 directive: `OS_reconstruction_from_H`,
+`reflection_positivity_check`, `correlation_decay_from_gap`,
+`clustering_for_YM3`, `MassGap_YM4_proven`.
+
+Honest scope: two real theorems (a trivial reflection-positivity
+check on the vacuum, and a combinator extracting a clustering
+witness from a `MassGapV2` hypothesis on the placeholder) and
+**three schemas**. Directive Track-3 tripwire honored:
+`clustering_for_YM3` is the explicitly-hardest brick (real
+exponential clustering for 3D YM is the Glimm-Jaffe-Spencer open
+problem) and stays a SCHEMA, AND per the tripwire `MassGap_YM4_
+proven` (which depends on it) ALSO stays a SCHEMA.
+`OS_reconstruction_from_H` is the named Osterwalder-Schrader
+reconstruction Prop, also a schema. YM tower stays Status: Open.
+No Clay claim — Δ > 0 for SU(3) 4D is not in this file. -/
+
+/-- **Schema (`OS_reconstruction_from_H`).** Named Prop predicate
+for the **Osterwalder-Schrader reconstruction** of a Wightman
+two-point function `W : SU3Connection → SU3Connection → ℝ` from a
+self-adjoint Hamiltonian: `W` is symmetric and vanishes on the
+vacuum slot (`W A vacuum_connection = 0`). Real Prop; **NOT proved
+here** — the OS reconstruction theorem (Wightman from Euclidean
+Schwinger functions satisfying OS0–OS4) is a genuine analytic
+theorem in constructive QFT, not discharged on the placeholder.
+The schema NAMES the existence shape. YM tower stays Open. -/
+def OS_reconstruction_from_H : Prop :=
+  ∃ W : SU3Connection → SU3Connection → ℝ,
+    (∀ A B : SU3Connection, W A B = W B A) ∧
+      (∀ A : SU3Connection, W A vacuum_connection = 0)
+
+/-- **Brick (`reflection_positivity_check`).** Real theorem: the
+**reflection-positivity check on the vacuum** reduces, on the
+placeholder, to `0 ≤ (YMHamiltonian vacuum_connection)^2 = 144`,
+which is `0 ≤ 144`. Closes by `positivity` / `norm_num`. Honest
+scope: this checks ONE point (the vacuum) of one positivity
+inequality, NOT a real OS-positivity / reflection-positivity proof
+(which would need a real reflection involution on the lattice
+algebra and a real Schwinger-function family — neither in scope on
+the placeholder). Names the per-vacuum-point positivity shape. -/
+theorem reflection_positivity_check :
+    0 ≤ YMHamiltonian vacuum_connection *
+        YMHamiltonian vacuum_connection :=
+  mul_self_nonneg _
+
+/-- **Brick (`correlation_decay_from_gap`).** Real combinator: from
+a `MassGapV2 Δ` hypothesis (Batch 9/10's gap-above-vacuum predicate)
+AND an `Exponential_clustering_schema` hypothesis (Batch 13's
+clustering Prop), produce a **packaged clustering witness** `∃ C ξ,
+0 < C ∧ 0 < ξ`. The mass-gap hypothesis is **consumed** for its
+positive Δ (used as `ξ := Δ`); the clustering hypothesis is named
+but its existential content is independently witnessed by
+`(C := 1, ξ := Δ)`. Honest scope: the **structural** combinator
+naming the "gap ⇒ exponential clustering" implication that
+Glimm-Jaffe-Spencer would discharge with rate `ξ ∼ 1/Δ`. NOT a
+real proof — the clustering bound itself is not extracted from the
+gap on the placeholder. -/
+theorem correlation_decay_from_gap (Δ : ℝ)
+    (h_gap : MassGapV2 Δ)
+    (_h_cluster : Exponential_clustering_schema) :
+    ∃ C ξ : ℝ, 0 < C ∧ 0 < ξ := by
+  exact ⟨1, Δ, one_pos, h_gap.1⟩
+
+/-- **Schema (`clustering_for_YM3`).** Named Prop predicate for
+**real exponential clustering of 3D Yang-Mills** (hardest brick of
+this track): there exist `C, ξ > 0` such that for every pair of
+connections `A, B` and every separation `r ≥ 0`, the
+clustering-residual bound
+`|YMHamiltonian A * YMHamiltonian B - YMHamiltonian vacuum_connection
+* YMHamiltonian vacuum_connection| ≤ C * exp(-r / ξ)` holds. Same
+shape as Batch 13's `Exponential_clustering_schema`, named separately
+to mark the **3D-YM-specific** target (vs. the abstract schema).
+Real Prop; **NOT proved here** — directive Track-3 tripwire:
+real exponential clustering for 3D YM is the genuine open Clay step.
+YM tower stays Open. -/
+def clustering_for_YM3 : Prop :=
+  ∃ C ξ : ℝ, 0 < C ∧ 0 < ξ ∧
+    ∀ A B : SU3Connection, ∀ r : ℝ, 0 ≤ r →
+      |YMHamiltonian A * YMHamiltonian B -
+        YMHamiltonian vacuum_connection *
+          YMHamiltonian vacuum_connection|
+        ≤ C * Real.exp (-r / ξ)
+
+/-- **Schema (`MassGap_YM4_proven`).** Named Prop predicate for the
+**conditional 4D-YM mass-gap conclusion** — the implication
+`clustering_for_YM3 → ∃ Δ > 0, MassGapV2 Δ`. Real Prop; **NOT proved
+here** — directive Track-3 tripwire: since `clustering_for_YM3`
+stays a schema (the hardest brick), `MassGap_YM4_proven` must also
+stay a schema. Names the shape the conditional Clay-YM 4D theorem
+would have (3D clustering ⇒ 4D mass gap, via dimensional-reduction
+arguments) without supplying a witness. YM tower stays Open. No
+Clay claim — Δ > 0 for SU(3) 4D is NOT proven in this file. -/
+def MassGap_YM4_proven : Prop :=
+  clustering_for_YM3 → ∃ Δ : ℝ, 0 < Δ ∧ MassGapV2 Δ
+
 end Spectrum
 end YM
 end Towers

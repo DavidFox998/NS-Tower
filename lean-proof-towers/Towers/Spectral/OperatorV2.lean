@@ -677,6 +677,95 @@ def MassGap_persists_under_limit_schema : Prop :=
        MassGap (Hamiltonian_IR_regularized 0 Λ) Δ) →
     MassGap (Hamiltonian_operator 0) Δ
 
+/-! ### Batch 14 (2026-05-26) — Track 1: uniform IR bound
+
+Five bricks on the **uniform-in-`Λ` IR-gap → continuum-limit** track.
+Names verbatim per the Batch 14 directive: `Hamiltonian_IR_gap_uniform`,
+`continuum_limit_exists`, `MassGap_continuum`, `first_excitation_continuum`,
+`spectrum_discrete_below_2Δ`.
+
+Honest scope: two real theorems (the trivial-constant continuum limit
+on the placeholder where `H_Λ ≡ 0`, and the existence of a non-vacuum
+vector on `Fin 1`), and **three schemas**. Directive Track-1 tripwire
+honored: on the placeholder Batch 13's `MassGap_IR` gives `Δ_Λ = Λ`,
+so a uniform lower bound `∃ C > 0, ∀ Λ, Δ_Λ ≥ C` is FALSE for
+`Λ → 0⁺` — therefore `Hamiltonian_IR_gap_uniform` stays a SCHEMA,
+AND per the tripwire `MassGap_continuum` (which depends on it) ALSO
+stays a SCHEMA. `spectrum_discrete_below_2Δ` is the named
+discrete-spectrum-below-`2Δ` Prop, also a schema. Spectral tower
+stays Status: Open. No Clay claim — Δ > 0 for SU(3) 4D is not in
+this file. -/
+
+/-- **Schema (`Hamiltonian_IR_gap_uniform`).** Named Prop predicate
+for a **uniform-in-`Λ` lower bound** on the IR-regularized mass gap:
+`∃ C > 0, ∀ Λ > 0, ∃ Δ ≥ C, MassGap (Hamiltonian_IR_regularized 0 Λ) Δ`.
+Real Prop; **NOT proved here** — directive Track-1 tripwire: on the
+placeholder Batch 13's `MassGap_IR` gives `Δ_Λ = Λ`, so for `Λ` ranging
+over all positive reals there is no uniform positive lower bound
+(take `Λ < C`). Names the shape a uniform IR gap would have without
+supplying a witness. Spectral tower stays Open. -/
+def Hamiltonian_IR_gap_uniform : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∀ Λ : ℝ, InfraredCutoff_Λ Λ →
+    ∃ Δ : ℝ, C ≤ Δ ∧ MassGap (Hamiltonian_IR_regularized 0 Λ) Δ
+
+/-- **Brick (`continuum_limit_exists`).** Real theorem: the
+IR-regularized Hamiltonian is **constant in `Λ`** on the
+placeholder, i.e. `∀ Λ Λ' > 0, Hamiltonian_IR_regularized n Λ =
+Hamiltonian_IR_regularized n Λ'`. Closes by `rfl` since both sides
+unfold to `fun _ => 0`. Honest scope: this is the **trivial
+continuum limit** statement on the placeholder — every cutoff gives
+the same (zero) operator, so the strong-operator limit
+`H = strong-lim H_Λ` exists and equals the constant `0`. NOT a real
+continuum-limit proof (which would require an actual Λ-dependence
+and a Stone-style limit on a real Hilbert-space operator). -/
+theorem continuum_limit_exists (n : ℕ) (Λ Λ' : ℝ) :
+    Hamiltonian_IR_regularized n Λ = Hamiltonian_IR_regularized n Λ' :=
+  rfl
+
+/-- **Schema (`MassGap_continuum`).** Named Prop predicate for the
+**continuum mass-gap conclusion** — the implication
+`Hamiltonian_IR_gap_uniform → ∃ Δ > 0, MassGap (Hamiltonian_operator
+0) Δ`. Real Prop; **NOT proved here** — directive Track-1 tripwire:
+since `Hamiltonian_IR_gap_uniform` stays a schema (no uniform `C` on
+the placeholder), `MassGap_continuum` must also stay a schema. Names
+the shape the continuum-limit mass-gap theorem would have (Clay-YM
+headline conditional on the uniform IR bound) without supplying a
+witness. Spectral tower stays Open. -/
+def MassGap_continuum : Prop :=
+  Hamiltonian_IR_gap_uniform →
+    ∃ Δ : ℝ, 0 < Δ ∧ MassGap (Hamiltonian_operator 0) Δ
+
+/-- **Brick (`first_excitation_continuum`).** Real `∃` theorem: on
+`EuclideanSpace ℝ (Fin 1)` there exists a vector `ψ ≠ vacuum_state 1`.
+Witnesses `ψ := first_excitation_explicit 0` (the
+`(1, 0, …)` standard basis vector at index `0` on `Fin 1`, which is
+`fun _ => 1` after collapsing the conditional); `ψ 0 = 1 ≠ 0 =
+vacuum_state 1 0`. Honest scope: NOT a proof that `ψ` is the first
+excited state of any operator (the placeholder Hamiltonian is zero,
+so every vector is in its kernel) — names the existence of a
+candidate first-excited vector at the **continuum** (post-removal)
+level on the singleton-dimensional placeholder. -/
+theorem first_excitation_continuum :
+    ∃ ψ : EuclideanSpace ℝ (Fin 1), ψ ≠ vacuum_state 1 := by
+  refine ⟨first_excitation_explicit 0, ?_⟩
+  intro h
+  have h' := congrArg (fun ψ => ψ (0 : Fin 1)) h
+  simp [first_excitation_explicit, vacuum_state] at h'
+
+/-- **Schema (`spectrum_discrete_below_2Δ`).** Named Prop predicate
+for the **discrete spectrum below `2Δ`** statement:
+`Hamiltonian_IR_gap_uniform → ∀ Δ > 0, ∀ μ, 0 ≤ μ < 2 * Δ →
+μ = 0 ∨ μ = Δ`. Real Prop; **NOT proved here** — the placeholder
+zero operator has no real spectral theory, and even on a real YM
+Hamiltonian this would require Glimm-Jaffe-Spencer-style
+positive-energy spectral analysis. Names the shape of the
+"discrete-spectrum-below-the-second-gap" target without supplying
+the witness. Spectral tower stays Open. -/
+def spectrum_discrete_below_2Δ : Prop :=
+  Hamiltonian_IR_gap_uniform →
+    ∀ Δ : ℝ, 0 < Δ → ∀ μ : ℝ, 0 ≤ μ → μ < 2 * Δ →
+      μ = 0 ∨ μ = Δ
+
 end OperatorV2
 end Spectral
 end Towers

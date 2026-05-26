@@ -661,6 +661,103 @@ def Global_scheme_for_all_data : Prop :=
     EnergyMonotone u u₀ ∧
       ∀ t : ℝ, 0 ≤ t → H1Norm u t ≤ H1Norm u₀ 0
 
+/-! ### Batch 14 (2026-05-26) — Track 2: break the conditional
+
+Five bricks on the **break-the-conditional → global-regularity** track.
+Names verbatim per the Batch 14 directive: `Enstrophy_bound_unconditional`,
+`BKM_implies_strong_L3_bound`, `Ladyzhenskaya_inequality`,
+`Serrin_criterion_L3`, `Global_regularity_proven`.
+
+Honest scope: three real theorems (BKM-bootstrap combinator on zero,
+Ladyzhenskaya inequality on zero, Serrin combinator on zero — all
+restricted to the zero velocity field per Batch 12/13 pattern) and
+**two schemas**. Directive Track-2 tripwire honored:
+`Enstrophy_bound_unconditional` is the explicitly-hardest brick
+(unconditional global enstrophy bound is the Clay-NS headline) and
+stays a SCHEMA, AND per the tripwire `Global_regularity_proven`
+(which depends on it) ALSO stays a SCHEMA. NS tower stays
+Status: Open. No Clay claim. -/
+
+/-- **Schema (`Enstrophy_bound_unconditional`).** Named Prop predicate
+for the **unconditional global enstrophy bound** (hardest brick of
+this track): for every initial velocity field `u₀` and every
+"solution" `u` whose energy is monotone in `u₀`, there exists a
+uniform constant `M ≥ 0` with `∀ t, Enstrophy u t ≤ M`. Real Prop
+over real arithmetic; **NOT proved here** — directive Track-2
+tripwire: this is exactly the unconditional 3D NS enstrophy control
+that, if available, would close the Clay problem. NS tower stays
+Open. -/
+def Enstrophy_bound_unconditional (u₀ : VelocityField) : Prop :=
+  ∀ u : VelocityField, EnergyMonotone u u₀ →
+    ∃ M : ℝ, 0 ≤ M ∧ ∀ t : ℝ, Enstrophy u t ≤ M
+
+/-- **Brick (`BKM_implies_strong_L3_bound`).** Real combinator on the
+**zero velocity field**: given Batch 12's `BealeKatoMajda_criterion_
+schema 0 T M` (the BKM hypothesis at `u = 0`), produce a strong-`L³`
+analogue `∃ K ≥ 0, ∀ t < T, H1Norm 0 t ≤ K` (uniform-in-`t`
+H¹-norm bound, the placeholder's surrogate for an `L³_x` bound). The
+BKM hypothesis is **consumed** (the witness comes from
+`H1Norm_zero`, not from the hypothesis). Honest scope: real on
+**zero only** — NOT a real BKM-to-`L³` implication (which would
+need genuine local existence + a regularity bootstrap). -/
+theorem BKM_implies_strong_L3_bound (T M : ℝ) (_hM : 0 ≤ M)
+    (_h_bkm : BealeKatoMajda_criterion_schema (0 : VelocityField) T M) :
+    ∃ K : ℝ, 0 ≤ K ∧ ∀ t : ℝ, t < T →
+      H1Norm (0 : VelocityField) t ≤ K := by
+  refine ⟨0, le_refl 0, ?_⟩
+  intro t _
+  rw [H1Norm_zero t]
+
+/-- **Brick (`Ladyzhenskaya_inequality`).** Real theorem on the
+**zero velocity field**: the placeholder analogue of Ladyzhenskaya's
+inequality `‖u‖_{L⁴} ≤ C ‖u‖_{L²}^{1/4} ‖∇u‖_{L²}^{3/4}` reduces, on
+the zero field, to the trivial inequality `H1Norm 0 t ≤ 1 *
+H1Norm 0 t` (both sides `0`). Honest scope: real arithmetic on the
+zero field, NOT a real Ladyzhenskaya inequality (which would need a
+genuine `L⁴` norm, a real gradient, and the actual interpolation
+proof — none of which the placeholder `VelocityField` / `H1Norm`
+support). Names the inequality shape; on zero the placeholder
+content is `0 ≤ 0`. -/
+theorem Ladyzhenskaya_inequality (t : ℝ) :
+    ∃ C : ℝ, 0 ≤ C ∧
+      H1Norm (0 : VelocityField) t ≤
+        C * H1Norm (0 : VelocityField) t := by
+  refine ⟨1, zero_le_one, ?_⟩
+  rw [H1Norm_zero t]
+  linarith
+
+/-- **Brick (`Serrin_criterion_L3`).** Real combinator on the **zero
+velocity field**: given any `L³`-shaped hypothesis `∃ M ≥ 0,
+∀ t, H1Norm 0 t ≤ M` (the placeholder's stand-in for
+`u ∈ L^∞_t L³_x`), conclude the enstrophy-stays-zero conclusion
+`∀ t ≤ T, Enstrophy 0 t ≤ 0` (the placeholder's stand-in for
+"global regularity"). The hypothesis is consumed; the conclusion
+follows from `H1Norm_zero`. Honest scope: real on zero only — NOT
+the real Serrin criterion (which would need a genuine `L³_x` norm
+plus the Escauriaza-Seregin-Šverák argument). -/
+theorem Serrin_criterion_L3 (T : ℝ)
+    (_h_serrin : ∃ M : ℝ, 0 ≤ M ∧
+      ∀ t : ℝ, H1Norm (0 : VelocityField) t ≤ M) :
+    ∀ t : ℝ, t ≤ T → Enstrophy (0 : VelocityField) t ≤ 0 := by
+  intro t _
+  unfold Enstrophy
+  rw [H1Norm_zero t]
+  linarith
+
+/-- **Schema (`Global_regularity_proven`).** Named Prop predicate
+for the **conditional global-regularity conclusion** — the
+implication `(∀ u₀, Enstrophy_bound_unconditional u₀) →
+Global_scheme_for_all_data`. Real Prop; **NOT proved here** —
+directive Track-2 tripwire: since `Enstrophy_bound_unconditional`
+stays a schema (the hardest brick), `Global_regularity_proven` must
+also stay a schema — the implication itself is the open Clay-NS
+step (an unconditional enstrophy bound is *expected* to suffice for
+global regularity, but the proof of the implication is non-trivial
+and NOT discharged on the placeholder). NS tower stays Open. -/
+def Global_regularity_proven : Prop :=
+  (∀ u₀ : VelocityField, Enstrophy_bound_unconditional u₀) →
+    Global_scheme_for_all_data
+
 end EnergyV2
 end NS
 end Towers
