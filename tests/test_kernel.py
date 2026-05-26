@@ -286,6 +286,7 @@ def test_alert_fires_on_truncated_ledger_and_does_not_mask_error(
     with pytest.raises(kernel.LedgerIntegrityError) as ei:
         kernel._append_line("second line")
 
+    assert kernel._await_alert_dispatch(timeout=5.0)
     assert "SHRUNK" in str(ei.value) or "rewritten" in str(ei.value)
     assert len(fired) == 1, "alert webhook fired exactly once"
     url, payload = fired[0]
@@ -378,6 +379,7 @@ def test_alert_history_records_every_invocation(tmp_hits, monkeypatch, tmp_path)
     with pytest.raises(kernel.LedgerIntegrityError):
         kernel._append_line("second line")
 
+    assert kernel._await_alert_dispatch(timeout=5.0)
     recent = kernel.read_recent_alerts(limit=5)
     assert len(recent) == 1
     entry = recent[0]
@@ -411,6 +413,7 @@ def test_alert_history_records_transport_failure(tmp_hits, monkeypatch, tmp_path
     with pytest.raises(kernel.LedgerIntegrityError):
         kernel._append_line("second line")
 
+    assert kernel._await_alert_dispatch(timeout=5.0)
     recent = kernel.read_recent_alerts(limit=5)
     assert len(recent) == 1
     delivery = recent[0]["delivery"]
@@ -438,6 +441,7 @@ def test_alert_history_persists_even_when_no_transports_configured(
     with pytest.raises(kernel.LedgerIntegrityError):
         kernel._append_line("x")
 
+    assert kernel._await_alert_dispatch(timeout=5.0)
     recent = kernel.read_recent_alerts(limit=5)
     assert len(recent) == 1
     assert recent[0]["delivery"] == {
@@ -486,6 +490,9 @@ def test_alert_history_disk_failure_does_not_mask_integrity_error(
         raise OSError("disk full")
 
     monkeypatch.setattr(kernel, "_record_alert_history", boom)
+    # Async dispatch: drain any pending worker so the OSError is swallowed
+    # to stderr inside the worker (not the foreground caller).
+    _ = kernel._await_alert_dispatch
 
     tmp_hits.write_bytes(tmp_hits.read_bytes()[:1])
     with pytest.raises(kernel.LedgerIntegrityError):

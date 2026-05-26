@@ -209,6 +209,7 @@ def test_webhook_wire_format_end_to_end(tmp_hits, monkeypatch, webhook_server):
     with pytest.raises(kernel.LedgerIntegrityError):
         kernel._append_line("second line")
 
+    assert kernel._await_alert_dispatch(timeout=5.0)
     assert len(captured) == 1, captured
     req = captured[0]
     assert req["path"] == "/alert"
@@ -255,7 +256,9 @@ def test_smtp_wire_format_end_to_end(tmp_hits, monkeypatch, smtp_server):
     with pytest.raises(kernel.LedgerIntegrityError):
         kernel._append_line("second line")
 
-    # Give the SMTP server thread a moment to drain.
+    # Async dispatch: drain the background delivery worker, then give the
+    # SMTP server thread a moment to finish parsing the conversation.
+    assert kernel._await_alert_dispatch(timeout=5.0)
     smtp_server._thread.join(timeout=5)
 
     assert len(smtp_server.messages) == 1, smtp_server.messages
@@ -301,6 +304,7 @@ def test_webhook_and_smtp_both_fire_end_to_end(
     with pytest.raises(kernel.LedgerIntegrityError):
         kernel._append_line("second line")
 
+    assert kernel._await_alert_dispatch(timeout=5.0)
     smtp_server._thread.join(timeout=5)
 
     assert len(captured) == 1
@@ -345,6 +349,7 @@ def test_webhook_http_500_records_failure_and_still_raises(
     with pytest.raises(kernel.LedgerIntegrityError):
         kernel._append_line("second line")
 
+    assert kernel._await_alert_dispatch(timeout=5.0)
     # The webhook was reached — the JSON body was POSTed — but the
     # server responded with 500.
     assert len(captured) == 1, captured
@@ -442,6 +447,7 @@ def test_smtp_550_rcpt_records_failure_and_webhook_still_fires(
     with pytest.raises(kernel.LedgerIntegrityError):
         kernel._append_line("second line")
 
+    assert kernel._await_alert_dispatch(timeout=5.0)
     new_thread.join(timeout=5)
 
     # SMTP saw the RCPT and rejected it.
@@ -460,3 +466,104 @@ def test_smtp_550_rcpt_records_failure_and_webhook_still_fires(
     assert "550" in email_delivery["error"]
     # Webhook delivery independently succeeded.
     assert entry["delivery"]["webhook"]["status"] == "ok"
+
+
+class _HangingHandler(BaseHTTPRequestHandler):
+    """HTTP handler that accepts the connection and then hangs on the
+    request body forever (until the client times out). Models the
+    realistic "DNS hang / TLS handshake stall / SMTP greylist delay"
+    failure mode the on-call sink imposes on the probe pipeline."""
+
+    def do_POST(self):  # noqa: N802 - BaseHTTPRequestHandler API
+        # Block on a server-side event that is never set. The client's
+        # urlopen timeout is the only thing that will release this.
+        self.server.hang_event.wait()  # type: ignore[attr-defined]
+        try:
+            self.send_response(200)
+            self.end_headers()
+        except OSError:
+            pass
+
+    def log_message(self, *args, **kwargs):
+        pass
+
+
+@pytest.fixture
+def hanging_webhook_server():
+    server = HTTPServer(("127.0.0.1", 0), _HangingHandler)
+    server.hang_event = threading.Event()  # type: ignore[attr-defined]
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        host, port = server.server_address
+        yield f"http://{host}:{port}/alert", server
+    finally:
+        server.hang_event.set()  # type: ignore[attr-defined]
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
+def test_append_returns_immediately_when_webhook_hangs(
+    tmp_hits, monkeypatch, hanging_webhook_server
+):
+    """Task #82: a slow / hung alert sink must NOT freeze the failing
+    `_append_line` caller for the full per-transport timeout. With
+    background dispatch, `LedgerIntegrityError` re-raises essentially
+    instantly even though the webhook would otherwise block for the
+    full `MORNINGSTAR_ALERT_TIMEOUT_SECONDS` window."""
+    import time as _time
+
+    url, server = hanging_webhook_server
+    # Pin the per-transport timeout to a value we can clearly distinguish
+    # from "returned in well under the timeout".
+    monkeypatch.setenv("MORNINGSTAR_ALERT_WEBHOOK_URL", url)
+    monkeypatch.setenv("MORNINGSTAR_ALERT_TIMEOUT_SECONDS", "10")
+    monkeypatch.delenv("MORNINGSTAR_ALERT_EMAIL_TO", raising=False)
+
+    _seed_and_truncate(tmp_hits)
+
+    t0 = _time.monotonic()
+    with pytest.raises(kernel.LedgerIntegrityError):
+        kernel._append_line("second line")
+    elapsed = _time.monotonic() - t0
+
+    # With synchronous dispatch this would block for the full 10s
+    # `urlopen` timeout. With background dispatch it must return in
+    # well under that — we allow a generous ceiling for CI scheduler
+    # jitter and process-fork costs, while still proving the timeout
+    # window is NOT the dominant cost.
+    assert elapsed < 2.0, (
+        f"append blocked for {elapsed:.2f}s on a hung webhook "
+        f"(per-transport timeout was 10s)"
+    )
+
+    # Unblock the hung handler so the background worker can finish (or
+    # at least its socket can close). The test's correctness does not
+    # depend on the worker terminating before pytest exits — the worker
+    # thread is a daemon — but we wake it for cleanliness.
+    server.hang_event.set()
+
+
+def test_alert_timeout_seconds_env_var_is_honored(monkeypatch):
+    """Task #82: `MORNINGSTAR_ALERT_TIMEOUT_SECONDS` must be the source
+    of truth for both transport timeouts. A typo or non-positive value
+    must fall back to the 5s default rather than raise — alerts are
+    best-effort and a bad env var must not break ledger writes."""
+    monkeypatch.delenv("MORNINGSTAR_ALERT_TIMEOUT_SECONDS", raising=False)
+    assert kernel._alert_timeout_seconds() == 5.0
+
+    monkeypatch.setenv("MORNINGSTAR_ALERT_TIMEOUT_SECONDS", "12.5")
+    assert kernel._alert_timeout_seconds() == 12.5
+
+    monkeypatch.setenv("MORNINGSTAR_ALERT_TIMEOUT_SECONDS", "  3  ")
+    assert kernel._alert_timeout_seconds() == 3.0
+
+    monkeypatch.setenv("MORNINGSTAR_ALERT_TIMEOUT_SECONDS", "not-a-number")
+    assert kernel._alert_timeout_seconds() == 5.0
+
+    monkeypatch.setenv("MORNINGSTAR_ALERT_TIMEOUT_SECONDS", "-1")
+    assert kernel._alert_timeout_seconds() == 5.0
+
+    monkeypatch.setenv("MORNINGSTAR_ALERT_TIMEOUT_SECONDS", "0")
+    assert kernel._alert_timeout_seconds() == 5.0

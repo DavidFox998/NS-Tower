@@ -249,6 +249,24 @@ _ALERT_RECOVERY_POINTER = (
 )
 
 
+def _alert_timeout_seconds() -> float:
+    """Read the per-transport alert delivery timeout (in seconds) from
+    `MORNINGSTAR_ALERT_TIMEOUT_SECONDS`, defaulting to 5.0. Task #82:
+    a real DNS hang / TLS handshake stall / SMTP greylist delay on the
+    on-call sink should be tunable per deployment without code edits.
+    Invalid or non-positive values fall back to the default rather than
+    raising — alerts are best-effort observability, not a correctness
+    surface, so a typo in the env var must not break ledger writes."""
+    raw = os.environ.get("MORNINGSTAR_ALERT_TIMEOUT_SECONDS", "").strip()
+    if not raw:
+        return 5.0
+    try:
+        v = float(raw)
+    except ValueError:
+        return 5.0
+    return v if v > 0 else 5.0
+
+
 def _post_webhook(url: str, payload: "dict[str, Any]") -> None:
     """POST JSON payload to `url` with a short timeout. Raises on any
     failure (caller wraps in best-effort try/except)."""
@@ -261,7 +279,9 @@ def _post_webhook(url: str, payload: "dict[str, Any]") -> None:
         headers={"Content-Type": "application/json"},
         method="POST",
     )
-    with _urlreq.urlopen(req, timeout=5) as resp:  # noqa: S310 - opt-in URL
+    with _urlreq.urlopen(  # noqa: S310 - opt-in URL
+        req, timeout=_alert_timeout_seconds()
+    ) as resp:
         resp.read()
 
 
@@ -300,7 +320,7 @@ def _send_email(payload: "dict[str, Any]", message: str) -> None:
         f"{_ALERT_RECOVERY_POINTER}\n"
     )
     msg.set_content(body)
-    with smtplib.SMTP(host, port, timeout=5) as smtp:
+    with smtplib.SMTP(host, port, timeout=_alert_timeout_seconds()) as smtp:
         if user:
             try:
                 smtp.starttls()
@@ -310,35 +330,47 @@ def _send_email(payload: "dict[str, Any]", message: str) -> None:
         smtp.send_message(msg)
 
 
-def _fire_ledger_alert(message: str, context: "dict[str, Any]") -> None:
-    """Best-effort notification that a ledger integrity check has failed.
+_ALERT_DISPATCH_THREADS: "list[threading.Thread]" = []
+_ALERT_DISPATCH_LOCK = threading.Lock()
 
-    Opt-in via env var:
-      - `MORNINGSTAR_ALERT_WEBHOOK_URL` — POST JSON payload, or
-      - `MORNINGSTAR_ALERT_EMAIL_TO` + `MORNINGSTAR_ALERT_SMTP_HOST` —
-        plaintext SMTP delivery.
 
-    Both may be set simultaneously; each transport is attempted
-    independently. If neither env var is configured, the function is a
-    silent no-op — that is the "no alert when the ledger is healthy"
-    contract (task #63).
+def _await_alert_dispatch(timeout: float = 10.0) -> bool:
+    """Block until every still-running background alert-dispatch thread
+    has terminated, or `timeout` seconds have elapsed. Returns True if
+    all threads completed in time, False if any were still alive at
+    the deadline.
 
-    Failure to deliver MUST NOT mask the underlying integrity exception:
-    every transport is wrapped in try/except, and the worst case is a
-    stderr warning. The caller is expected to re-raise the
-    `LedgerIntegrityError` after this returns.
+    Task #82: alert delivery now runs in a daemon thread so a hung sink
+    (DNS hang, TLS stall, SMTP greylist) doesn't freeze the caller of
+    `_append_line`. This helper exists so tests and operator tooling
+    can deterministically wait for delivery + history-write to finish
+    before reading the on-disk ring buffer.
     """
-    webhook = os.environ.get("MORNINGSTAR_ALERT_WEBHOOK_URL", "").strip()
-    email_to = os.environ.get("MORNINGSTAR_ALERT_EMAIL_TO", "").strip()
-    payload: dict[str, Any] = {
-        "workflow": _alert_workflow_name(),
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "message": message,
-        "recovery": _ALERT_RECOVERY_POINTER,
-        "hits_path": str(HITS),
-        "checkpoint_path": str(CHECKPOINT),
-        **context,
-    }
+    deadline = time.monotonic() + max(0.0, timeout)
+    with _ALERT_DISPATCH_LOCK:
+        threads = [t for t in _ALERT_DISPATCH_THREADS if t.is_alive()]
+    for t in threads:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
+        t.join(remaining)
+    with _ALERT_DISPATCH_LOCK:
+        _ALERT_DISPATCH_THREADS[:] = [
+            t for t in _ALERT_DISPATCH_THREADS if t.is_alive()
+        ]
+        return not _ALERT_DISPATCH_THREADS
+
+
+def _deliver_ledger_alert(
+    payload: "dict[str, Any]",
+    message: str,
+    webhook: str,
+    email_to: str,
+) -> None:
+    """Background worker: run each configured transport, then write the
+    ring-buffer history line. Exceptions are swallowed to stderr —
+    this runs after the foreground `LedgerIntegrityError` has already
+    re-raised, so it has nowhere to surface failures except the log."""
     delivery: dict[str, Any] = {}
     if webhook:
         try:
@@ -368,6 +400,56 @@ def _fire_ledger_alert(message: str, context: "dict[str, Any]") -> None:
         sys.stderr.write(
             f"WARN: ledger alert history dispatch failed: {e}\n"
         )
+
+
+def _fire_ledger_alert(message: str, context: "dict[str, Any]") -> None:
+    """Best-effort notification that a ledger integrity check has failed.
+
+    Opt-in via env var:
+      - `MORNINGSTAR_ALERT_WEBHOOK_URL` — POST JSON payload, or
+      - `MORNINGSTAR_ALERT_EMAIL_TO` + `MORNINGSTAR_ALERT_SMTP_HOST` —
+        plaintext SMTP delivery.
+
+    Both may be set simultaneously; each transport is attempted
+    independently. If neither env var is configured, the function is
+    still recorded to the on-disk ring buffer (task #71) — but no
+    network call is made.
+
+    Task #82: the actual network delivery + history write run in a
+    daemon thread so a slow or hung sink can't block the failing
+    `_append_line` caller for the full timeout window. The foreground
+    caller returns immediately after building the payload and
+    launching the worker; the `LedgerIntegrityError` then re-raises
+    without waiting for socket I/O.
+
+    Failure to deliver MUST NOT mask the underlying integrity
+    exception. Tests and operator tooling that need to read the ring
+    buffer can call `_await_alert_dispatch(timeout)` to block until
+    the worker has finished.
+    """
+    webhook = os.environ.get("MORNINGSTAR_ALERT_WEBHOOK_URL", "").strip()
+    email_to = os.environ.get("MORNINGSTAR_ALERT_EMAIL_TO", "").strip()
+    payload: dict[str, Any] = {
+        "workflow": _alert_workflow_name(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "message": message,
+        "recovery": _ALERT_RECOVERY_POINTER,
+        "hits_path": str(HITS),
+        "checkpoint_path": str(CHECKPOINT),
+        **context,
+    }
+    thread = threading.Thread(
+        target=_deliver_ledger_alert,
+        args=(payload, message, webhook, email_to),
+        name="ledger-alert-dispatch",
+        daemon=True,
+    )
+    with _ALERT_DISPATCH_LOCK:
+        _ALERT_DISPATCH_THREADS[:] = [
+            t for t in _ALERT_DISPATCH_THREADS if t.is_alive()
+        ]
+        _ALERT_DISPATCH_THREADS.append(thread)
+    thread.start()
 
 
 def _record_alert_history(
