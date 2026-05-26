@@ -183,6 +183,93 @@ tower status unchanged: **Open**. -/
 theorem YMHamiltonian_gap_above_vacuum_schema
     {Δ : ℝ} (h : MassGapV2 Δ) : 0 < Δ := h.1
 
+/-! ### Batch 9 (5) — vacuum-attained inf + MassGapV2 algebra
+
+Five more bricks on the Batch 8 `MassGapV2` / `YMHamiltonian` /
+`vacuum_connection` surface. Two name the vacuum-value side of the
+"placeholder spectrum"; two are pure algebra on the `MassGapV2`
+predicate (positivity, monotone-in-Δ); one is the `0 ≤ Δ`
+projection schema.
+
+**Honest scope.** None of these advance the YM tower past
+`Status: Open` (see `docs/ROADMAP.md` § 2). They prove only:
+
+  * `YMHamiltonian_inf_eq_twelve` — `sInf {YMHamiltonian
+    vacuum_connection} = 12`, i.e. `sInf` of the **singleton**
+    `{12}`. NOT the infimum of the full image
+    `Set.range YMHamiltonian` (that infimum is `-12`, not `12`).
+  * `YMHamiltonian_attains_inf` — `∃ A, YMHamiltonian A = 12`
+    (witness `vacuum_connection`). Stand-in for "the placeholder
+    value `12` is attained", not "the YM Hamiltonian achieves its
+    spectral infimum at the vacuum".
+  * `MassGap_v2_zero_iff` — `MassGapV2 0 ↔ False`. Pure logic on
+    the positivity component of the predicate.
+  * `MassGap_v2_monotone` — `MassGapV2 Δ₁ → Δ₂ ≤ Δ₁ → 0 < Δ₂ →
+    MassGapV2 Δ₂`. Pure algebra: a lower bound at `Δ₁` is still a
+    lower bound at any smaller positive `Δ₂`.
+  * `spectrum_gap_schema` — `MassGapV2 Δ → 0 ≤ Δ`. Non-strict
+    projection (companion to `YMHamiltonian_gap_above_vacuum_schema`,
+    which gives the strict `0 < Δ`). -/
+
+/-- **Brick (`YMHamiltonian_inf_eq_twelve`).** The `sInf` of the
+singleton set `{YMHamiltonian vacuum_connection}` equals `12`.
+Via `YMHamiltonian_vacuum_def` (the singleton is `{12}`) then
+`csInf_singleton`. **Honest scope.** This is `sInf {12} = 12`,
+NOT `sInf (Set.range YMHamiltonian) = 12` — the latter is
+**FALSE** (the range is bounded below by `-12` via
+`YMHamiltonian_abs_le_twelve`, with `-12` attained by `-1`-trace
+SU(3) components). The brick names the vacuum value's
+singleton-infimum, not the full spectral infimum. -/
+theorem YMHamiltonian_inf_eq_twelve :
+    sInf ({YMHamiltonian vacuum_connection} : Set ℝ) = 12 := by
+  rw [YMHamiltonian_vacuum_def]
+  exact csInf_singleton 12
+
+/-- **Brick (`YMHamiltonian_attains_inf`).** The placeholder value
+`12` is attained by `YMHamiltonian` on `vacuum_connection`:
+`∃ A : SU3Connection, YMHamiltonian A = 12`. Witness
+`vacuum_connection` via `YMHamiltonian_vacuum_def`. Honest scope:
+this says only that `12` is in the range; it does NOT say `12`
+is the spectral infimum (the range infimum is `-12`, not `12`). -/
+theorem YMHamiltonian_attains_inf :
+    ∃ A : SU3Connection, YMHamiltonian A = 12 :=
+  ⟨vacuum_connection, YMHamiltonian_vacuum_def⟩
+
+/-- **Brick (`MassGap_v2_zero_iff`).** `MassGapV2 0 ↔ False`. The
+positivity component of `MassGapV2` requires `0 < Δ`, so `Δ = 0`
+contradicts it; conversely `False` implies anything. Pure logic
+on the predicate's first conjunct. Honest scope: this is a
+falsity proof for the degenerate `Δ = 0` case, not a non-existence
+proof for any `Δ > 0`. -/
+theorem MassGap_v2_zero_iff : MassGapV2 0 ↔ False := by
+  constructor
+  · intro h
+    exact lt_irrefl 0 h.1
+  · intro h
+    exact h.elim
+
+/-- **Brick (`MassGap_v2_monotone`).** If `MassGapV2 Δ₁` holds and
+`0 < Δ₂ ≤ Δ₁`, then `MassGapV2 Δ₂` also holds. Pure algebra:
+the universal lower bound `Δ₁ ≤ |YMHamiltonian A − 12|` for
+non-zero `ψ` implies the weaker `Δ₂ ≤ |YMHamiltonian A − 12|` by
+transitivity through `Δ₂ ≤ Δ₁`. Honest scope: this is monotone-
+in-Δ algebra on the predicate, NOT a sharpness or attainment
+result. -/
+theorem MassGap_v2_monotone {Δ₁ Δ₂ : ℝ}
+    (h : MassGapV2 Δ₁) (hle : Δ₂ ≤ Δ₁) (hpos : 0 < Δ₂) :
+    MassGapV2 Δ₂ := by
+  refine ⟨hpos, ?_⟩
+  intro A hne
+  exact hle.trans (h.2 A hne)
+
+/-- **Brick (`spectrum_gap_schema`).** Non-strict version of
+`YMHamiltonian_gap_above_vacuum_schema`: `MassGapV2 Δ → 0 ≤ Δ`.
+Via `le_of_lt` on `h.1`. Honest scope: schema-level projection,
+NOT an existence claim — does NOT prove `∃ Δ ≥ 0, MassGapV2 Δ`
+nor any positive lower bound on `|YMHamiltonian A − 12|`. -/
+theorem spectrum_gap_schema {Δ : ℝ} (h : MassGapV2 Δ) : 0 ≤ Δ :=
+  le_of_lt h.1
+
 end Spectrum
 end YM
 end Towers

@@ -170,6 +170,110 @@ theorem mass_gap_from_lower_bound {n : ℕ}
       ψ ≠ vacuum_state n → μ ≤ inner (H ψ) ψ) :
     MassGap H μ := ⟨h_pos, h_bnd⟩
 
+/-! ### Batch 9 (5) — first Δ > 0 witness on the toy schema
+
+Bricks named exactly per the Batch 9 directive. They prove the
+first non-vacuous `MassGap` witness in this tower, using the trivial
+`EuclideanSpace ℝ (Fin 0)` (a one-point space) where the `∀ ψ ≠
+vacuum, …` quantifier is vacuously discharged.
+
+**Honest scope.** None of these advance the spectral tower past
+`Status: Open` (see `docs/ROADMAP.md` § 2 / § 3). They prove only:
+
+  * `Hamiltonian_spectrum_toy` — `⟨id ψ, ψ⟩ = ‖ψ‖²` (real inner
+    product self-pairing for the v2 identity Hamiltonian);
+  * `vacuum_is_ground_state` — the zero vector achieves the
+    pointwise minimum of `⟨H ψ, ψ⟩` for `H = id` (trivially: `0
+    ≤ ‖ψ‖²`);
+  * `MassGap_exists_diagonal` and `Hamiltonian_mass_gap_toy` —
+    `∃ μ > 0, MassGap (Hamiltonian_operator_v2 0) μ` and the
+    explicit witness `MassGap … 1`. **This is on `Fin 0`** — the
+    one-point space where every vector equals the vacuum, so the
+    `∀ ψ ≠ vacuum, μ ≤ ⟨H ψ, ψ⟩` quantifier has empty domain. NOT
+    a real spectral gap on infinite-dim Hilbert space; vacuous
+    domain proof.
+  * `lower_bound_from_psd` — the trivial `0`-lower-bound combinator:
+    any PSD operator satisfies `0 ≤ ⟨H ψ, ψ⟩` away from vacuum.
+    Does NOT produce a positive μ. -/
+
+/-- **Brick (`Hamiltonian_spectrum_toy`).** Real inner-product
+self-pairing for the v2 Hamiltonian: `⟨H ψ, ψ⟩_ℝ = ‖ψ‖²`. Since
+`H = id`, both sides reduce to `⟨ψ, ψ⟩_ℝ`, which mathlib's
+`real_inner_self_eq_norm_mul_norm` rewrites to `‖ψ‖ * ‖ψ‖`.
+Honest scope: this is the "spectrum" of the toy operator (the
+quadratic form `ψ ↦ ‖ψ‖²`). Not a spectral theorem; just the form
+identity for `H = id`. -/
+theorem Hamiltonian_spectrum_toy {n : ℕ}
+    (ψ : EuclideanSpace ℝ (Fin n)) :
+    @inner ℝ _ _ (Hamiltonian_operator_v2 n ψ) ψ = ‖ψ‖ * ‖ψ‖ := by
+  show @inner ℝ _ _ ψ ψ = ‖ψ‖ * ‖ψ‖
+  exact real_inner_self_eq_norm_mul_norm ψ
+
+/-- **Brick (`vacuum_is_ground_state`).** The vacuum
+(`vacuum_state n = 0`) achieves the pointwise minimum of the
+quadratic form `⟨H ψ, ψ⟩_ℝ` for the v2 Hamiltonian: for every `ψ`,
+`⟨H 0, 0⟩_ℝ ≤ ⟨H ψ, ψ⟩_ℝ`. LHS = `⟨0, 0⟩ = 0`; RHS = `‖ψ‖² ≥ 0`.
+Honest scope: this is *pointwise* ground-state-ness for `H = id`,
+not the spectral ground-state theorem on a physical Hilbert
+space. -/
+theorem vacuum_is_ground_state {n : ℕ}
+    (ψ : EuclideanSpace ℝ (Fin n)) :
+    @inner ℝ _ _ (Hamiltonian_operator_v2 n (vacuum_state n))
+      (vacuum_state n)
+      ≤ @inner ℝ _ _ (Hamiltonian_operator_v2 n ψ) ψ := by
+  show @inner ℝ _ _ (vacuum_state n) (vacuum_state n) ≤ @inner ℝ _ _ ψ ψ
+  have h0 : @inner ℝ _ _ (vacuum_state n) (vacuum_state n) = (0 : ℝ) := by
+    unfold vacuum_state
+    exact inner_zero_left _
+  rw [h0]
+  exact real_inner_self_nonneg
+
+/-- **Brick (`Hamiltonian_mass_gap_toy`).** Explicit `MassGap`
+witness on the one-point space `EuclideanSpace ℝ (Fin 0)` with
+`μ = 1`: positivity is `zero_lt_one`; the universal lower bound
+holds vacuously because every `ψ : EuclideanSpace ℝ (Fin 0)`
+equals the vacuum (the index type is empty, so `funext` collapses
+every function to the unique one). **This is NOT a real spectral
+gap** — the domain has no non-vacuum points, so the universal
+quantifier is vacuous. First non-vacuous witness in the tower; the
+Δ > 0 is `1`. -/
+theorem Hamiltonian_mass_gap_toy :
+    MassGap (Hamiltonian_operator_v2 0) 1 := by
+  refine ⟨zero_lt_one, ?_⟩
+  intro ψ hne
+  exfalso
+  apply hne
+  unfold vacuum_state
+  ext i
+  exact Fin.elim0 i
+
+/-- **Brick (`MassGap_exists_diagonal`).** Existential form of
+`Hamiltonian_mass_gap_toy`: `∃ μ, MassGap (Hamiltonian_operator_v2
+0) μ`. Witness `μ = 1` via the previous brick. Honest scope: this
+is the existential on the one-point space `Fin 0`; the ∃ on
+positive-dimensional Hilbert space (e.g. `Fin (n + 1)`) is **not**
+proved and would in fact be **false** for `H = id` (because
+`⟨ψ, ψ⟩ = ‖ψ‖² → 0` as `ψ → 0`). -/
+theorem MassGap_exists_diagonal :
+    ∃ μ : ℝ, MassGap (Hamiltonian_operator_v2 0) μ :=
+  ⟨1, Hamiltonian_mass_gap_toy⟩
+
+/-- **Brick (`lower_bound_from_psd`).** Trivial `0`-lower-bound
+combinator: if `H` is PSD on the whole space
+(`∀ ψ, 0 ≤ ⟨H ψ, ψ⟩_ℝ`), then in particular `0 ≤ ⟨H ψ, ψ⟩_ℝ` for
+every non-vacuum ψ. Pure projection; does NOT produce a positive
+μ — for that, one needs a strictly positive lower bound away from
+vacuum (which is what `mass_gap_from_lower_bound` packages). The
+brick supplies the trivial half: PSD ⇒ non-negative on every
+input, vacuous on the non-vacuum subset. -/
+theorem lower_bound_from_psd {n : ℕ}
+    (H : EuclideanSpace ℝ (Fin n) → EuclideanSpace ℝ (Fin n))
+    (hpsd : ∀ ψ : EuclideanSpace ℝ (Fin n),
+      (0 : ℝ) ≤ inner (H ψ) ψ) :
+    ∀ ψ : EuclideanSpace ℝ (Fin n),
+      ψ ≠ vacuum_state n → (0 : ℝ) ≤ inner (H ψ) ψ :=
+  fun ψ _ => hpsd ψ
+
 end OperatorV2
 end Spectral
 end Towers

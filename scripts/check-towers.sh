@@ -447,6 +447,32 @@ BRICKS=(
   "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.YMHamiltonian_image_has_inf"
   "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.YMHamiltonian_vacuum_def"
   "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.YMHamiltonian_gap_above_vacuum_schema"
+
+  # ---- Batch 9 (2026-05-26) — +15 bricks across 3 same files, zero
+  # cross-imports. Track 1 (OperatorV2): first non-vacuous `MassGap`
+  # witness via the one-point space `EuclideanSpace ℝ (Fin 0)`, plus
+  # quadratic-form identity, ground-state inequality, PSD lower-bound
+  # combinator. Track 2 (EnergyV2): adds a SECOND dissipation surface
+  # (`Dissipation_real` ≠ 0) and `LerayEnergyIneq_real` over it,
+  # WITHOUT touching the Batch 8 `Dissipation = 0` tripwire. Track 3
+  # (Spectrum): vacuum-singleton sInf = 12, attainment witness, and
+  # MassGapV2 algebra (zero-iff-False, monotone-in-Δ, ≤ 0 projection).
+  # None promote any tower; YM / NS / Spectral stay Status: Open.
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.Hamiltonian_spectrum_toy"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.vacuum_is_ground_state"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.Hamiltonian_mass_gap_toy"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.MassGap_exists_diagonal"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.lower_bound_from_psd"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.H1Norm_real"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Dissipation_real"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.LerayEnergyIneq_real"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Dissipation_positive_ae"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.EnergyDecayBound"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.YMHamiltonian_inf_eq_twelve"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.YMHamiltonian_attains_inf"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.MassGap_v2_zero_iff"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.MassGap_v2_monotone"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.spectrum_gap_schema"
   # Task #56 Path B batch 2 v2 (2026-05-26): the explicit
   # `↥su3_submodule ≃ₗ[ℝ] (Fin 8 → ℝ)` equiv, the Gell-Mann basis
   # packaging via `Basis.ofEquivFun`, plus the linear-independence

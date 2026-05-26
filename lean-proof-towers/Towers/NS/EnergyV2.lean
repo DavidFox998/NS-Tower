@@ -190,6 +190,85 @@ theorem LerayEnergyIneq_dissipation_zero_simplifies
     have := h t
     linarith
 
+/-! ### Batch 9 (5) — real (non-zero) dissipation track
+
+Adds a SECOND dissipation surface (`Dissipation_real`) and a
+SECOND Leray-flavoured energy inequality (`LerayEnergyIneq_real`)
+that uses it, **without touching** the Batch 8 `Dissipation`
+(`= 0`) or its `LerayEnergyIneq_dissipation_zero_simplifies`
+tripwire above. The tripwire stays green; the new track exposes
+the "real" shape that downstream work can specialise.
+
+**Honest scope.** None of these advance the NS tower past
+`Status: Open`. They prove only:
+
+  * `H1Norm_real` — squared placeholder H¹-norm `(‖u t 0‖)²`.
+    NOT the real L² spatial integral.
+  * `Dissipation_real` — non-zero placeholder dissipation
+    `(‖u t 0‖)²`. Shape of `ν ‖∇u‖_{L²}²`, NOT the gradient
+    L² norm.
+  * `LerayEnergyIneq_real` — `Prop` shape
+    `½ E(t) + ∫ D ≤ ½ E(0)` over the new defs. No proof —
+    the Leray-Hopf inequality is **not** proved here.
+  * `Dissipation_positive_ae` — `0 ≤ Dissipation_real u t` via
+    `mul_self_nonneg`.
+  * `EnergyDecayBound` — `0 ≤ H1Norm_real u t`; trivial lower
+    bound on the squared placeholder, NOT a real decay theorem. -/
+
+/-- **Brick (`H1Norm_real`).** Squared placeholder H¹-norm:
+`(H1Norm u t)²` written as `H1Norm u t * H1Norm u t`. Real,
+non-negative, deterministic function of `(u, t)`. NOT the L²
+spatial integral of `|∇u|²`; just the square of the Task #51
+placeholder evaluated at the spatial origin. -/
+noncomputable def H1Norm_real (u : VelocityField) (t : ℝ) : ℝ :=
+  H1Norm u t * H1Norm u t
+
+/-- **Brick (`Dissipation_real`).** Non-zero placeholder dissipation,
+shaped like `‖∇u‖²_{L²}` but using the Task #51 placeholder norm
+in place of a real gradient. Concretely `H1Norm u t * H1Norm u t`.
+NOT the L² norm of the velocity gradient; just a non-negative real
+that downstream `LerayEnergyIneq_real` can refer to. The Batch 8
+`Dissipation = 0` placeholder above is intentionally NOT changed
+so the existing `LerayEnergyIneq_dissipation_zero_simplifies`
+tripwire stays compileable. -/
+noncomputable def Dissipation_real (u : VelocityField) (t : ℝ) : ℝ :=
+  H1Norm u t * H1Norm u t
+
+/-- **Brick (`LerayEnergyIneq_real`).** Leray-flavoured energy
+inequality over the *real* (non-zero) dissipation placeholder:
+`∀ t, ½ H1Norm_real u t + ν * t * Dissipation_real u 0
+     ≤ ½ H1Norm_real u₀ 0`. A real `Prop` over real arithmetic on
+the Batch 9 placeholders. **Not proved here** — the inequality is
+the Clay-flavoured target, not a theorem on placeholders. NOT the
+Leray-Hopf energy inequality; the constituent norms are
+placeholders. -/
+def LerayEnergyIneq_real (ν : ℝ) (u u₀ : VelocityField) : Prop :=
+  ∀ t : ℝ,
+    (1 / 2) * H1Norm_real u t + ν * t * Dissipation_real u 0
+      ≤ (1 / 2) * H1Norm_real u₀ 0
+
+/-- **Brick (`Dissipation_positive_ae`).** Pointwise non-negativity
+of the Batch 9 `Dissipation_real` placeholder at every `(u, t)`.
+Via `mul_self_nonneg`, since the body is `x * x`. Honest scope:
+this is non-negativity of the *placeholder*, not the "almost
+everywhere" positivity of a real dissipation density. -/
+theorem Dissipation_positive_ae (u : VelocityField) (t : ℝ) :
+    0 ≤ Dissipation_real u t := by
+  unfold Dissipation_real
+  exact mul_self_nonneg _
+
+/-- **Brick (`EnergyDecayBound`).** Trivial pointwise lower bound on
+the Batch 9 squared placeholder H¹-norm: `0 ≤ H1Norm_real u t`.
+Honest scope: this is *not* a decay theorem; it's the floor of the
+squared placeholder, available unconditionally via
+`mul_self_nonneg`. A real energy-decay statement would require the
+Leray-Hopf inequality, which is `LerayEnergyIneq_real` above and
+is **not** proved. -/
+theorem EnergyDecayBound (u : VelocityField) (t : ℝ) :
+    0 ≤ H1Norm_real u t := by
+  unfold H1Norm_real
+  exact mul_self_nonneg _
+
 end EnergyV2
 end NS
 end Towers
