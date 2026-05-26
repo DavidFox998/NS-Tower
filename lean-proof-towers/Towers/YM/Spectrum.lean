@@ -480,6 +480,101 @@ theorem vacuum_expectation_bounded :
     |YMHamiltonian vacuum_connection| ≤ 12 :=
   YMHamiltonian_abs_le_twelve vacuum_connection
 
+/-! ### Batch 12 (2026-05-26) — Track 3: selfadjoint to OS
+
+Five bricks on the OS-reconstruction track. Two real theorems
+extracted from existing infrastructure (Task #61's
+`YMHamiltonian_abs_le_twelve` and the `YMHamiltonian` function-
+identity surface), one combinator threading through Batch 11's
+`vacuum_gap_positive_schema`, and two NAMED Prop schemas for shapes
+the placeholder cannot discharge. Tripwire honored: `YMHamiltonian_
+selfadjoint_proven` is a function-identity existence statement (NOT
+the Kato-Rellich essential-self-adjointness theorem), so
+`OS0_temperedness_from_coercive` is correspondingly the *uniform-
+boundedness* form (NOT real OS0 temperedness of a Schwinger
+function). YM tower stays Status: Open. -/
+
+/-- **Brick (`YMHamiltonian_selfadjoint_proven`).** Real `∃`
+theorem: `∀ A, ∃ B, YMHamiltonian B = YMHamiltonian A` (witness
+`B := A`, conclusion by `rfl`). Honest scope: this is the placeholder
+analogue of "every configuration has a self-conjugate partner",
+which is trivially true for any function. NOT a Kato-Rellich proof
+of essential self-adjointness of the YM Hamiltonian operator (which
+would require a Hilbert space + an unbounded operator + a relatively
+bounded perturbation, none of which exist on the placeholder
+surface). Named to thread Track-3 OS reconstruction through the
+existing `YMHamiltonian` function-identity surface. -/
+theorem YMHamiltonian_selfadjoint_proven (A : SU3Connection) :
+    ∃ B : SU3Connection, YMHamiltonian B = YMHamiltonian A :=
+  ⟨A, rfl⟩
+
+/-- **Brick (`OS0_temperedness_from_coercive`).** Real combinator
+theorem: given the coercive lower bound `∀ A, -12 ≤ YMHamiltonian A`
+(Batch 10's `YMHamiltonian_coercive`-shape hypothesis), conclude
+**uniform boundedness** `∃ C, ∀ A, |YMHamiltonian A| ≤ C`,
+discharged with `C := 12` via Task #61's
+`YMHamiltonian_abs_le_twelve`. Honest scope: this is the placeholder
+analogue of OS0 temperedness (uniform polynomial bounds on the
+Schwinger functions), specialized to the simplest *uniform-bounded*
+form. NOT real OS0 temperedness of an n-point Schwinger function on
+ℝ^(4n) (which requires test-function spaces and tempered
+distributions, out of scope on the placeholder). Tripwire honored:
+the conclusion is the *uniform-bounded* form, not real temperedness,
+matching the Track-3 directive that `YMHamiltonian_selfadjoint_
+proven` is the function-identity form, not Kato-Rellich. -/
+theorem OS0_temperedness_from_coercive
+    (_h_coercive : ∀ A : SU3Connection, -12 ≤ YMHamiltonian A) :
+    ∃ C : ℝ, ∀ A : SU3Connection, |YMHamiltonian A| ≤ C :=
+  ⟨12, YMHamiltonian_abs_le_twelve⟩
+
+/-- **Schema (`OS1_euclidean_invariance_schema`).** Named Prop
+predicate for OS1 Euclidean invariance: `∀ A, ∀ R : SU3Connection →
+SU3Connection, YMHamiltonian (R A) = YMHamiltonian A`. Real Prop;
+FALSE in general on the placeholder (an arbitrary `R` can map
+`vacuum_connection` (value `12`) to `diagNegOneOneOneOne` (value
+`-4` from Batch 8), so the equality fails). The schema is left
+unproved deliberately — real OS1 Euclidean invariance requires
+gauge-fixing and a restriction of `R` to the Euclidean group on the
+underlying lattice, both out of scope on the placeholder. Track-3
+directive says "still schema, needs gauge fixing"; this is the
+honest stand-in. YM tower stays Open. -/
+def OS1_euclidean_invariance_schema : Prop :=
+  ∀ A : SU3Connection, ∀ R : SU3Connection → SU3Connection,
+    YMHamiltonian (R A) = YMHamiltonian A
+
+/-- **Brick (`cluster_decomposition_implies_gap`).** Real combinator
+theorem: given **both** `∀ A B, cluster_decomposition_schema A B`
+(uniform cluster decomposition) AND `vacuum_gap_positive_schema`
+(existence of a positive gap above the vacuum), derive the
+`∃ Δ : ℝ, 0 < Δ ∧ MassGapV2 Δ` packaging. Honest scope: this is
+the formal implication "cluster ⇒ mass gap" elimination on the
+placeholder predicates; the cluster hypothesis is **consumed** (not
+used algebraically, since `cluster_decomposition_schema` is the
+trivial `True` placeholder), and the conclusion is repackaged from
+the `vacuum_gap_positive_schema` witness. NOT a real proof of mass
+gap from cluster decomposition — `vacuum_gap_positive_schema` itself
+remains unproved, so YM mass-gap existence stays Open. -/
+theorem cluster_decomposition_implies_gap
+    (_h_cluster : ∀ A B : SU3Connection, cluster_decomposition_schema A B)
+    (h_gap : vacuum_gap_positive_schema) :
+    ∃ Δ : ℝ, 0 < Δ ∧ MassGapV2 Δ := by
+  obtain ⟨Δ, hΔ⟩ := h_gap
+  exact ⟨Δ, hΔ.1, hΔ⟩
+
+/-- **Schema (`vacuum_gap_lower_bound`).** Named Prop predicate for
+the **conjectural lower bound** on the YM mass gap:
+`∃ Δ : ℝ, 12 ≤ Δ ∧ MassGapV2 Δ`. The numerical lower bound `12` is
+the gap one would expect from the placeholder normalization
+(`YMHamiltonian` ranges over `[-12, 12]` by Task #61, vacuum value
+is `12` by Task #55, so the maximum possible gap above the vacuum is
+`|−12 − 12| = 24` and the lower-bound conjecture `Δ ≥ 12` is the
+midpoint conjecture `24 - 12 = 12` per the directive). Real Prop;
+NOT proved here — even `vacuum_gap_positive_schema` (the bare
+existence of a positive Δ) is unproved, so the existence of a
+Δ ≥ 12 is a strict strengthening. YM tower stays Open. -/
+def vacuum_gap_lower_bound : Prop :=
+  ∃ Δ : ℝ, 12 ≤ Δ ∧ MassGapV2 Δ
+
 end Spectrum
 end YM
 end Towers

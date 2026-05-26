@@ -561,6 +561,66 @@ BRICKS=(
   "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.Wightman_functions_from_OS_schema"
   "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.cluster_implies_mass_gap_schema"
   "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.vacuum_expectation_bounded"
+
+  # ---- Batch 12 (2026-05-26) — +15 bricks across 3 same files, zero
+  # cross-imports. Wall 171 → 186. Track 1 (OperatorV2): prove the toy
+  # gap — `Hamiltonian_compact_resolvent_toy` (REAL theorem for the
+  # zero operator on `EuclideanSpace ℝ (Fin n)`, N := 0);
+  # `essential_spectrum_empty_toy` (REAL theorem on `Fin 0` via
+  # `Subsingleton.elim` — tripwire honored: VACUOUS on Fin 0, would
+  # FAIL on Fin (n+1)); `MassGap_toy_exists` (REAL ∃ ∃ theorem `∃ H,
+  # ∃ μ > 0, MassGap H μ` on Fin 0 — second fully-∃ mass-gap witness
+  # after Batch 11's MassGap_toy_proven); `first_excitation_explicit`
+  # (noncomputable def of the standard basis vector e₀ on Fin (n+1));
+  # `gap_equals_μ` (Iff.rfl identification of MassGap with the
+  # gap-conjunction). Track 2 (EnergyV2): small-data global existence
+  # — `SmallDataGlobal_nonzero` (REAL theorem on constant velocity
+  # fields `fun _ _ => v` — second real witness for the schema after
+  # Batch 11's zero witness, restricted to constant-field surface);
+  # `Enstrophy_bound_global` (NAMED Prop schema `∃ C ≥ 0, ∀ t,
+  # Enstrophy u t ≤ C * H1Norm u₀ 0`); `Energy_decay_optimal` (NAMED
+  # Prop schema `∃ C > 0, ∀ t ≥ 0, H1Norm u t ≤ C / (1+t)²` —
+  # Schonbek sharp rate companion to Batch 11's exponential decay);
+  # `BealeKatoMajda_criterion` (REAL theorem on zero velocity field
+  # for any T, M ≥ 0 via H1Norm_zero — tripwire honored: BKM
+  # promoted only on zero, matching SmallDataGlobal_nonzero on
+  # constant); `LerayHopf_unique` (NAMED Prop schema uniqueness
+  # `∀ u u', EnergyMonotone u u₀ → EnergyMonotone u' u₀ → u = u'`).
+  # Track 3 (Spectrum): selfadjoint to OS — `YMHamiltonian_selfadjoint_
+  # proven` (REAL ∃ theorem `∀ A, ∃ B, YMHamiltonian B = YMHamiltonian
+  # A` via B := A, rfl — function-identity form, NOT Kato-Rellich);
+  # `OS0_temperedness_from_coercive` (REAL combinator: coercive
+  # hypothesis → uniform boundedness `∃ C, ∀ A, |YMHamiltonian A| ≤ C`
+  # via Task #61's YMHamiltonian_abs_le_twelve — uniform-bounded
+  # form, NOT real OS0 temperedness); `OS1_euclidean_invariance_
+  # schema` (NAMED Prop schema `∀ A, ∀ R, YMHamiltonian (R A) =
+  # YMHamiltonian A` — FALSE in general, needs gauge fixing);
+  # `cluster_decomposition_implies_gap` (REAL combinator threading
+  # cluster + vacuum_gap_positive_schema → ∃ Δ > 0, MassGapV2 Δ —
+  # tripwire honored: vacuum_gap_positive_schema stays unproved);
+  # `vacuum_gap_lower_bound` (NAMED Prop schema `∃ Δ ≥ 12,
+  # MassGapV2 Δ` — conjectural lower bound, NOT proved). All three
+  # directive tripwires honored: Track 1 — essential_spectrum_empty_
+  # toy vacuous on singleton; Track 2 — BKM real only on zero so
+  # SmallDataGlobal_nonzero stays on constant fields; Track 3 —
+  # selfadjoint is function-identity so OS0 is uniform-bounded form,
+  # OS1 stays schema. No promotion: YM / NS / Spectral stay
+  # Status: Open (`docs/ROADMAP.md` § 2 / § 3).
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.Hamiltonian_compact_resolvent_toy"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.essential_spectrum_empty_toy"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.MassGap_toy_exists"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.first_excitation_explicit"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.gap_equals_μ"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.SmallDataGlobal_nonzero"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Enstrophy_bound_global"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Energy_decay_optimal"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.BealeKatoMajda_criterion"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.LerayHopf_unique"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.YMHamiltonian_selfadjoint_proven"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.OS0_temperedness_from_coercive"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.OS1_euclidean_invariance_schema"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.cluster_decomposition_implies_gap"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.vacuum_gap_lower_bound"
   # Task #56 Path B batch 2 v2 (2026-05-26): the explicit
   # `↥su3_submodule ≃ₗ[ℝ] (Fin 8 → ℝ)` equiv, the Gell-Mann basis
   # packaging via `Basis.ofEquivFun`, plus the linear-independence

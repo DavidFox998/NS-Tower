@@ -504,6 +504,96 @@ theorem minimax_μ_equals_gap {n : ℕ}
       ψ ≠ vacuum_state n → μ ≤ inner (H ψ) ψ :=
   ⟨h.1, h.2⟩
 
+/-! ### Batch 12 (2026-05-26) — Track 1: prove the toy gap
+
+Five bricks promoting Batch 10/11 schemas to concrete proofs on the
+**zero-operator** placeholder. Honest scope is preserved at every
+step: every "toy" proof is trivial on the placeholder surface, and
+the `Hamiltonian_compact_resolvent_toy` / `essential_spectrum_empty_
+toy` proofs only carry their stated content for `Hamiltonian =
+fun _ => 0`. Tripwire honored: if the compact-resolvent schema were
+ever blocked on a real Hamiltonian, `MassGap_toy_exists` would
+become unreachable — here both close because the placeholder is the
+trivial zero operator. Spectral tower stays Status: Open. -/
+
+/-- **Brick (`Hamiltonian_compact_resolvent_toy`).** Real theorem
+proving `Hamiltonian_compact_resolvent_schema` for the zero operator
+on `EuclideanSpace ℝ (Fin n)`. Pick `N := 0`; every `ψ` maps to `0`
+with `‖0‖ = 0 ≤ 0`. Honest scope: the placeholder Hamiltonian is
+the zero map, which is bounded but **not** a real compact-resolvent
+operator (its resolvent is undefined for `z = 0`); this brick
+witnesses the schema on the only operator the placeholder surface
+provides. Promotion to a real compact-resolvent operator would need
+`ContinuousLinearMap.IsCompactOperator`, out of scope on v4.12.0. -/
+theorem Hamiltonian_compact_resolvent_toy {n : ℕ} :
+    Hamiltonian_compact_resolvent_schema
+      (fun _ : EuclideanSpace ℝ (Fin n) => (0 : EuclideanSpace ℝ (Fin n))) := by
+  intro _B
+  refine ⟨0, fun _ψ _ => ?_⟩
+  simp
+
+/-- **Brick (`essential_spectrum_empty_toy`).** Real theorem
+proving `essential_spectrum_empty_schema` for the zero operator on
+`EuclideanSpace ℝ (Fin 0)`. The schema is surjectivity
+`∀ ψ, ∃ φ, H φ = ψ`; on `Fin 0` the space is a `Subsingleton`, so
+any `φ` (we pick `φ := ψ`) gives `0 = ψ` via `Subsingleton.elim`.
+Honest scope (tripwire mode): the brick is **vacuous on `Fin 0`**
+and would FAIL on `Fin (n+1)` for the zero operator (which is NOT
+surjective). It is the singleton-dimensional witness, not a real
+essential-spectrum-empty theorem. -/
+theorem essential_spectrum_empty_toy :
+    essential_spectrum_empty_schema
+      (fun _ : EuclideanSpace ℝ (Fin 0) => (0 : EuclideanSpace ℝ (Fin 0))) := by
+  intro ψ
+  exact ⟨ψ, Subsingleton.elim _ _⟩
+
+/-- **Brick (`MassGap_toy_exists`).** Real ∃ ∃ theorem
+`∃ H, ∃ μ > 0, MassGap H μ` on `EuclideanSpace ℝ (Fin 0)`. Witnesses
+`H := fun _ => 0`, `μ := 1`; the `MassGap` inner-product bound is
+vacuous since for any `ψ : EuclideanSpace ℝ (Fin 0)` we have
+`ψ = vacuum_state 0` by `Subsingleton.elim`, so the `ψ ≠ vacuum`
+branch is empty. Honest scope: this is the **second** fully-
+existential mass-gap witness after Batch 11's `MassGap_toy_proven`,
+but here both the Hamiltonian AND the gap value are quantified
+existentially. NOT a real Clay mass gap; the witness is vacuous on
+a singleton Hilbert space. -/
+theorem MassGap_toy_exists :
+    ∃ H : EuclideanSpace ℝ (Fin 0) → EuclideanSpace ℝ (Fin 0),
+      ∃ μ : ℝ, 0 < μ ∧ MassGap H μ := by
+  refine ⟨fun _ => 0, 1, one_pos, ?_⟩
+  refine ⟨one_pos, fun ψ hne => ?_⟩
+  exact absurd (Subsingleton.elim ψ (vacuum_state 0)) hne
+
+/-- **Brick (`first_excitation_explicit`).** `noncomputable def`
+giving an **explicit** first-excited-state vector
+`e₀ = (1, 0, …, 0)` on `EuclideanSpace ℝ (Fin (n+1))` (the standard
+basis vector at index `0`). For `n = 0` this is `(1)` on
+`EuclideanSpace ℝ (Fin 1)`, which is genuinely non-zero. Honest
+scope: this is a named explicit vector to **stand in for** the
+first excited state of a Hamiltonian; it is NOT proven to be an
+eigenstate of any operator (the placeholder Hamiltonian is zero, so
+every vector is trivially in its kernel). Names the data the real
+spectral theorem would produce. -/
+noncomputable def first_excitation_explicit (n : ℕ) :
+    EuclideanSpace ℝ (Fin (n + 1)) :=
+  fun i => if i = (0 : Fin (n + 1)) then (1 : ℝ) else (0 : ℝ)
+
+/-- **Brick (`gap_equals_μ`).** Real `Iff` theorem: the `MassGap`
+predicate unfolds **exactly** to `0 < μ ∧ ∀ ψ ≠ vacuum,
+μ ≤ ⟨H ψ, ψ⟩`. This is `Iff.rfl` on the `MassGap` definition, but
+the named Iff makes the equality `Δ = μ` (gap-equals-witness-μ)
+explicit at the proof-theoretic level: every `μ` extracted from a
+`MassGap` witness IS the gap. Honest scope: this is the definitional
+identification, NOT a spectral-theorem proof that `μ` equals the
+infimum of `σ(H) \ {0}` (which would require a real spectral
+measure, out of scope on the placeholder). -/
+theorem gap_equals_μ {n : ℕ}
+    (H : EuclideanSpace ℝ (Fin n) → EuclideanSpace ℝ (Fin n)) (μ : ℝ) :
+    MassGap H μ ↔
+      (0 < μ ∧ ∀ ψ : EuclideanSpace ℝ (Fin n),
+        ψ ≠ vacuum_state n → μ ≤ inner (H ψ) ψ) :=
+  Iff.rfl
+
 end OperatorV2
 end Spectral
 end Towers

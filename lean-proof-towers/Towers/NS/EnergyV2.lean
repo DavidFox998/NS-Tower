@@ -476,6 +476,92 @@ scope. NS tower stays Open. -/
 def LerayHopf_weak_solution_exists (u₀ : VelocityField) : Prop :=
   ∃ u : VelocityField, EnergyMonotone u u₀
 
+/-! ### Batch 12 (2026-05-26) — Track 2: small-data global existence
+
+Five bricks. Two real theorems on **constant velocity fields** (the
+honest placeholder analogue of "no advection, no dissipation"),
+and three NAMED Prop schemas for shapes the placeholder cannot
+discharge. Tripwire honored: `BealeKatoMajda_criterion` IS promoted
+to a real theorem, but **only** on the zero velocity field, so
+`SmallDataGlobal_nonzero` is correspondingly restricted to the
+constant-field witness — both stay honest stand-ins for their real
+Fujita-Kato / Beale-Kato-Majda counterparts. NS tower stays
+Status: Open. Batch 8 `Dissipation = 0` tripwire untouched. -/
+
+/-- **Brick (`SmallDataGlobal_nonzero`).** Real theorem proving
+`SmallDataGlobal_schema (fun _ _ => v) (fun _ _ => v) ‖v‖` for any
+`v : EuclideanSpace ℝ (Fin 3)`. Witnesses the schema on a
+**constant-in-time** velocity field, which is genuinely non-zero
+for `v ≠ 0`. The schema unfolds to `‖v‖ ≤ ‖v‖ → ∀ t, ‖v‖ ≤ 2 * ‖v‖`,
+which closes by `0 ≤ ‖v‖` (`norm_nonneg`). Honest scope: this is
+the **second** real witness for `SmallDataGlobal_schema` (Batch 11
+proved it on zero); the constant-field surface has no advection or
+dissipation, so the bound is vacuous — NOT real Fujita-Kato
+contraction in critical Besov space. -/
+theorem SmallDataGlobal_nonzero (v : EuclideanSpace ℝ (Fin 3)) :
+    SmallDataGlobal_schema
+      (fun (_t : ℝ) (_x : EuclideanSpace ℝ (Fin 3)) => v)
+      (fun (_t : ℝ) (_x : EuclideanSpace ℝ (Fin 3)) => v)
+      (‖v‖) := by
+  intro _h_small t
+  show H1Norm (fun (_t : ℝ) (_x : EuclideanSpace ℝ (Fin 3)) => v) t ≤
+      2 * H1Norm (fun (_t : ℝ) (_x : EuclideanSpace ℝ (Fin 3)) => v) 0
+  unfold H1Norm
+  have h_nn : (0 : ℝ) ≤ ‖v‖ := norm_nonneg v
+  linarith
+
+/-- **Schema (`Enstrophy_bound_global`).** Named Prop predicate for
+the **global enstrophy bound** `∫₀^∞ ‖∇u(s)‖_{L²}² ds ≤ C * ‖u₀‖_{H¹}²`
+that small-data Fujita-Kato yields. On the placeholder rendered as
+`∃ C ≥ 0, ∀ t, Enstrophy u t ≤ C * H1Norm u₀ 0` (the placeholder
+has no time integral; the bound is pointwise-in-`t` rather than
+integrated). Real Prop; NOT proved here — would require a real
+dissipation mechanism the placeholder lacks. NS tower stays Open. -/
+def Enstrophy_bound_global (u u₀ : VelocityField) : Prop :=
+  ∃ C : ℝ, 0 ≤ C ∧ ∀ t : ℝ, Enstrophy u t ≤ C * H1Norm u₀ 0
+
+/-- **Schema (`Energy_decay_optimal`).** Named Prop predicate for
+**optimal algebraic energy decay** `E(t) ≤ C / (1 + t)²` (Schonbek
+1985 sharp rate for NS in ℝ³ under decay assumptions on the data).
+Real Prop over real arithmetic; NOT proved here — algebraic decay
+requires a Fourier-side argument on the dissipative semigroup,
+out of scope on the placeholder. Companion to Batch 11's
+`Energy_decay_exponential` (the exponential-decay analogue). NS
+tower stays Open. -/
+def Energy_decay_optimal (u : VelocityField) : Prop :=
+  ∃ C : ℝ, 0 < C ∧ ∀ t : ℝ, 0 ≤ t → H1Norm u t ≤ C / (1 + t) ^ 2
+
+/-- **Brick (`BealeKatoMajda_criterion`).** Real theorem proving
+`BealeKatoMajda_criterion_schema (0 : VelocityField) T M` for any
+`T` and any `M ≥ 0`. The zero velocity field has
+`Enstrophy 0 t = 0` for all `t` (via Task #56's `H1Norm_zero`), so
+the schema's implication trivially holds. Honest scope (tripwire
+mode): the BKM schema is promoted to a real theorem ONLY on the
+zero velocity field — the implication shape is correct, the
+**witness** is the trivial-on-zero case. NOT the real BKM
+continuation criterion (which requires local existence in `H^s`,
+out of scope on the placeholder). Track-2 tripwire: this is why
+`SmallDataGlobal_nonzero` is restricted to constant fields. -/
+theorem BealeKatoMajda_criterion (T M : ℝ) (hM : 0 ≤ M) :
+    BealeKatoMajda_criterion_schema (0 : VelocityField) T M := by
+  intro _h_bound t _ht
+  unfold Enstrophy
+  rw [H1Norm_zero t]
+  linarith
+
+/-- **Schema (`LerayHopf_unique`).** Named Prop predicate for
+**uniqueness of the Leray-Hopf weak solution** under small initial
+data: `∀ u u', EnergyMonotone u u₀ → EnergyMonotone u' u₀ → u = u'`.
+Real Prop; FALSE in general on the placeholder (any two velocity
+fields satisfying the energy bound trivially satisfy the
+premise, but there is no NS evolution to force them equal), so the
+schema is unproved. Honest scope: uniqueness of Leray-Hopf is open
+even in 3D as an unconditional theorem; the schema NAMES the shape
+the conjectural uniqueness proof would have. NS tower stays Open. -/
+def LerayHopf_unique (u₀ : VelocityField) : Prop :=
+  ∀ u u' : VelocityField,
+    EnergyMonotone u u₀ → EnergyMonotone u' u₀ → u = u'
+
 end EnergyV2
 end NS
 end Towers
