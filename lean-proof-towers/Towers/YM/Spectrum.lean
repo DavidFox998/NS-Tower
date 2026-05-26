@@ -575,6 +575,120 @@ existence of a positive Δ) is unproved, so the existence of a
 def vacuum_gap_lower_bound : Prop :=
   ∃ Δ : ℝ, 12 ≤ Δ ∧ MassGapV2 Δ
 
+/-! ### Batch 13 (2026-05-26) — Track 3: cluster → gap
+
+Five bricks on the **cluster-decomposition → mass-gap** track.
+Names verbatim per the Batch 13 directive:
+`Correlation_length_from_coercive`, `Exponential_clustering_schema`,
+`cluster_decomposition_proven`, `spectral_gap_from_clustering`,
+`vacuum_gap_positive_theorem`.
+
+Honest scope: two real theorems (one combinator extracting a
+correlation-length bound from the coercive lower bound, one
+proving the placeholder `cluster_decomposition_schema` from its
+trivial-reflexivity body), one combinator threading
+`Exponential_clustering_schema` + `vacuum_gap_positive_schema` →
+∃ Δ packaging, and two NAMED Prop schemas. Directive Track-3
+tripwire honored: `cluster_decomposition_proven` IS promoted to a
+real theorem (because the placeholder body of
+`cluster_decomposition_schema` is trivial reflexivity), but the
+corresponding `vacuum_gap_positive_theorem` (the iff-bridge to
+real clustering) stays a **schema** — the genuinely hard step of
+extracting an unconditional positive Δ from real exponential
+clustering is not discharged on the placeholder. YM tower stays
+Status: Open. -/
+
+/-- **Brick (`Correlation_length_from_coercive`).** Real combinator:
+from the coercive lower bound `∀ A, -12 ≤ YMHamiltonian A` (Batch
+10's `YMHamiltonian_coercive`-shape hypothesis), produce a
+correlation length witness `∃ ξ, 0 < ξ ∧ ξ ≤ 12`. Discharged with
+`ξ := 1` (the inverse-bound `ξ ≤ 1/|spectral bound|^{-1}` would
+give `ξ ≤ 1/12 < 1 ≤ 12`; the brick names the named-correlation-
+length-from-coercive shape with the weaker `ξ ≤ 12` upper bound
+the placeholder can witness). Honest scope: NOT a real
+correlation length (which would be `ξ = 1/m` for the physical
+mass `m`); placeholder constant `1` is named "correlation length"
+because the coercive bound `-12` gives the spectral interval
+`[-12, 12]` of width `24`, and `ξ ≤ 12` is the half-width upper
+bound. -/
+theorem Correlation_length_from_coercive
+    (_h_coercive : ∀ A : SU3Connection, -12 ≤ YMHamiltonian A) :
+    ∃ ξ : ℝ, 0 < ξ ∧ ξ ≤ 12 := by
+  refine ⟨1, one_pos, ?_⟩
+  norm_num
+
+/-- **Schema (`Exponential_clustering_schema`).** Named Prop
+predicate for **exponential clustering** of vacuum expectations:
+there exist `C, ξ > 0` such that for every pair of connections
+`A, B` and every separation `r ≥ 0`,
+`|YMHamiltonian A * YMHamiltonian B - YMHamiltonian vacuum_connection
+* YMHamiltonian vacuum_connection| ≤ C * exp(-r / ξ)`. Real Prop;
+**NOT proved here** — FALSE in general on the placeholder
+(`A := -1`-trace SU(3) connection from Task #77 gives
+`YMHamiltonian A = -4`, so `(-4)*(-4) - 12*12 = 16 - 144 = -128`,
+which is independent of `r` and not bounded by `C * exp(-r/ξ)` as
+`r → ∞`). The schema NAMES the shape real exponential clustering
+would have — independence of vacuum expectations at large
+separation. YM tower stays Open. -/
+def Exponential_clustering_schema : Prop :=
+  ∃ C ξ : ℝ, 0 < C ∧ 0 < ξ ∧
+    ∀ A B : SU3Connection, ∀ r : ℝ, 0 ≤ r →
+      |YMHamiltonian A * YMHamiltonian B -
+        YMHamiltonian vacuum_connection *
+          YMHamiltonian vacuum_connection|
+        ≤ C * Real.exp (-r / ξ)
+
+/-- **Brick (`cluster_decomposition_proven`).** Real theorem:
+`∀ A B, cluster_decomposition_schema A B`. The placeholder body of
+`cluster_decomposition_schema A B` is the trivial implication
+`(A = vacuum ∧ B = vacuum) → YMHamiltonian A * YMHamiltonian B =
+YMHamiltonian A * YMHamiltonian B` (reflexivity); closes by
+`intro _; rfl`. Honest scope (directive Track-3 tripwire mode):
+the placeholder schema IS proven — but this is **not** a real
+proof of cluster decomposition for YM Schwinger functions; it
+discharges only the trivial-reflexivity body
+`cluster_decomposition_schema` carries on the placeholder. The
+corresponding **real** cluster decomposition for the YM functional
+integral remains open; this brick is the **named promotion** of
+the placeholder schema, NOT a Glimm-Jaffe-Spencer-style theorem. -/
+theorem cluster_decomposition_proven (A B : SU3Connection) :
+    cluster_decomposition_schema A B := by
+  intro _
+  rfl
+
+/-- **Brick (`spectral_gap_from_clustering`).** Real combinator:
+from `Exponential_clustering_schema` (the hypothetical exponential
+clustering bound) AND `vacuum_gap_positive_schema` (the
+hypothetical positive gap above the vacuum), conclude
+`∃ Δ : ℝ, 0 < Δ ∧ MassGapV2 Δ`. The clustering hypothesis is
+**consumed** (not used algebraically — the placeholder
+`Exponential_clustering_schema` does not give us a `Δ`); the
+existential is supplied entirely by `vacuum_gap_positive_schema`.
+Honest scope: the **structural** combinator naming the
+"clustering ⇒ gap" implication that the Glimm-Jaffe-Spencer
+programme would discharge unconditionally. NOT a real proof —
+both hypotheses are unproved on the placeholder. -/
+theorem spectral_gap_from_clustering
+    (_h_clustering : Exponential_clustering_schema)
+    (h_gap : vacuum_gap_positive_schema) :
+    ∃ Δ : ℝ, 0 < Δ ∧ MassGapV2 Δ := by
+  obtain ⟨Δ, hΔ⟩ := h_gap
+  exact ⟨Δ, hΔ.1, hΔ⟩
+
+/-- **Schema (`vacuum_gap_positive_theorem`).** Named Prop
+predicate for the **iff-bridge** between exponential clustering and
+positivity of the vacuum gap:
+`Exponential_clustering_schema ↔ vacuum_gap_positive_schema`. Real
+Prop; **NOT proved here** — directive Track-3 tripwire: extracting
+unconditional positive Δ from real exponential clustering is the
+genuine open Clay step (the forward direction is OS reconstruction
++ Glimm-Jaffe-Spencer; the reverse direction needs spectral
+analysis of the OS-reconstructed Hamiltonian). The schema NAMES
+the iff shape the real theorem would have, without supplying
+either direction. YM tower stays Open. -/
+def vacuum_gap_positive_theorem : Prop :=
+  Exponential_clustering_schema ↔ vacuum_gap_positive_schema
+
 end Spectrum
 end YM
 end Towers

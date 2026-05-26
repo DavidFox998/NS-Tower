@@ -849,6 +849,44 @@ BRICKS=(
   "Towers.YM.MassGap|TheoremaAureum.Towers.YM.YMHamiltonian_no_eigenstate"
   "Towers.YM.MassGap|TheoremaAureum.Towers.YM.YMHamiltonian_no_nonzero_eigenstate"
   "Towers.YM.MassGap|TheoremaAureum.Towers.YM.MassGap_iff_pos"
+  # ---- Batch 13 (2026-05-26) — +15 bricks across 3 same files, zero
+  # cross-imports. Track 1: infrared regularization on
+  # Spectral/OperatorV2.lean. Track 2: large-data attempt on
+  # NS/EnergyV2.lean. Track 3: cluster → gap on YM/Spectrum.lean.
+  # All three directive tripwires honored:
+  #   - Spectral: `IR_removal_limit_schema` and
+  #     `MassGap_persists_under_limit_schema` stay schemas; the
+  #     `Λ → ∞` removal step is the genuinely hard one and is not
+  #     discharged on the placeholder. `MassGap_IR` is real on
+  #     `Fin 0` only (vacuous-on-singleton, identical-shape to
+  #     Batch 11/12 vacuous witnesses).
+  #   - NS: `BealeKatoMajda_bootstrap` packages BKM only on the
+  #     zero velocity field; `Blowup_exclusion_small_target` is
+  #     real on zero only; `Global_scheme_for_all_data` stays a
+  #     schema (the genuine open Clay step of upgrading small-data
+  #     to all-data is NOT discharged).
+  #   - YM: `cluster_decomposition_proven` IS promoted to a real
+  #     theorem (the placeholder body is trivial reflexivity), but
+  #     `vacuum_gap_positive_theorem` stays a schema (iff-bridge
+  #     to real exponential clustering; the genuine open Clay
+  #     step of producing an unconditional Δ > 0 from real
+  #     clustering is NOT discharged). YM / NS / Spectral towers
+  #     stay Status: Open (`docs/ROADMAP.md` § 2 / § 3).
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.InfraredCutoff_Λ"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.Hamiltonian_IR_regularized"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.MassGap_IR"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.IR_removal_limit_schema"
+  "Towers.Spectral.OperatorV2|TheoremaAureum.Towers.Spectral.OperatorV2.MassGap_persists_under_limit_schema"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Enstrophy_critical_bound"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.BealeKatoMajda_bootstrap"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Conditional_regularity_theorem"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Blowup_exclusion_small_target"
+  "Towers.NS.EnergyV2|TheoremaAureum.Towers.NS.EnergyV2.Global_scheme_for_all_data"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.Correlation_length_from_coercive"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.Exponential_clustering_schema"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.cluster_decomposition_proven"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.spectral_gap_from_clustering"
+  "Towers.YM.Spectrum|TheoremaAureum.Towers.YM.Spectrum.vacuum_gap_positive_theorem"
 )
 
 VERIFIER_DIR="$(mktemp -d)"

@@ -594,6 +594,89 @@ theorem gap_equals_μ {n : ℕ}
         ψ ≠ vacuum_state n → μ ≤ inner (H ψ) ψ) :=
   Iff.rfl
 
+/-! ### Batch 13 (2026-05-26) — Track 1: infrared regularization
+
+Five bricks introducing the **IR-regularized Hamiltonian** surface.
+Names verbatim per the Batch 13 directive: `InfraredCutoff_Λ`,
+`Hamiltonian_IR_regularized`, `MassGap_IR`, `IR_removal_limit_schema`,
+`MassGap_persists_under_limit_schema`.
+
+Honest scope: the IR-regularized Hamiltonian is the *zero* operator on
+`EuclideanSpace ℝ (Fin n)` for every cutoff `Λ`; the cutoff parameter
+is reserved-slot — NOT a real volume / mass cutoff acting on a real
+operator. `MassGap_IR` is REAL on `Fin 0` (the vacuous-on-singleton
+witness, identical-shape to Batch 11/12), but the `IR_removal_limit`
+and `MassGap_persists_under_limit` Props remain **schemas** —
+directive Track-1 tripwire honored: removing the cutoff at `Λ → ∞`
+is the genuinely hard step; on the placeholder it cannot be
+discharged, so persistence under the limit stays unproved. Spectral
+tower stays Status: Open. -/
+
+/-- **Def (`InfraredCutoff_Λ`).** Named predicate `0 < Λ` — names
+the positive-real "infrared cutoff" parameter the IR-regularized
+Hamiltonian depends on. Honest scope: this is just `0 < Λ`, the
+hypothesis a real IR cutoff parameter would satisfy; NOT a real
+spatial volume or infrared mass scale. -/
+def InfraredCutoff_Λ (Λ : ℝ) : Prop := 0 < Λ
+
+/-- **Def (`Hamiltonian_IR_regularized`).** `noncomputable def`
+giving the IR-regularized Hamiltonian on `EuclideanSpace ℝ (Fin n)`
+parameterized by a cutoff `Λ : ℝ`. Currently the zero operator
+`fun _ => 0` regardless of `Λ` — the cutoff parameter is a
+reserved slot for the future upgrade to a real cutoff-dependent
+operator. Honest scope: NOT a real IR-regularized Hamiltonian (no
+spatial cutoff, no infrared mass, no operator dependence on Λ);
+identity-of-zero placeholder. -/
+noncomputable def Hamiltonian_IR_regularized (n : ℕ) (_Λ : ℝ) :
+    EuclideanSpace ℝ (Fin n) → EuclideanSpace ℝ (Fin n) :=
+  fun _ => 0
+
+/-- **Brick (`MassGap_IR`).** Real `∃` theorem: for any cutoff
+`Λ > 0`, there exists `Δ ≥ Λ` such that
+`MassGap (Hamiltonian_IR_regularized 0 Λ) Δ`. Witnesses `Δ := Λ`
+(the gap dominates the cutoff with equality — `f(Λ) = Λ`); the
+`MassGap` universal clause is vacuous on `EuclideanSpace ℝ (Fin 0)`
+(only the vacuum vector lives there). Honest scope: real proof of
+the "gap-dominates-cutoff" relation `Δ_Λ ≥ f(Λ)` with `f(Λ) = Λ`,
+but **only** on the singleton-dimensional placeholder where the
+gap inequality is vacuous. NOT a real IR-regularized mass gap. -/
+theorem MassGap_IR (Λ : ℝ) (hΛ : InfraredCutoff_Λ Λ) :
+    ∃ Δ : ℝ, Λ ≤ Δ ∧ MassGap (Hamiltonian_IR_regularized 0 Λ) Δ := by
+  refine ⟨Λ, le_refl Λ, hΛ, ?_⟩
+  intro ψ hne
+  exact absurd (Subsingleton.elim ψ (vacuum_state 0)) hne
+
+/-- **Schema (`IR_removal_limit_schema`).** Named Prop predicate for
+the IR cutoff removal limit `Λ → ∞`: for every tolerance `ε > 0`,
+there exists `Λ₀` such that all `Λ ≥ Λ₀` give the same
+IR-regularized Hamiltonian as `Λ₀`. Real Prop; trivially true on
+the placeholder (the IR-regularized Hamiltonian is `fun _ => 0`
+independent of `Λ`), but the schema NAMES the shape the real
+removal limit would have — convergence of `H_Λ` to a `Λ`-independent
+limit. NOT proved here; the placeholder's identity-of-zero makes the
+schema content-free as Clay physics. Spectral tower stays Open. -/
+def IR_removal_limit_schema : Prop :=
+  ∀ ε : ℝ, 0 < ε → ∃ Λ₀ : ℝ, 0 < Λ₀ ∧
+    ∀ Λ : ℝ, Λ₀ ≤ Λ →
+      Hamiltonian_IR_regularized 0 Λ =
+        Hamiltonian_IR_regularized 0 Λ₀
+
+/-- **Schema (`MassGap_persists_under_limit_schema`).** Named Prop
+predicate for **persistence of the mass gap under the IR removal
+limit**: if a fixed `Δ > 0` is a `MassGap` of `H_Λ` for *every*
+cutoff `Λ > 0`, then `Δ` is also a `MassGap` of the unregularized
+Hamiltonian `Hamiltonian_operator 0`. Real Prop; **NOT proved
+here** — directive Track-1 tripwire: removing the cutoff at
+`Λ → ∞` is the genuinely hard step (would require uniform-in-`Λ`
+spectral control + a Stone-style limit, neither in scope on the
+placeholder). The schema NAMES the persistence target without
+supplying a witness. Spectral tower stays Open. -/
+def MassGap_persists_under_limit_schema : Prop :=
+  ∀ Δ : ℝ, 0 < Δ →
+    (∀ Λ : ℝ, InfraredCutoff_Λ Λ →
+       MassGap (Hamiltonian_IR_regularized 0 Λ) Δ) →
+    MassGap (Hamiltonian_operator 0) Δ
+
 end OperatorV2
 end Spectral
 end Towers

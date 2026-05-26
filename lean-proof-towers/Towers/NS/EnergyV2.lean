@@ -562,6 +562,105 @@ def LerayHopf_unique (u₀ : VelocityField) : Prop :=
   ∀ u u' : VelocityField,
     EnergyMonotone u u₀ → EnergyMonotone u' u₀ → u = u'
 
+/-! ### Batch 13 (2026-05-26) — Track 2: large-data attempt
+
+Five bricks on the **large-data regularity** track. Names verbatim
+per the Batch 13 directive: `Enstrophy_critical_bound`,
+`BealeKatoMajda_bootstrap`, `Conditional_regularity_theorem`,
+`Blowup_exclusion_small_target`, `Global_scheme_for_all_data`.
+
+Honest scope: two real theorems on the zero velocity field, one
+real combinator threading Batch 12's `BealeKatoMajda_criterion` to
+a `∃ M` packaging, and two NAMED Prop schemas for the shapes the
+placeholder cannot discharge. Directive Track-2 tripwire honored:
+`BealeKatoMajda_bootstrap` packages BKM **only on the zero field**,
+matching Batch 12's `BealeKatoMajda_criterion` restriction; the
+corresponding `Global_scheme_for_all_data` (which would close NS
+global regularity unconditionally) stays a SCHEMA — the genuinely
+hard step of upgrading small-data global existence to all data is
+not discharged. NS tower stays Status: Open. Batch 8
+`Dissipation = 0` tripwire untouched. -/
+
+/-- **Schema (`Enstrophy_critical_bound`).** Named Prop predicate
+for the **critical-norm enstrophy bound**: if the initial H¹ norm
+is below a critical threshold `ε`, the enstrophy stays uniformly
+bounded by some `C` for all time. Real Prop over real arithmetic;
+NOT proved here — would require a real critical-norm argument
+(Koch-Tataru in BMO⁻¹ or Fujita-Kato in Ḣ^{1/2}), out of scope on
+the placeholder. NS tower stays Open. -/
+def Enstrophy_critical_bound (u u₀ : VelocityField) (ε : ℝ) : Prop :=
+  H1Norm u₀ 0 < ε →
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ t : ℝ, Enstrophy u t ≤ C
+
+/-- **Brick (`BealeKatoMajda_bootstrap`).** Real combinator on the
+**zero velocity field**: packages Batch 12's `BealeKatoMajda_
+criterion` (the schema-witness on zero) together with the zero-field
+enstrophy bound `Enstrophy 0 t ≤ M` for any `M ≥ 0` and any `T`.
+The combinator returns the conjunction
+`BealeKatoMajda_criterion_schema 0 T M ∧ (∀ t < T, Enstrophy 0 t ≤ M)`.
+Honest scope (tripwire mode): real on zero only — the bootstrap is
+the **identity-on-zero** combinator, NOT a real BKM bootstrap (which
+would require local existence + a `‖ω‖_{L^∞}` integrability
+criterion). Track-2 tripwire honored: this restriction to zero is
+exactly why `Global_scheme_for_all_data` below stays a schema. -/
+theorem BealeKatoMajda_bootstrap (T M : ℝ) (hM : 0 ≤ M) :
+    BealeKatoMajda_criterion_schema (0 : VelocityField) T M ∧
+      (∀ t : ℝ, t < T → Enstrophy (0 : VelocityField) t ≤ M) := by
+  refine ⟨BealeKatoMajda_criterion T M hM, ?_⟩
+  intro t _
+  unfold Enstrophy
+  rw [H1Norm_zero t]
+  linarith
+
+/-- **Brick (`Conditional_regularity_theorem`).** Real combinator:
+from a uniformly-quantified BKM-schema family `∀ M ≥ 0, BKM(u, T, M)`
+AND an existential enstrophy bound `∃ M ≥ 0, ∀ t < T, Enstrophy u t
+≤ M`, conclude `∃ M, ∀ t ≤ T, Enstrophy u t ≤ M`. The bound `M` is
+threaded through unchanged; the BKM-schema at that `M` extends `< T`
+to `≤ T`. Honest scope: this is the **conditional** form — IF the
+caller supplies a uniform BKM family AND an enstrophy bound, THEN
+conditional regularity holds. NOT a proof of unconditional
+regularity. Real combinator, no new content beyond `h_bkm` /
+`h_bound` application. -/
+theorem Conditional_regularity_theorem
+    (u : VelocityField) (T : ℝ)
+    (h_bkm : ∀ M : ℝ, 0 ≤ M → BealeKatoMajda_criterion_schema u T M)
+    (h_bound : ∃ M : ℝ, 0 ≤ M ∧ ∀ t : ℝ, t < T → Enstrophy u t ≤ M) :
+    ∃ M : ℝ, ∀ t : ℝ, t ≤ T → Enstrophy u t ≤ M := by
+  obtain ⟨M, hMnn, hbd⟩ := h_bound
+  exact ⟨M, h_bkm M hMnn hbd⟩
+
+/-- **Brick (`Blowup_exclusion_small_target`).** Real theorem on the
+**zero velocity field**: for any `T`, the enstrophy of the zero
+target is bounded by `0` for all `t ≤ T`. Via `H1Norm_zero` (Task
+#56) — the zero field has zero H¹ norm at every time, so its
+enstrophy is `(1/2) * 0 * 0 = 0`. Honest scope: real proof that
+the **zero target does not blow up** (trivially, it never grows);
+NOT a real blowup-exclusion theorem (which would require a critical
+small-data lower bound preventing finite-time singularity
+formation). Track-2 companion to `BealeKatoMajda_bootstrap` —
+both are real witnesses restricted to zero. -/
+theorem Blowup_exclusion_small_target (T : ℝ) :
+    ∀ t : ℝ, t ≤ T → Enstrophy (0 : VelocityField) t ≤ 0 := by
+  intro t _
+  unfold Enstrophy
+  rw [H1Norm_zero t]
+  linarith
+
+/-- **Schema (`Global_scheme_for_all_data`).** Named Prop predicate
+for **global regularity for ALL initial data** (Clay-NS headline):
+for every `u₀`, there exists a velocity field `u` satisfying
+`EnergyMonotone u u₀` AND a uniform H¹ bound `H1Norm u t ≤
+H1Norm u₀ 0` for all `t ≥ 0`. Real Prop; **NOT proved here** —
+directive Track-2 tripwire: upgrading small-data global existence
+(Fujita-Kato) to all-data global existence is the open Clay
+problem. NS tower stays **Open**. The schema NAMES the all-data
+target without supplying a witness. -/
+def Global_scheme_for_all_data : Prop :=
+  ∀ u₀ : VelocityField, ∃ u : VelocityField,
+    EnergyMonotone u u₀ ∧
+      ∀ t : ℝ, 0 ≤ t → H1Norm u t ≤ H1Norm u₀ 0
+
 end EnergyV2
 end NS
 end Towers
