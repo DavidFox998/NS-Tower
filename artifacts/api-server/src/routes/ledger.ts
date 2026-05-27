@@ -1404,7 +1404,7 @@ export function startLedgerMonitor(
   let lastCheckpointStaleAlerted = false;
   let lastTickAt: string | null = null;
   let lastTickMs: number | null = null;
-  let inFlight = false;
+  let inFlightTick: Promise<void> | null = null;
   const intervalSeconds = Math.max(
     1,
     Math.floor(opts.intervalMs / 1000),
@@ -1489,8 +1489,21 @@ export function startLedgerMonitor(
   }
 
   async function tick(): Promise<void> {
-    if (inFlight) return;
-    inFlight = true;
+    // Task #130: when a tick is already running (e.g. the eager
+    // startup tick), join its promise instead of returning a silent
+    // no-op. Callers that `await monitor.tick()` after a state change
+    // would otherwise observe the previous tick's snapshot and miss
+    // the alert they were trying to provoke.
+    if (inFlightTick) return inFlightTick;
+    inFlightTick = runTick();
+    try {
+      await inFlightTick;
+    } finally {
+      inFlightTick = null;
+    }
+  }
+
+  async function runTick(): Promise<void> {
     try {
       // Task #110: drain the one-shot boot-forged latch on the very
       // first tick. Runs before buildStatus so a sink that throws
@@ -1715,7 +1728,6 @@ export function startLedgerMonitor(
       const tickMs = now();
       lastTickMs = tickMs;
       lastTickAt = new Date(tickMs).toISOString();
-      inFlight = false;
     }
   }
 
@@ -1801,6 +1813,15 @@ export function startLedgerMonitor(
     void tick();
   }, opts.intervalMs);
   handle.unref?.();
+
+  // Task #130: fire an initial tick immediately so `lastTickAt` is
+  // populated within seconds of boot. Without this, `setInterval`
+  // doesn't fire until t+intervalMs, leaving the dashboard's monitor
+  // line stuck on `data-monitor-stalled="true"` for the entire first
+  // interval (5 minutes at the default cadence). Eager kickoff also
+  // means the watchdog has a real baseline to compare against on its
+  // first poll instead of relying solely on `monitorStartedMs`.
+  void tick();
 
   // Task #113: separate watchdog timer so a wedged tick still gets a
   // push alert. We poll at the configured tick cadence — the stall

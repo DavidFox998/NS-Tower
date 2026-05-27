@@ -692,6 +692,69 @@ describe("startLedgerMonitor", () => {
     expect(calls).toHaveLength(0);
   });
 
+  it("fires an eager initial tick so getInfo().lastTickAt is populated within milliseconds of start (task #130)", async () => {
+    const sealed = "line1\nline2\nline3\n";
+    const { size, sha } = writeHits(sealed);
+    writeCheckpoint(size, sha);
+
+    const { buildStatus } = createLedgerChecker({
+      hitsPath,
+      checkpointPath,
+      lastOkPath,
+    });
+    const { sink } = makeRecordingSink();
+    // intervalMs is huge so setInterval's first scheduled fire is
+    // ~hours away; the only way lastTickAt becomes non-null in this
+    // window is the eager initial tick.
+    monitor = startLedgerMonitor({
+      buildStatus,
+      sink,
+      intervalMs: 3_600_000,
+      logger: silentLogger(),
+    });
+    expect(monitor.getInfo().lastTickAt).toBeNull();
+    // Yield to the microtask queue so the eager `void tick()` resolves.
+    await new Promise((r) => setTimeout(r, 20));
+    const info = monitor.getInfo();
+    expect(info.lastTickAt).not.toBeNull();
+    const tickAgeMs = Date.now() - Date.parse(info.lastTickAt!);
+    expect(tickAgeMs).toBeGreaterThanOrEqual(0);
+    expect(tickAgeMs).toBeLessThan(5_000);
+  });
+
+  it("advances getInfo().lastTickAt after each completed tick (task #130)", async () => {
+    const sealed = "line1\n";
+    const { size, sha } = writeHits(sealed);
+    writeCheckpoint(size, sha);
+
+    const { buildStatus } = createLedgerChecker({
+      hitsPath,
+      checkpointPath,
+      lastOkPath,
+    });
+    const { sink } = makeRecordingSink();
+    let clockMs = 1_700_000_000_000;
+    monitor = startLedgerMonitor({
+      buildStatus,
+      sink,
+      intervalMs: 3_600_000,
+      logger: silentLogger(),
+      now: () => clockMs,
+    });
+    // Drain the eager initial tick.
+    await new Promise((r) => setTimeout(r, 20));
+    const first = monitor.getInfo().lastTickAt;
+    expect(first).not.toBeNull();
+    expect(Date.parse(first!)).toBe(clockMs);
+
+    clockMs += 60_000;
+    await monitor.tick();
+    const second = monitor.getInfo().lastTickAt;
+    expect(second).not.toBeNull();
+    expect(Date.parse(second!)).toBe(clockMs);
+    expect(Date.parse(second!)).toBeGreaterThan(Date.parse(first!));
+  });
+
   it("stop() halts the interval", async () => {
     const sealed = "line1\n";
     const { size, sha } = writeHits(sealed);
