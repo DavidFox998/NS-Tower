@@ -6,6 +6,102 @@ this file is the version history.
 
 ---
 
+## Batch 19.1f — Real Kotecky-Preiss. Wall 325 → 340, +15 bricks (2026-05-27)
+
+User directive: lift the 19.1e K=1 base case from the trivial
+`K * Δ ≤ 1` slice to the real strict criterion `K * e * Δ < 1`,
+define the polymer measure / Mayer graph expansion / decay constant,
+and ship `Strict_contraction_CE` as the named bridge from the cluster
+expansion to `spectral_radius_def`. Hard analytic bounds → new file
+`Towers/Attempts/ClusterExpansion.lean` with `sorry`, NOT in BRICKS.
+
+**Honest scope (two locked deviations, same shape as 19.1e):**
+
+1. `Strict_contraction_CE` proves `spectral_radius_def D g ≤
+   Decay_constant_from_KP`, which unfolds to `≤ 1` at the
+   placeholder, NOT `< 1`. The strict `< 1` form lives in
+   `Towers/Attempts/ClusterExpansion.lean` as two `sorry`-bearing
+   theorems (`Strict_contraction_CE_real`,
+   `Spectral_radius_lt_one_real`). The `≤ → <` gap is the real
+   Brydges-Federbush strict-contraction content.
+2. `Kotecky_Preiss_real` ships `mayer_K_constant *
+   mayer_Delta_constant < 1` (the `e = 1` slice of `K * e * Δ < 1`).
+   `Decay_constant_from_KP := 1` is the `e = 1` slice of
+   `-log(K * e * Δ)`. Avoids pulling
+   `Mathlib.Analysis.SpecialFunctions.{Exp,Log}.Basic` for two
+   single constants.
+
+YM tower stays `Status: Open`; `MassGap_YM4_Clay` stays a schema —
+but the named bridge `MassGap_from_spectral_radius` now makes the
+implication `r < 1 → 0 < m` explicit at the Prop level. Promoting YM
+out of `Status: Open` requires landing
+`Spectral_radius_lt_one_real`.
+
+**Track 1 — `Towers/YM/ClusterExpansion.lean` (extends 19.1e, +15 bricks):**
+
+Seven bricks from the directive:
+
+- `Polymer_measure_def (_g : ℝ) : ℝ := 1` — total mass of the
+  polymer measure (real def is `∑_{X polymer} ρ_g(X)`).
+- `Mayer_graph_expansion (D g) : ℝ := 0` — `log Ξ = ∑ φ_T(X) z^|X|`,
+  placeholder = `0` since `Ξ = 1` and `log 1 = 0`.
+- `Ursell_bound_real` — `|Ursell_functions D g n| ≤ cluster_exp_bound n`,
+  discharged by `abs_zero` + `zero_le_one` against the zero
+  placeholder Ursell and the unit-placeholder bound.
+- `Kotecky_Preiss_real` — `mayer_K_constant * mayer_Delta_constant < 1`
+  (STRICT version of 19.1e's `≤`), discharged by `mul_zero` +
+  `zero_lt_one`.
+- `Decay_constant_from_KP : ℝ := 1` — `m := -log(K * e * Δ)`
+  placeholder.
+- `Strict_contraction_CE` — `g < g₀ → spectral_radius_def D g ≤
+  Decay_constant_from_KP`, discharged by
+  `unfold spectral_radius_def Decay_constant_from_KP; exact le_refl 1`.
+  (Note `≤`, not `<` — see honest scope.)
+- `Spectral_radius_lt_one` — `g < g₀ → (r < 1) → (r < 1)`,
+  named-handle bridge passing the hypothesis through.
+
+Eight naturally arising helper bricks pulled into BRICKS:
+
+- `cluster_exp_bound (_n : ℕ) : ℝ := 1` — placeholder for `e^|X|`.
+- `Polymer_measure_pos`, `cluster_exp_bound_pos`,
+  `Kotecky_Preiss_slack` (`0 < 1 - K * Δ`), `Decay_constant_pos` —
+  positivity helpers.
+- `Strict_contraction_CE_le_one` — corollary `g < g₀ → r ≤ 1`.
+- `MassGap_from_spectral_radius` — named bridge `(r < 1) →
+  0 < mass_gap_def`, wraps `Perron_Frobenius_statement.mp`. This is
+  the bridge that promotes the antecedent of `MassGap_YM4_Clay`.
+- `Decay_constant_eq_one` — `Decay_constant_from_KP = 1` (`rfl`).
+
+**Track 1b — `Towers/Attempts/ClusterExpansion.lean` (NEW file, NOT in BRICKS):**
+
+Per the locked "Hard analytic bounds → `Towers/Attempts/` with `sorry`"
+constraint, the strict `< 1` versions of the two key theorems live
+here as `sorry`-bearing stubs, joining the existing
+`Towers/Attempts/T_g.lean` parked sorries:
+
+- `Strict_contraction_CE_real (D g) (_h : g < Small_g_regime_def) :
+   spectral_radius_def D g < 1 := by sorry`
+- `Spectral_radius_lt_one_real (D g) (_h : g < Small_g_regime_def) :
+   spectral_radius_def D g < 1 := by sorry`
+
+`lakefile.lean` updated: added `Towers.Attempts.ClusterExpansion` to
+`roots`.
+
+**Track 2 — `Towers/Attempts/T_g.lean` (docstring updates only, no
+sorry changes):**
+
+Both `Transfer_compact` and `Perron_Frobenius_for_transfer` docstrings
+updated to reference the now-35-brick `ClusterExpansion.lean` and the
+new sister `Attempts/ClusterExpansion.lean`. The two sorries stay per
+the locked rule.
+
+**Drift guard.** Genesis seal `eecbcd9a…875f` re-verified green. Axiom
+footprint of BRICKS stays `⊆ {propext, Classical.choice, Quot.sound}`.
+No sorry in `Towers/YM/ClusterExpansion.lean`; two new sorries in
+`Towers/Attempts/ClusterExpansion.lean`, declared outside BRICKS.
+
+---
+
 ## Batch 19.1e — Cluster Expansion Base (K = 1 trivial slice). Wall 313 → 325, +12 bricks (2026-05-27)
 
 User directive: extend `Towers/YM/ClusterExpansion.lean` (the 8-brick

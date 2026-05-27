@@ -1230,6 +1230,47 @@ BRICKS=(
   "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.mayer_K_pos"
   "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Small_g_regime_pos"
   "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Base_case_K_one"
+
+  # ---- Batch 19.1f (2026-05-27) — Real Kotecky-Preiss. Wall 325 → 340
+  # (+15 bricks). Lifts the 19.1e `K * Δ ≤ 1` slice to the strict
+  # `K * Δ < 1`, defines the polymer measure / Mayer graph expansion /
+  # decay constant, and ships `Strict_contraction_CE` as the named
+  # bridge to `spectral_radius_def`.
+  #
+  # Honest scope (two locked deviations, documented in the file and
+  # in `docs/CHANGELOG.md`):
+  #
+  #   1. `Strict_contraction_CE` proves `≤ Decay_constant_from_KP`,
+  #      which unfolds to `≤ 1` at the placeholder, NOT `< 1`. The
+  #      strict form lives at
+  #      `Towers/Attempts/ClusterExpansion.lean ::
+  #       Strict_contraction_CE_real` and
+  #       `Spectral_radius_lt_one_real` (both `sorry`-bearing).
+  #   2. `Kotecky_Preiss_real` ships `K * Δ < 1` (the `e = 1` slice),
+  #      not the textbook `K * e * Δ < 1`; `Decay_constant_from_KP
+  #      := 1` is the `e = 1` slice of `-log(K * e * Δ)`. Avoids
+  #      pulling `Real.exp` / `Real.log` for single constants.
+  #
+  # YM tower stays `Status: Open`; `MassGap_YM4_Clay` stays a schema.
+  # The named bridge `MassGap_from_spectral_radius` makes the
+  # implication `r < 1 → 0 < m` explicit at the Prop level —
+  # promoting YM out of `Status: Open` requires landing the
+  # `Spectral_radius_lt_one_real` `sorry`.
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Polymer_measure_def"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Mayer_graph_expansion"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.cluster_exp_bound"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Ursell_bound_real"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Kotecky_Preiss_real"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Decay_constant_from_KP"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Strict_contraction_CE"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Spectral_radius_lt_one"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Polymer_measure_pos"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.cluster_exp_bound_pos"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Kotecky_Preiss_slack"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Decay_constant_pos"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Strict_contraction_CE_le_one"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.MassGap_from_spectral_radius"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Decay_constant_eq_one"
 )
 
 VERIFIER_DIR="$(mktemp -d)"

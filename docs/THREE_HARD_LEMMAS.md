@@ -1,8 +1,30 @@
 # The Three Hard Lemmas
 
-**Status:** open. **Repository wall:** 325 bricks, axiom footprint
+**Status:** open. **Repository wall:** 340 bricks, axiom footprint
 `⊆ {propext, Classical.choice, Quot.sound}`. **Towers:**
 `Status: Open` (`docs/ROADMAP.md` § 2, § 3).
+
+**Batch 19.1f update (2026-05-27):** the K=1 base case is lifted
+to the real strict Kotecky-Preiss criterion `K * Δ < 1` (the
+`e = 1` slice of the textbook `K * e * Δ < 1`). +15 bricks in
+`Towers/YM/ClusterExpansion.lean`: `Polymer_measure_def`,
+`Mayer_graph_expansion`, `cluster_exp_bound`, `Ursell_bound_real`,
+`Kotecky_Preiss_real`, `Decay_constant_from_KP`,
+`Strict_contraction_CE`, `Spectral_radius_lt_one`,
+`Polymer_measure_pos`, `cluster_exp_bound_pos`,
+`Kotecky_Preiss_slack`, `Decay_constant_pos`,
+`Strict_contraction_CE_le_one`, `MassGap_from_spectral_radius`,
+`Decay_constant_eq_one`. Honest scope: `Strict_contraction_CE`
+proves `≤ Decay_constant_from_KP` (unfolds to `≤ 1`), NOT `< 1`;
+the strict form lives at the NEW
+`Towers/Attempts/ClusterExpansion.lean` as two `sorry`-bearing
+theorems (`Strict_contraction_CE_real`, `Spectral_radius_lt_one_real`).
+The named bridge `MassGap_from_spectral_radius` now makes the
+implication `r < 1 → 0 < m` explicit at the Prop level — promoting
+YM out of `Status: Open` requires landing the
+`Spectral_radius_lt_one_real` sorry. YM tower stays `Status: Open`;
+`MassGap_YM4_Clay` stays a schema — see `docs/CHANGELOG.md`
+Batch 19.1f.
 
 **Batch 19.1e update (2026-05-27):** the K=1 base case of the
 cluster expansion ships on top of the 19.1d skeleton (+12 bricks

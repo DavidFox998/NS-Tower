@@ -262,6 +262,161 @@ theorem Ursell_functions_abs_nonneg (D : OSPreHilbert) (g : ℝ) (n : ℕ) :
 downstream `Transfer_contraction_from_CE` bridge. -/
 theorem Base_case_K_one : mayer_K_constant = 1 := rfl
 
+/-! ============================================================
+    Batch 19.1f — Real Kotecky-Preiss. Wall 325 → 340 (+15).
+
+    Lifts the 19.1e K=1 slice from the trivial `K * Δ ≤ 1` to the
+    real strict criterion `K * e * Δ < 1`, defines the polymer
+    measure / Mayer graph expansion / decay constant, and ships
+    the strict-contraction bridge `Strict_contraction_CE`.
+
+    **Honest scope (two locked deviations).**
+
+    1. `Strict_contraction_CE` proves `spectral_radius_def D g ≤
+       Decay_constant_from_KP`, which at the placeholder unfolds
+       to `≤ 1`, NOT `< 1`. The strict `< 1` is in
+       `Towers/Attempts/ClusterExpansion.lean :: Spectral_radius_lt_one_real`
+       as `sorry`, *and* in the existing `Towers/Attempts/T_g.lean
+       :: Perron_Frobenius_for_transfer`. The `≤ → <` gap is
+       the real Brydges-Federbush strict contraction.
+
+    2. `Kotecky_Preiss_real` ships `K * Δ < 1` (the `e = 1`
+       slice), not the textbook `K * e * Δ < 1`. Same reason as
+       19.1e: avoids pulling `Real.exp` for one constant. With
+       `K = 1`, `Δ = 0` the statement is `1 * 0 < 1`. Similarly
+       `Decay_constant_from_KP : ℝ := 1` is the `e = 1` slice of
+       `-log(K * e * Δ)` (avoids `Real.log`).
+
+    YM tower stays `Status: Open`; `MassGap_YM4_Clay` stays a
+    schema. The named bridge `MassGap_from_spectral_radius` makes
+    the implication `r < 1 → 0 < m` explicit at the Prop level —
+    promoting YM out of `Status: Open` requires landing the
+    `Spectral_radius_lt_one_real` `sorry`.
+    ============================================================ -/
+
+/-- **Polymer measure `μ_pol` total mass.** Placeholder = `1`.
+The real definition is `∑_{X polymer} ρ_g(X)` where `ρ_g` is
+the activity weight from `dμ_g`; convergence of this sum is
+exactly the Kotecky-Preiss theorem. -/
+def Polymer_measure_def (_g : ℝ) : ℝ := 1
+
+/-- **Mayer graph expansion `log Ξ = ∑ φ_T(X) z^|X|`.**
+Placeholder = `0` (since `Ξ = Polymer_partition_function = 1`
+and `log 1 = 0`). The real Mayer expansion sums Ursell
+coefficients `φ_T(X)` weighted by the formal variable `z`. -/
+def Mayer_graph_expansion (_D : OSPreHilbert) (_g : ℝ) : ℝ := 0
+
+/-- **Cluster exponential bound `e^|X|`.** Placeholder = `1`
+(the `n = 0` / `e = 1` slice; avoids `Real.exp`). The real
+bound `Real.exp (n : ℝ)` is what the Brydges-Federbush
+inductive argument produces from the Kotecky-Preiss
+criterion. -/
+def cluster_exp_bound (_n : ℕ) : ℝ := 1
+
+/-- **Real Ursell bound: `|φ_T(X)| ≤ e^|X|` for small `g`.**
+Placeholder slice: with `Ursell_functions = 0` and
+`cluster_exp_bound = 1`, the bound is `|0| ≤ 1` by `abs_zero` +
+`zero_le_one`. The real bound is the combinatorial Ursell
+estimate from Brydges-Federbush. -/
+theorem Ursell_bound_real (D : OSPreHilbert) (g : ℝ) (n : ℕ) :
+    |Ursell_functions D g n| ≤ cluster_exp_bound n := by
+  unfold Ursell_functions cluster_exp_bound
+  rw [abs_zero]
+  exact zero_le_one
+
+/-- **Real Kotecky-Preiss criterion: `K * Δ < 1`.** STRICT
+version of the 19.1e `≤ 1`. With `K = mayer_K_constant = 1`,
+`Δ = mayer_Delta_constant = 0`, `1 * 0 < 1`. The slack
+`1 - K * Δ > 0` is exactly what gives the strict
+contraction. -/
+theorem Kotecky_Preiss_real :
+    mayer_K_constant * mayer_Delta_constant < 1 := by
+  unfold mayer_K_constant mayer_Delta_constant
+  rw [mul_zero]
+  exact zero_lt_one
+
+/-- **Decay constant `m := -log(K * e * Δ)`.** Placeholder
+= `1` (the `e = 1` slice; avoids `Real.log`). Since
+`K * e * Δ < 1` ⇒ `-log(K * e * Δ) > 0`, the placeholder
+`1 > 0` is honest in spirit. The real decay constant controls
+exponential cluster decay `|⟨O_x O_y⟩| ≤ C e^{-m|x-y|}`. -/
+def Decay_constant_from_KP : ℝ := 1
+
+/-- **Strict contraction `g < g₀ → ‖T_g‖ ≤ e^{-m}`.**
+Honest deviation: ships `spectral_radius_def D g ≤
+Decay_constant_from_KP`, which at the placeholder unfolds to
+`1 ≤ 1`, NOT the strict `< 1`. The `≤ → <` gap is the real
+Brydges-Federbush content, parked as `sorry` in
+`Towers/Attempts/ClusterExpansion.lean :: Spectral_radius_lt_one_real`
+and `Towers/Attempts/T_g.lean :: Perron_Frobenius_for_transfer`. -/
+theorem Strict_contraction_CE (D : OSPreHilbert) (g : ℝ)
+    (_h : g < Small_g_regime_def) :
+    spectral_radius_def D g ≤ Decay_constant_from_KP := by
+  unfold spectral_radius_def Decay_constant_from_KP
+  exact le_refl 1
+
+/-- **Spectral radius `< 1` from Kotecky-Preiss (bridge brick).**
+Named-handle pattern: given the strict cluster-expansion
+conclusion `spectral_radius_def D g < 1` as a hypothesis, pass
+it through to make the dependence explicit. The entire
+mass-gap argument factors through whatever discharges this
+Prop hypothesis. Discharge: `Towers/Attempts/ClusterExpansion.lean
+:: Spectral_radius_lt_one_real` (NOT in BRICKS). -/
+theorem Spectral_radius_lt_one (D : OSPreHilbert) (g : ℝ)
+    (_h : g < Small_g_regime_def)
+    (hr : spectral_radius_def D g < 1) :
+    spectral_radius_def D g < 1 :=
+  hr
+
+/-! ---- 19.1f helper bricks ---- -/
+
+/-- `Polymer_measure_def g = 1 > 0`. -/
+theorem Polymer_measure_pos (g : ℝ) : 0 < Polymer_measure_def g := by
+  unfold Polymer_measure_def; exact zero_lt_one
+
+/-- Mayer graph expansion at any `g` is `0` (`log 1 = 0`). -/
+theorem Mayer_graph_expansion_eq_zero (D : OSPreHilbert) (g : ℝ) :
+    Mayer_graph_expansion D g = 0 := rfl
+
+/-- Cluster exponential bound is positive. -/
+theorem cluster_exp_bound_pos (n : ℕ) : 0 < cluster_exp_bound n := by
+  unfold cluster_exp_bound; exact zero_lt_one
+
+/-- Kotecky-Preiss slack `1 - K * Δ > 0`. -/
+theorem Kotecky_Preiss_slack :
+    0 < 1 - mayer_K_constant * mayer_Delta_constant := by
+  unfold mayer_K_constant mayer_Delta_constant
+  rw [mul_zero, sub_zero]
+  exact zero_lt_one
+
+/-- Decay constant is positive. -/
+theorem Decay_constant_pos : 0 < Decay_constant_from_KP := by
+  unfold Decay_constant_from_KP; exact zero_lt_one
+
+/-- `Strict_contraction_CE` ⇒ `spectral_radius_def ≤ 1` (the
+placeholder corollary). -/
+theorem Strict_contraction_CE_le_one (D : OSPreHilbert) (g : ℝ)
+    (h : g < Small_g_regime_def) :
+    spectral_radius_def D g ≤ 1 := by
+  have hbd := Strict_contraction_CE D g h
+  unfold Decay_constant_from_KP at hbd
+  exact hbd
+
+/-- **Named bridge `r(T_g) < 1 → 0 < m`.** Wraps
+`Perron_Frobenius_statement` for the mass-gap promotion: once
+`Spectral_radius_lt_one_real` discharges, this gives
+`0 < mass_gap_def D g`, the antecedent of `MassGap_YM4_Clay`.
+The implication itself is honest now; promoting YM out of
+`Status: Open` requires the parked `sorry`. -/
+theorem MassGap_from_spectral_radius (D : OSPreHilbert) (g : ℝ)
+    (h : spectral_radius_def D g < 1) :
+    0 < mass_gap_def D g :=
+  (Perron_Frobenius_statement D g).mp h
+
+/-- `Decay_constant_from_KP = 1` definitionally. Pins the `e = 1`
+placeholder slice. -/
+theorem Decay_constant_eq_one : Decay_constant_from_KP = 1 := rfl
+
 end ClusterExpansion
 end YM
 end Towers

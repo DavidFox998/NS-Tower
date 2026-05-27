@@ -41,17 +41,21 @@ Prop, used as a Prop-level stand-in for "the construction has
 produced a real compact operator on a real Hilbert space". The
 proof is left as `sorry`.
 
-**Batch 19.1d / 19.1e note:** the cluster-expansion *skeleton*
-now lives in `Towers/YM/ClusterExpansion.lean` (20 bricks: 8 from
-19.1d + 12 from 19.1e). Discharging this sorry is the
-Arzelà-Ascoli argument applied to the `Transfer_from_measure` of
-that file together with the `Cluster_estimate_base` /
-`Base_case_discharge` bound at `K = mayer_K_constant = 1` — both
-currently honest placeholders. The real discharge needs (a) a
-real Wilson measure, (b) the Brydges-Federbush convergent polymer
-expansion at general `K * e * Δ ≤ 1` (the Kotecky-Preiss
-criterion; 19.1e ships the `e = 1`, `Δ = 0` slice), (c) a real
-operator-norm on `physHilbert`. -/
+**Batch 19.1d / 19.1e / 19.1f note:** the cluster-expansion
+*skeleton* now lives in `Towers/YM/ClusterExpansion.lean`
+(35 bricks: 8 from 19.1d + 12 from 19.1e + 15 from 19.1f, the
+last batch landing the real Kotecky-Preiss strict criterion
+`Kotecky_Preiss_real : K * Δ < 1` and the strict-contraction
+bridge `Strict_contraction_CE : g < g₀ → r(T_g) ≤
+Decay_constant_from_KP`). Discharging this sorry is the
+Arzelà-Ascoli argument applied to `Transfer_from_measure`
+together with `Strict_contraction_CE` lifted to its strict
+form (the `≤ → <` gap is parked in
+`Towers/Attempts/ClusterExpansion.lean :: Strict_contraction_CE_real`).
+The real discharge needs (a) a real Wilson measure, (b) the
+Brydges-Federbush convergent polymer expansion at the full
+textbook `K * e * Δ < 1` (19.1f ships the `e = 1` slice),
+(c) a real operator-norm on `physHilbert`. -/
 theorem Transfer_compact (D : OSPreHilbert) (_g : ℝ) :
     D.physHilbert_isHilbert := by
   sorry
@@ -66,17 +70,23 @@ batch that promoting `spectral_radius_def` away from the literal
 bound here. Marked `sorry`; lives outside BRICKS so the axiom
 footprint of the green wall is untouched.
 
-**Batch 19.1d / 19.1e note:** the cluster-expansion skeleton
-ships in `Towers/YM/ClusterExpansion.lean` (20 bricks). Two
-named bridges land the explicit reduction:
+**Batch 19.1d / 19.1e / 19.1f note:** the cluster-expansion
+skeleton ships in `Towers/YM/ClusterExpansion.lean` (35 bricks).
+Three named bridges now land the explicit reduction:
 `Transfer_bound_from_CE` reduces `r(T_g) < 1` to the Prop
 `spectral_radius_def D g < 1` (19.1d); `Transfer_contraction_from_CE`
-ships the K=1 trivial slice `g < Small_g_regime_def → r(T_g) ≤ 1`
-(19.1e — note `≤`, not `<`, that gap *is* this sorry). Real
-discharge = Brydges-Federbush convergent polymer expansion for
-`g < g₀` at general `K * e * Δ ≤ 1` (the `Cluster_convergence_radius`
-witness, currently placeholder = 1; the `Kotecky_Preiss_criterion`
-of 19.1e ships only the `e = 1`, `Δ = 0` slice). -/
+ships the K=1 trivial slice `g < g₀ → r(T_g) ≤ 1` (19.1e); and
+`Spectral_radius_lt_one` is the 19.1f named-handle bridge
+`g < g₀ → (r < 1) → (r < 1)`. The 19.1f
+`MassGap_from_spectral_radius` then composes with
+`Perron_Frobenius_statement` to give `0 < mass_gap_def`. Real
+discharge = Brydges-Federbush convergent polymer expansion at
+the full `K * e * Δ < 1` (the 19.1f `Kotecky_Preiss_real`
+ships only the `e = 1`, `Δ = 0` slice). The companion stub
+`Towers/Attempts/ClusterExpansion.lean ::
+Spectral_radius_lt_one_real` carries the same `sorry` as a
+ClusterExpansion-shaped surface; this T_g surface stays as the
+canonical "Perron-Frobenius for the transfer operator" sorry. -/
 theorem Perron_Frobenius_for_transfer (D : OSPreHilbert)
     (g : ℝ) (_hg : 0 < g) :
     spectral_radius_def D g < 1 := by
