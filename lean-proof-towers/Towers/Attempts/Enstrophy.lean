@@ -52,13 +52,13 @@ open TheoremaAureum.Towers.NS.EnergyV2
 
 /-- **Global enstrophy bound for 3D Navier-Stokes.**
 
-For every velocity field `u : ℝ → (EuclideanSpace ℝ (Fin 3)) → ℝ`
-the H¹-norm of `u(t)` is bounded by a finite constant `C` uniformly
-in `t`. Discharging this is equivalent to the Clay 3D Navier-Stokes
+For every velocity field `u : VelocityField` the H¹-norm of
+`u(t)` is bounded by a finite constant `C` uniformly in `t`.
+Discharging this is equivalent to the Clay 3D Navier-Stokes
 global regularity statement (no finite-time blow-up of `‖∇u‖_{L²}`).
 Proof is `sorry` — far outside the Towers scope. -/
 theorem enstrophy_bound_global
-    (u : ℝ → (EuclideanSpace ℝ (Fin 3)) → ℝ) :
+    (u : VelocityField) :
     ∃ C : ℝ, ∀ t : ℝ, H1Norm_v2 u t ≤ C := by
   sorry
 

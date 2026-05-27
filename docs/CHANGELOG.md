@@ -6,6 +6,63 @@ this file is the version history.
 
 ---
 
+## Towers-build green — surgical fixes to pre-existing breakage (2026-05-27)
+
+`towers-build` exited 0 for the first time covering full 19.1m + 19.1n:
+"all 433 brick(s) passed the axiom-footprint check." Footprint stays
+`⊆ {propext, Classical.choice, Quot.sound}`; YM / NS towers remain
+`Status: Open`. No sealed surface touched (`replit.md`, `hits.txt`,
+`scripts/print-direction.sh`, Lean spine, `docs/ROADMAP.md`).
+
+**Root cause: Lean 4.12 lexer choke on `/-! ---- … ---- -/`.**
+Inside `/-!` (module-doc) blocks, a run of `----` is mis-tokenised
+and the lexer fails to recognise the trailing `-/`, reporting
+"unterminated comment" at EOF. All nine section headers of the
+form `/-! ---- 19.1<x> helper bricks ---- -/` in
+`Towers/YM/ClusterExpansion.lean` (lines 238, 372, 571, 825, 970,
+1150, 1333, 1479, 1635) were rewritten to `/-! ==== … ==== -/`.
+Verified with a minimal reproducer:
+`/-! ---- helper ---- -/\n\ntheorem foo : 1 = 1 := rfl` →
+`error: unterminated comment` under Lean 4.12; same file with
+`==== … ====` compiles clean.
+
+**Cascade fixes once the lexer choke cleared** (all in
+`Towers/YM/ClusterExpansion.lean`; previously hidden because the
+broken `/-!` ate the rest of the file):
+
+- `Combinatorial_constant_e : ℝ := Real.exp 1` → marked
+  `noncomputable` (line 486).
+- `Combinatorial_constant_e_real : ℝ := Real.exp 1` → marked
+  `noncomputable` (line 724).
+- `Heat_kernel_def_real (t : ℝ) : ℝ := Real.exp …` → marked
+  `noncomputable` (line 1617).
+- `Real.exp_pos.le` (no-such-constant) → `(Real.exp_pos _).le`
+  at lines 502 and 739 (the constant takes one explicit argument
+  in mathlib v4.12.0).
+
+**Other surgical fixes:**
+
+- `Towers/YM/SpectralGap.lean` `mass_gap_nonneg` — rewrote the
+  `by_cases` body to `split_ifs with h; · exact zero_le_one;
+  · exact le_refl 0`. The earlier `rw [if_pos h]; exact
+  zero_le_one` + `rw [if_neg h]` form was tripping a "no goals
+  to be solved" error at the second bullet (the second `rw`
+  rewrites `0 ≤ 0` and `rw`'s implicit `rfl`-finish closes it,
+  but the bullet then has no further goal — same end state, less
+  finicky tactic).
+- `Towers/Attempts/Enstrophy.lean` `enstrophy_bound_global` —
+  changed the parameter `u : ℝ → (EuclideanSpace ℝ (Fin 3)) → ℝ`
+  to `u : VelocityField` so it matches `H1Norm_v2`'s expected
+  signature `VelocityField → ℝ → ℝ` (vector-valued `u t x`).
+  Discharge remains `sorry` — far outside Towers scope (Clay
+  3D NS global regularity).
+
+**Honest scope unchanged:** the towers are computational /
+structural scaffolding. YM and NS stay `Status: Open` in
+`docs/ROADMAP.md`. Nothing in this batch claims a Clay surface.
+
+---
+
 ## Batch 19.1n — Explicit Weyl dim / Casimir polynomial forms. Wall 420 → 428, +8 BRICKS, no new Attempts sorry (2026-05-27)
 
 Promote the 19.1m `Weyl_dim_def := 1` / `Casimir_eigenvalue_def := 0`

@@ -235,7 +235,7 @@ theorem Transfer_contraction_from_CE (D : OSPreHilbert) (g : ℝ)
   unfold spectral_radius_def
   exact le_refl 1
 
-/-! ---- 19.1e helper bricks (honest, naturally arising) ---- -/
+/-! ==== 19.1e helper bricks (honest, naturally arising) ==== -/
 
 /-- `K = 1 > 0`. -/
 theorem mayer_K_pos : 0 < mayer_K_constant := by
@@ -369,7 +369,7 @@ theorem Spectral_radius_lt_one (D : OSPreHilbert) (g : ℝ)
     spectral_radius_def D g < 1 :=
   hr
 
-/-! ---- 19.1f helper bricks ---- -/
+/-! ==== 19.1f helper bricks ==== -/
 
 /-- `Polymer_measure_def g = 1 > 0`. -/
 theorem Polymer_measure_pos (g : ℝ) : 0 < Polymer_measure_def g := by
@@ -480,7 +480,7 @@ placeholder to the real value `Real.exp 1 ≈ 2.71828`. Naming
 this constant lets every downstream brick state the textbook
 shape `K * e * Δ < 1` with the real `e`. The `:= 1` placeholder
 era is over. -/
-def Combinatorial_constant_e : ℝ := Real.exp 1
+noncomputable def Combinatorial_constant_e : ℝ := Real.exp 1
 
 /-- **Real Ursell tree bound: `|φ_T(X)| ≤ e^{|X|} * |X|!`**
 (Brydges-Federbush convergent polymer expansion). Placeholder
@@ -496,7 +496,7 @@ theorem Ursell_tree_bound (D : OSPreHilbert) (g : ℝ) (n : ℕ) :
       Combinatorial_constant_e * (Nat.factorial n : ℝ) := by
   unfold Ursell_functions Combinatorial_constant_e
   rw [abs_zero]
-  exact mul_nonneg Real.exp_pos.le (Nat.cast_nonneg _)
+  exact mul_nonneg (Real.exp_pos _).le (Nat.cast_nonneg _)
 
 /-- **Full Kotecky-Preiss criterion: `K * e * Δ < 1`**
 (textbook strict form, with the named `e` factor restored).
@@ -568,7 +568,7 @@ theorem Spectral_radius_lt_one_real (D : OSPreHilbert) (g : ℝ)
     spectral_radius_def D g < 1 :=
   hr
 
-/-! ---- 19.1g helper bricks ---- -/
+/-! ==== 19.1g helper bricks ==== -/
 
 /-- `Combinatorial_constant_e > 0`. **Batch 19.1i:** promoted
 from `unfold; zero_lt_one` (placeholder) to `Real.exp_pos`. -/
@@ -718,7 +718,7 @@ Real.exp 1`** from Brydges-Federbush tree-counting. **Batch
 `Combinatorial_constant_e` (pinned by helper `_eq_e := rfl`).
 The `:= 1` placeholder era is over — every downstream bound now
 carries the real `e ≈ 2.71828` factor at the Prop level. -/
-def Combinatorial_constant_e_real : ℝ := Real.exp 1
+noncomputable def Combinatorial_constant_e_real : ℝ := Real.exp 1
 
 /-- **Real Ursell tree bound `|φ_T(X)| ≤ e^{|X|} * |X|!`**
 (Brydges-Federbush convergent polymer expansion, with the real
@@ -733,7 +733,7 @@ theorem Ursell_tree_bound_real (D : OSPreHilbert) (g : ℝ) (n : ℕ) :
       Combinatorial_constant_e_real ^ n * (Nat.factorial n : ℝ) := by
   unfold Ursell_functions Combinatorial_constant_e_real
   rw [abs_zero]
-  exact mul_nonneg (pow_nonneg Real.exp_pos.le n) (Nat.cast_nonneg _)
+  exact mul_nonneg (pow_nonneg (Real.exp_pos _).le n) (Nat.cast_nonneg _)
 
 /-- **Strict Kotecky-Preiss criterion `K * e * Δ < 1`** (the
 real-`e` form of 19.1g `Kotecky_Preiss_full`, definitionally
@@ -822,7 +822,7 @@ theorem MassGap_YM4_Clay_from_strict (D : OSPreHilbert) (g : ℝ)
     (Perron_Frobenius_statement D g).mp hr
   exact ⟨mass_gap_def D g, hpos, le_refl _⟩
 
-/-! ---- 19.1h helper bricks ---- -/
+/-! ==== 19.1h helper bricks ==== -/
 
 /-- `Tree_graph_counting 1 = 1` (Cayley boundary case: a single
 vertex has one labeled tree). Via `Nat.sub`: `1 - 2 = 0` and
@@ -967,7 +967,7 @@ theorem Kotecky_Preiss_strict_real :
   rw [Combinatorial_constant_e_real_def] at h
   exact h
 
-/-! ---- 19.1i replacement helpers (for the deleted `_eq_one`) ---- -/
+/-! ==== 19.1i replacement helpers (for the deleted `_eq_one`) ==== -/
 
 /-- **`1 ≤ Combinatorial_constant_e`** (since `Real.exp 1 ≥ 1`).
 Replacement for the 19.1g `Combinatorial_constant_e_eq_one`
@@ -1147,7 +1147,7 @@ threshold); this is the *predicate* form used by the 19.1j
 Brydges-Federbush bound. -/
 def Small_beta_regime_def (g : ℝ) : Prop := g < Small_beta_threshold
 
-/-! ---- 19.1j BRICKS (15 sorry-free theorems) ---- -/
+/-! ==== 19.1j BRICKS (15 sorry-free theorems) ==== -/
 
 /-- `Wilson_action_decomposition D g = 0` (placeholder rfl pin). -/
 theorem Wilson_action_decomposition_zero (D : OSPreHilbert) (g : ℝ) :
@@ -1330,7 +1330,7 @@ the disjoint-loop factorization in the Wick expansion.
 Placeholder `:= 1`. -/
 def Wick_pairing_constant : ℝ := 1
 
-/-! ---- 19.1k BRICKS (12 sorry-free theorems) ---- -/
+/-! ==== 19.1k BRICKS (12 sorry-free theorems) ==== -/
 
 /-- `Plaquette_action_def D g = 0` (placeholder rfl pin). -/
 theorem Plaquette_action_def_zero (D : OSPreHilbert) (g : ℝ) :
@@ -1476,7 +1476,7 @@ as `t → 0⁺`, where `c` is determined by the Casimir spectrum
 on SU(3). -/
 def Heat_kernel_def (_t : ℝ) : ℝ := 1
 
-/-! ---- 19.1l BRICKS (8 sorry-free theorems) ---- -/
+/-! ==== 19.1l BRICKS (8 sorry-free theorems) ==== -/
 
 /-- `SU3_dimension_def = 8` (rfl pin). -/
 theorem SU3_dimension_eq_eight : SU3_dimension_def = 8 := rfl
@@ -1611,7 +1611,7 @@ diverges polynomially at `t → 0⁺`).
 Coexists with the 19.1l `Heat_kernel_def := 1` — the 19.1l
 bricks (`Heat_kernel_asymptotics`, `Heat_kernel_def_pos`)
 still typecheck unchanged. -/
-def Heat_kernel_def_real (t : ℝ) : ℝ :=
+noncomputable def Heat_kernel_def_real (t : ℝ) : ℝ :=
   Real.exp (-(heat_decay_constant / t)) / t ^ 4
 
 /-- **Placeholder Weyl dimension** `dim(λ)` for the SU(3)
@@ -1632,7 +1632,7 @@ for the SU(3) irrep of highest weight `λ`. Placeholder
 `:= 0` (which is the value at `λ = 0`, the trivial rep). -/
 def Casimir_eigenvalue_def (_n : ℕ) : ℝ := 0
 
-/-! ---- 19.1m BRICKS (12 sorry-free theorems) ---- -/
+/-! ==== 19.1m BRICKS (12 sorry-free theorems) ==== -/
 
 /-- `0 ≤ Heat_kernel_def_real t` for all `t : ℝ`. The
 quotient is nonnegative because the numerator

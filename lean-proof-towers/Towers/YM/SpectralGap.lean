@@ -106,9 +106,9 @@ nonneg. -/
 theorem mass_gap_nonneg (D : OSPreHilbert) (g : ℝ) :
     0 ≤ mass_gap_def D g := by
   unfold mass_gap_def
-  by_cases h : spectral_radius_def D g < 1
-  · rw [if_pos h]; exact zero_le_one
-  · rw [if_neg h]
+  split_ifs with h
+  · exact zero_le_one
+  · exact le_refl 0
 
 end SpectralGap
 end YM
