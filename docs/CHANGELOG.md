@@ -6,6 +6,154 @@ this file is the version history.
 
 ---
 
+## Batch 156.2 — Task #156 file 2 of 6 (Varadhan scaffolding): Weyl-dim cubic upper bound. Wall 465 → 467, +1 audited BRICK (2026-05-27)
+
+**Goal.** Land the **second arithmetic input** for the task #156
+integrated-tail Varadhan target. File 1 (Batch 20.2a) shipped the
+**quadratic lower bound** on the SU(3) Casimir
+`C₂(m, n) ≥ ¾·(m+n)² + 3·(m+n)`. This batch ships the matching
+**cubic upper bound** on the Weyl dimension
+`dim_SU3(m, n) ≤ 8 · (m + n + 1)³`
+with `dim_SU3 m n := (m + 1) · (n + 1) · (m + n + 2) / 2` (standard
+SU(3) Weyl formula on the (m, n) highest-weight lattice, ℕ floor
+division). Together these are the two polynomial inequalities the
+future file 3 (`HeatTraceBound`) will combine to land the Weyl-law
+heat-trace shape
+
+  `K(t) = Σ dim² · exp(−t · C₂) ≤ Σ poly(m+n) · exp(−t · (m+n)²) ≲ t⁻ᵈᐟ²`
+
+with `d = dim_ℝ SU(3) = 8` ⇒ `t⁻⁴`. **This batch lands neither
+that combination nor any heat-kernel content** — file 3 is the
+next batch, and files 4–6 (off-diagonal kernel, Varadhan
+asymptotic, KP wire-up) remain blocked on bi-invariant Riemannian
+geometry on SU(3) (absent from mathlib v4.12.0).
+
+**What landed.**
+
+  - New file `Towers/YM/WeylDim.lean` (95 lines, single namespace
+    `TheoremaAureum.Towers.YM.WeylDim`):
+      - `def dim_SU3 (m n : ℕ) : ℕ := (m+1)*(n+1)*(m+n+2)/2` — the
+        SU(3) Weyl-dim formula (named to avoid collision with the
+        existing `Weyl_dim_SU3_explicit` in `PeterWeyl.lean`,
+        which uses a different ℕ → ℝ cast pattern targeting the
+        product-envelope summability bound).
+      - `theorem dim_cubic_bound (m n : ℕ) :
+            dim_SU3 m n ≤ 8 * (m + n + 1) ^ 3`
+        — the audited brick. Explicit `k₀ = 0` (the inequality
+        holds for **every** `(m, n) : ℕ²`, no "for sufficiently
+        large m + n" caveat).
+
+  - `lean-proof-towers/lakefile.lean` — `Towers.YM.WeylDim` added
+    to `roots` (now 36 module roots).
+  - `scripts/check-towers.sh` — `Towers.YM.WeylDim |
+    TheoremaAureum.Towers.YM.WeylDim.dim_cubic_bound` appended to
+    `BRICKS` array (with inline comment block documenting the
+    cubic-vs-degree-4 distinction).
+  - `replit.md` Path B table — new row.
+
+**Proof.** Two-stage `omega` chase after a polynomial-inequality
+unlock:
+
+```lean
+unfold dim_SU3
+have key : (m+1) * (n+1) * (m+n+2) ≤ 16 * (m+n+1)^3 := by
+  zify
+  nlinarith [sq_nonneg ((m:ℤ) - n), sq_nonneg ((m:ℤ) + n + 1),
+             sq_nonneg ((m:ℤ) + n), Int.natCast_nonneg m,
+             Int.natCast_nonneg n]
+set R := (m + n + 1) ^ 3
+set A := (m + 1) * (n + 1) * (m + n + 2)
+omega
+```
+
+The `16 ×` slack is ≫ tight (AM-GM on `(m+1) + (n+1) = m+n+2`
+plus `m+n+2 ≤ 2·(m+n+1)` would give `16/2 = 8 ≥ 2` directly), but
+we don't need tightness — the future file 3 absorbs the constant
+`8` into `C` anyway. Once `key` is in scope and `R`, `A` are
+generalized to opaque ℕ, `omega` discharges `A / 2 ≤ 8 · R` from
+`A ≤ 16 · R` via the standard `Nat.div_le_div_right` factor of 2
+and exact `Nat.mul_div_cancel_left` for `16 = 2 · 8`.
+
+**Why a separate file from `PeterWeyl.lean`.** The existing
+`Weyl_dim_SU3_explicit_real_le_poly` is the **degree-4** real-valued
+bound
+  `(Weyl_dim_SU3_explicit (m, n) : ℝ) ≤ ((m:ℝ)+1)² · ((n:ℝ)+1)²`
+which is what the Peter–Weyl **summability envelope** wants
+(paired with the geometric `exp(−βm) · exp(−βn)` factor that
+splits on (m, n) separately). The future file 3 needs a different
+shape — a **cubic** bound in `m + n`, not `m` and `n` separately —
+because the Weyl-law `t⁻ᵈᐟ²` heat-trace estimate sums on the
+`m + n = k` antidiagonal and asks for
+`# antidiagonal · dim² · exp(−t · C₂) ≲ poly(k) · exp(−t · k²)`.
+Both bounds are real and live independently; this batch
+**strengthens neither** (`dim_cubic_bound` neither implies nor is
+implied by `Weyl_dim_SU3_explicit_real_le_poly` because the
+constants on the two sides are scaled by `(m + n + 1)` vs
+`(m + 1)(n + 1)`). Bridging the two so that file 3 can cite a
+single dim bound is a separate housekeeping task; it is **not**
+part of Batch 156.2.
+
+**Honest scope (locked, unchanged).**
+
+  - mathlib v4.12.0 only. No other deps.
+  - Axiom footprint: `{propext, Classical.choice, Quot.sound}`
+    (mathlib's classical trio; no research-grade axioms).
+  - No `sorry`, no `admit`, no `axiom`, no `unsafe`, no
+    `implemented_by`. (The five `sorry` strings that `grep` finds
+    in `Towers/YM/WeylDim.lean` are all doc-comment mentions in
+    the file header explaining what is **not** used.)
+  - YM tower stays `Status: Open` in `docs/ROADMAP.md` § 2.
+  - Surface #2 stays OPEN (4 open-gap blocks in
+    `docs/Surface2_ResearchProgram.tex`; `kotecky_preiss_criterion`
+    remains a `sorry` in `Towers/Attempts/ClusterExpansion.lean`).
+  - Landing this brick does **not** discharge Varadhan, the
+    per-plaquette activity bound, KP, cluster expansion, area law,
+    or any mass-gap statement. It is **one ℕ-polynomial
+    inequality**.
+
+**Script-count drift — full attribution.** `scripts/check-towers.sh`
+reports `465 → 467`. The diff of axiom-debt-checked theorems
+between the previous (21:46 UTC) and post-WeylDim (22:34 UTC)
+build logs is **exactly two**:
+
+  1. `TheoremaAureum.Towers.YM.WeylDim.dim_cubic_bound` — this batch.
+  2. `TheoremaAureum.Towers.NS.HasFiniteEnergy_galilean_group` —
+     **a separate NS brick from the Task #146 context** that was
+     already registered in the `BRICKS` array (line 442:
+     `"Towers.NS.EnergyIneq|TheoremaAureum.Towers.NS.HasFiniteEnergy_galilean_group"`)
+     but had not yet been picked up by a build at the time of the
+     21:46 UTC snapshot. **Not authored or registered in this
+     batch.** The wall jump is therefore not "+1 audited brick +
+     reconciliation"; it is "+1 from this batch + 1 from a
+     previously-registered NS brick whose first axiom-debt log
+     entry happens to land in the same build". Counted honestly,
+     Batch 156.2's brick delta is **+1**.
+
+Caught and corrected by code review (architect, `evaluate_task`,
+fail-then-fix); flagging the drift explicitly so future batches
+don't conflate cross-batch counts.
+
+**Genesis seal:** verified (`eecbcd9a…875f`). `data/hits.txt`
+**not touched** (the user's check #1 `grep -c '^ "Towers'
+data/hits.txt = 466` is mistaken — `hits.txt` is the L-function
+probe ledger, has zero `Towers` lines, and per the locked
+honest-scope guard in `replit.md` is append-only via
+`kernel.probe()`, not a brick registry).
+
+**Tripwires unchanged.** `RealCurvature.curvature_eq_zero` still
+routes through the placeholder `f^{abc} = 0`; replacing the
+constants with real Gell-Mann values will intentionally break it.
+
+**Next.** File 3 (`HeatTraceBound`) — combine the quadratic
+Casimir lower bound (file 1) with this cubic Weyl-dim upper bound
+to land the Weyl-law `K(t) ≤ C · t⁻⁴` heat-trace shape via a
+geometric-series tail on `Σₖ poly(k) · exp(−t · k²)`. No new
+math input needed; pure `Mathlib.Analysis.SpecificLimits` work.
+Files 4–6 remain blocked on bi-invariant Riemannian geometry on
+SU(3) (absent from mathlib v4.12.0).
+
+---
+
 ## Batch 20.2a — Task #156 file 1 of 6 (Varadhan scaffolding): Casimir quadratic lower bound. Wall 464 → 465, +1 BRICK (2026-05-27)
 
 **Goal.** Land the **arithmetic input** for the eventual Varadhan
