@@ -341,6 +341,23 @@ BRICKS=(
   # L² energy bound or any Leray-Hopf solution; this is closure of the
   # *placeholder* predicate under the time-axis reflection.
   "Towers.NS.EnergyIneq|TheoremaAureum.Towers.NS.HasFiniteEnergy_time_reverse"
+  # Task #132 (2026-05-27): *signed* time-reversal invariance of the
+  # placeholder finite-energy predicate — the physically correct
+  # Navier-Stokes time reversal `u₀(t, x) ↦ -u₀(-t, x)`, which Task
+  # #117 deferred. Where Task #117's unsigned `HasFiniteEnergy_time_reverse`
+  # reverses only the time axis (`u₀(-t, x)`) and reduces to a pure
+  # reindexing (`-0 = 0`) with no norm facts, the signed variant
+  # *also* applies `Neg.neg` on the velocity output — exactly the
+  # physical convention that velocity reverses under time reversal.
+  # At `t = 0` the transformed field is `-(u₀ 0 x)`, and the proof
+  # closes via `norm_neg : ‖-v‖ = ‖v‖` + the original hypothesis.
+  # Same witness `M` as `u₀` itself. Both honest variants of the
+  # time-axis reflection are now on the schema. NS tower status
+  # unchanged: Open (`docs/ROADMAP.md` § 3). NOT a statement about
+  # the L² energy bound or any Leray-Hopf solution; this is closure
+  # of the *placeholder* predicate under the full physical time
+  # reversal.
+  "Towers.NS.EnergyIneq|TheoremaAureum.Towers.NS.HasFiniteEnergy_time_reverse_signed"
   # Task #118 (2026-05-27): full spacetime rigid-motion invariance of
   # the placeholder finite-energy predicate. Composes Task #100
   # (`HasFiniteEnergy_time_translate`, time translation, conditional

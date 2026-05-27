@@ -697,6 +697,65 @@ theorem HasFiniteEnergy_time_reverse (u₀ : VelocityField)
   simpa using hM x
 
 /-
+  ## Task #132 (2026-05-27) — *signed* time-reversal invariance of the
+  placeholder finite-energy predicate.
+
+  Task #117 landed the *unsigned* time-reversal brick
+  `HasFiniteEnergy_time_reverse` on the placeholder NS energy predicate
+  (`fun t x => u₀ (-t) x`). The physically correct Navier-Stokes time
+  reversal also flips the sign of the velocity
+  (`u₀(t, x) ↦ -u₀(-t, x)`), since velocity reverses under time
+  reversal. This brick adds the **signed** variant.
+
+  **Contrast: signed vs unsigned.** The unsigned form just reindexes
+  `t ↦ -t`; on the placeholder predicate, which inspects `u₀` only at
+  the fixed point `t = 0`, this is definitional and uses no norm
+  facts. The signed form *also* applies `Neg.neg` on the velocity
+  output. At `t = 0` the time-reversed-with-flip field is
+  `-(u₀ 0 x)`, so the bound `‖-(u₀ 0 x)‖ ≤ M` is reached by
+  `norm_neg : ‖-v‖ = ‖v‖` followed by the original hypothesis. Same
+  witness `M`, but the proof exercises the genuine PDE-physical
+  reversal `u(t, x) ↦ -u(-t, x)` rather than the surface-level
+  reindexing of #117.
+
+  **Honest scope.** Does NOT advance the NS tower past `Status: Open`
+  (see `docs/ROADMAP.md` § 3). `HasFiniteEnergy` is still the Task #51
+  placeholder (bounded amplitude at `t = 0`), not the L² energy bound;
+  signed-time-reversal closure of the *placeholder* predicate is not
+  signed-time-reversal invariance of the real energy. The companion
+  Task #117 brick (unsigned reversal) remains in place; both honest
+  variants of the time-axis reflection are now on the schema.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Signed time-reversal invariance of placeholder finite-energy.**
+    If `u₀` has finite placeholder energy with witness `M`, then the
+    fully physically-reversed field
+    `fun t x => -(u₀ (-t) x)` — time reversal `t ↦ -t` composed with
+    the velocity sign flip `u ↦ -u` that physical NS time reversal
+    requires — also has finite placeholder energy with the *same*
+    witness `M`. At `t = 0` (the fixed point of `t ↦ -t`) the
+    transformed value is `-(u₀ 0 x)`, and `‖-(u₀ 0 x)‖ = ‖u₀ 0 x‖`
+    by `norm_neg`, so `hM x` closes the bound. References the Task
+    #51 schema def `HasFiniteEnergy` and is the signed companion to
+    Task #117's unsigned `HasFiniteEnergy_time_reverse`: unsigned
+    reverses only the time axis (`u₀(-t, x)`), signed also flips the
+    velocity (`-u₀(-t, x)`) as physical NS reversal demands. NOT a
+    statement about the L² energy bound or any Leray-Hopf solution;
+    this is closure of the *placeholder* predicate under the full
+    physical time reversal. -/
+theorem HasFiniteEnergy_time_reverse_signed (u₀ : VelocityField)
+    (hu : HasFiniteEnergy u₀) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      -(u₀ (-t) x)) := by
+  obtain ⟨M, hM⟩ := hu
+  refine ⟨M, fun x => ?_⟩
+  simpa [norm_neg] using hM x
+
+/-
   ## Task #118 (2026-05-27) — full spacetime rigid-motion invariance
   of the placeholder finite-energy predicate.
 
