@@ -341,6 +341,31 @@ BRICKS=(
   # L² energy bound or any Leray-Hopf solution; this is closure of the
   # *placeholder* predicate under the time-axis reflection.
   "Towers.NS.EnergyIneq|TheoremaAureum.Towers.NS.HasFiniteEnergy_time_reverse"
+  # Task #118 (2026-05-27): full spacetime rigid-motion invariance of
+  # the placeholder finite-energy predicate. Composes Task #100
+  # (`HasFiniteEnergy_time_translate`, time translation, conditional
+  # on a uniform spatial bound at the shifted time `s`) with Task #101
+  # (`HasFiniteEnergy_euclidean_motion`, full spatial Euclidean motion
+  # `x ↦ R x + a`) into the full spacetime rigid motion
+  # `(t, x) ↦ (t + s, R x + a)` — exactly what a complete change of
+  # inertial reference frame looks like on the spatial slice. Given
+  # `∀ x, ‖u₀ s x‖ ≤ M`, any linear isometry
+  # `R : EuclideanSpace ℝ (Fin 3) →ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 3)`,
+  # and any spatial translation `a : ℝ³`, the field
+  # `fun t x => u₀ (t + s) (R x + a)` also has finite placeholder
+  # energy with the same witness `M`. The hypothesis sits at the
+  # shifted time `s` (not `0`) — inherited from Task #100 — because
+  # the placeholder predicate only sees `u₀` at `t = 0` and translation
+  # cannot manufacture a bound at `s` from one at `0` without the
+  # (absent) Leray energy inequality; the spatial Euclidean step
+  # composes for free since it is unconditional. Documents that the
+  # schema respects the full rigid-motion group on spacetime, not just
+  # the purely spatial subgroup or the time axis in isolation. NS
+  # tower status unchanged: Open (`docs/ROADMAP.md` § 3). NOT a
+  # statement about the L² energy bound or any Leray-Hopf solution;
+  # this is closure of the *placeholder* predicate under spacetime
+  # rigid motion.
+  "Towers.NS.EnergyIneq|TheoremaAureum.Towers.NS.HasFiniteEnergy_spacetime_rigid_motion"
   # Task #70 (2026-05-26): name the "energy never grows" predicate
   # inside the NS schema. `EnergyMonotone u u₀ : Prop` is the
   # explicit `∀ t, H1Norm u t ≤ H1Norm u₀ 0` shape named by the

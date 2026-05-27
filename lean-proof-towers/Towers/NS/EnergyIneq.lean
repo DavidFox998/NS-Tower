@@ -696,6 +696,74 @@ theorem HasFiniteEnergy_time_reverse (u₀ : VelocityField)
   refine ⟨M, fun x => ?_⟩
   simpa using hM x
 
+/-
+  ## Task #118 (2026-05-27) — full spacetime rigid-motion invariance
+  of the placeholder finite-energy predicate.
+
+  Task #101 landed closure under the full *spatial* Euclidean motion
+  group E(3) (`HasFiniteEnergy_euclidean_motion`, `x ↦ R x + a`).
+  Task #100 separately landed *conditional* closure under time
+  translation (`HasFiniteEnergy_time_translate`,
+  `t ↦ t + s`, hypothesis at the shifted time `s`). The natural next
+  composite is the full *spacetime* rigid motion
+  `(t, x) ↦ (t + s, R x + a)` — exactly what a complete change of
+  inertial reference frame looks like on the spatial slice. Landing
+  this composite documents that the schema respects the full
+  rigid-motion group on spacetime, not just the purely spatial
+  subgroup or the time axis in isolation.
+
+  The proof is one line: chain `HasFiniteEnergy_time_translate`
+  (the conditional step, which converts a uniform spatial bound at
+  the shifted time `s` into a `HasFiniteEnergy` witness for the
+  time-shifted field `fun t x => u₀ (t + s) x`) into
+  `HasFiniteEnergy_euclidean_motion` (which then closes that
+  intermediate field under `x ↦ R x + a`). The composite reuses the
+  same witness `M` end-to-end.
+
+  The hypothesis sits at the *shifted* time `s` — inherited from
+  Task #100 — because the placeholder predicate only sees the
+  velocity field at `t = 0`, and the time-translate brick cannot
+  manufacture a bound at time `s` from one at `t = 0` without the
+  (absent) Leray energy inequality. The spatial Euclidean step then
+  composes for free, since it is unconditional.
+
+  **Honest scope.** Does NOT advance the NS tower past
+  `Status: Open` (see `docs/ROADMAP.md` § 3). `HasFiniteEnergy` is
+  still the Task #51 placeholder (bounded amplitude at `t = 0`),
+  not the L² energy bound. Full spacetime rigid-motion closure of
+  the *placeholder* predicate is not rigid-motion invariance of the
+  real energy or any Leray-Hopf solution.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Full spacetime rigid-motion invariance of placeholder
+    finite-energy.** Given a uniform spatial bound `∀ x, ‖u₀ s x‖ ≤ M`
+    on `u₀` at the shifted time `s`, any linear isometry `R` of `ℝ³`,
+    and any spatial translation `a : ℝ³`, the spacetime rigid motion
+    `(t, x) ↦ u₀ (t + s) (R x + a)` also has finite placeholder energy
+    with the same witness `M`. Composes Task #100
+    (`HasFiniteEnergy_time_translate`, time translation) with Task #101
+    (`HasFiniteEnergy_euclidean_motion`, full spatial Euclidean
+    motion), documenting closure of the placeholder schema under the
+    full rigid-motion group on spacetime — a complete change of
+    inertial reference frame on the spatial slice — not just the
+    spatial or temporal subgroups in isolation. NOT a statement about
+    the L² energy bound or any Leray-Hopf solution; this is closure of
+    the *placeholder* predicate under spacetime rigid motion. -/
+theorem HasFiniteEnergy_spacetime_rigid_motion (u₀ : VelocityField)
+    (s : ℝ)
+    (R : EuclideanSpace ℝ (Fin 3) →ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 3))
+    (a : EuclideanSpace ℝ (Fin 3)) (M : ℝ)
+    (h : ∀ x : EuclideanSpace ℝ (Fin 3), ‖u₀ s x‖ ≤ M) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u₀ (t + s) (R x + a)) :=
+  HasFiniteEnergy_euclidean_motion
+    (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) => u₀ (t + s) x) R a
+    (HasFiniteEnergy_time_translate u₀ s M h)
+
 end NS
 end Towers
 end TheoremaAureum
