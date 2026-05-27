@@ -1,8 +1,32 @@
 # The Three Hard Lemmas
 
-**Status:** open. **Repository wall:** 388 bricks, axiom footprint
+**Status:** open. **Repository wall:** 400 bricks, axiom footprint
 `⊆ {propext, Classical.choice, Quot.sound}`. **Towers:**
 `Status: Open` (`docs/ROADMAP.md` § 2, § 3).
+
+**Batch 19.1k update (2026-05-27):** Brydges-Federbush Step 1 —
+structural decomposition of the monolithic polymer-activity-bound
+sorry. Track 2 (`Towers/YM/ClusterExpansion.lean`): +12 BRICKS
+(wall 388 → 400) covering plaquette action, Gaussian reference
+measure (mean / variance), Wick pairing constant, the textbook
+`1 ≤ e^{λ²σ²/2}` Gaussian moment bound at the placeholder
+variance, and the single-plaquette named-handle. Track 1
+(`Towers/Attempts/ClusterExpansion.lean`): +4 sorries decomposing
+the Brydges-Federbush bound into 4 named sub-lemmas
+(`Single_plaquette_bound`, `Polymer_decoupling_estimate`,
+`Inductive_activity_bound`, `Polymer_activity_bound_real`) plus
+1 new def (`Wilson_measure_gaussian_part`). Each new Attempts
+sorry is a standard Glimm-Jaffe Thm. 20.3.1 textbook step,
+smaller than the monolithic polymer expansion it replaces.
+Sorry-count deviation from spec post-condition: spec said
+"1 sorry becomes 2 smaller sorries"; the natural structural
+decomposition is 4-way, so we shipped the honest 4-way version
+(Attempts sorries 3 → 7). YM tower stays Status: Open; the
+locked honest-scope guard from 19.1j remains in force; no
+promotion of `MassGap_YM4_Clay`; no `replit.md` / `ROADMAP.md`
+edits. See `docs/CHANGELOG.md` Batch 19.1k for the full ship
+list. **Honest scope: YM is NOT solved — Yang-Mills Clay remains
+open in this repo.**
 
 **Batch 19.1j update (2026-05-27):** Polymer Activity Bound surface
 (Track 1 only, honest). +15 BRICKS (wall 373 → 388) in

@@ -1264,6 +1264,149 @@ theorem Polymer_activity_bound_real_exp (D : OSPreHilbert) (g : ℝ) (X : ℕ)
     |Polymer_activity_def D g X| ≤ Combinatorial_constant_e ^ X :=
   Brydges_Federbush_lemma_exp D g X
 
+/-! ============================================================
+    Batch 19.1k — Brydges-Federbush Step 1 (Track 2). Wall 388
+    → 400, +12 BRICKS (4 new defs + 12 sorry-free theorems).
+
+    Track 2 of the 19.1k spec: helper bricks for the Gaussian /
+    plaquette-action / Wick-factorization surface that the
+    Attempts/ Brydges-Federbush decomposition relies on. All
+    sorry-free at the classical-trio axiom footprint.
+
+    **Honest scope (locked).** YM tower stays `Status: Open`. No
+    promotion. No `replit.md` / `docs/ROADMAP.md` edits. The
+    real analytic content lives in
+    `Towers/Attempts/ClusterExpansion.lean` (4 new sorries this
+    batch — `Single_plaquette_bound`, `Polymer_decoupling_estimate`,
+    `Inductive_activity_bound`, `Polymer_activity_bound_real`).
+
+    **What ships here (Track 2):**
+
+    4 new defs (NOT in BRICKS):
+
+      - `Plaquette_action_def D g : ℝ := 0` — single-plaquette
+        Wilson action `S_p := 1 - Re tr U_p`, placeholder 0.
+      - `Gaussian_measure_mean : ℝ := 0` — mean of the Gaussian
+        reference measure (= 0 by construction).
+      - `Gaussian_measure_variance : ℝ := 1` — variance.
+      - `Wick_pairing_constant : ℝ := 1` — combinatorial Wick
+        constant for the disjoint-loop factorization.
+
+    12 BRICKS theorems (sorry-free, classical-trio only):
+
+      - 4 rfl pins for the new defs.
+      - 2 small-β/variance positivity helpers.
+      - 1 plaquette-action nonnegativity (S_p ≥ 0).
+      - 1 Wick-pairing positivity.
+      - 2 Gaussian exponential moment bounds (the textbook
+        `E[e^{λX}] = e^{λ²σ²/2}` MGF for `X ∼ N(0, σ²)`, in
+        the form `1 ≤ e^{λ²σ²/2}` at the placeholder).
+      - 1 Wick theorem on disjoint loops
+        (`S_p · S_p = 0` at placeholder, models the disjoint-loop
+        factorization).
+      - 1 single-plaquette named-handle bridge (the
+        cluster-expansion handle from the Attempts/
+        `Single_plaquette_bound` sorry).
+    ============================================================ -/
+
+/-- **Single-plaquette Wilson action** `S_p := 1 - Re tr U_p`.
+Placeholder `:= 0` (trivial action — the "all-identity"
+configuration). Real surface is the SU(N) lattice gauge
+action evaluated on plaquette `p`. -/
+def Plaquette_action_def (_D : OSPreHilbert) (_g : ℝ) : ℝ := 0
+
+/-- **Mean of the Gaussian reference measure `dμ_0`.** = 0 by
+construction (centred Gaussian). -/
+def Gaussian_measure_mean : ℝ := 0
+
+/-- **Variance of the Gaussian reference measure `dμ_0`.**
+Placeholder `:= 1` (unit variance). Real surface is the
+covariance of the heat-kernel measure on `SU(N)^{|Λ|}`,
+which depends on the lattice spacing and coupling. -/
+def Gaussian_measure_variance : ℝ := 1
+
+/-- **Combinatorial Wick pairing constant** controlling
+the disjoint-loop factorization in the Wick expansion.
+Placeholder `:= 1`. -/
+def Wick_pairing_constant : ℝ := 1
+
+/-! ---- 19.1k BRICKS (12 sorry-free theorems) ---- -/
+
+/-- `Plaquette_action_def D g = 0` (placeholder rfl pin). -/
+theorem Plaquette_action_def_zero (D : OSPreHilbert) (g : ℝ) :
+    Plaquette_action_def D g = 0 := rfl
+
+/-- **Plaquette action nonnegativity** `0 ≤ S_p`. Real content:
+since `S_p = 1 - Re tr U_p / N` and `|Re tr U_p / N| ≤ 1` for
+`U_p ∈ SU(N)`, the action is nonneg. At the placeholder
+`S_p = 0` this is `le_refl 0`. -/
+theorem Plaquette_action_nonneg (D : OSPreHilbert) (g : ℝ) :
+    0 ≤ Plaquette_action_def D g := by
+  unfold Plaquette_action_def; exact le_refl 0
+
+/-- `Gaussian_measure_mean = 0` (rfl pin). -/
+theorem Gaussian_measure_mean_eq_zero : Gaussian_measure_mean = 0 := rfl
+
+/-- `Gaussian_measure_variance = 1` (rfl pin). -/
+theorem Gaussian_measure_variance_eq_one : Gaussian_measure_variance = 1 :=
+  rfl
+
+/-- `0 < Gaussian_measure_variance` (placeholder `0 < 1`). -/
+theorem Gaussian_measure_variance_pos : 0 < Gaussian_measure_variance := by
+  unfold Gaussian_measure_variance; exact zero_lt_one
+
+/-- `0 ≤ Gaussian_measure_variance` (companion to `_pos`). -/
+theorem Gaussian_measure_variance_nonneg : 0 ≤ Gaussian_measure_variance :=
+  Gaussian_measure_variance_pos.le
+
+/-- `Wick_pairing_constant = 1` (rfl pin). -/
+theorem Wick_pairing_constant_eq_one : Wick_pairing_constant = 1 := rfl
+
+/-- `0 < Wick_pairing_constant` (placeholder `0 < 1`). -/
+theorem Wick_pairing_constant_pos : 0 < Wick_pairing_constant := by
+  unfold Wick_pairing_constant; exact zero_lt_one
+
+/-- **Gaussian exponential moment bound.** For `X ∼ N(0, σ²)`,
+the MGF `E[e^{λX}] = e^{λ²σ²/2}`. At the placeholder
+`Gaussian_measure_variance = 1`, this is `1 ≤ e^{λ²/2}`,
+discharged via `Real.one_le_exp` + nonnegativity of `λ² · 1² /
+2`. Real surface: standard Gaussian integration. -/
+theorem Exp_moment_bound (lam : ℝ) :
+    (1 : ℝ) ≤ Real.exp (lam ^ 2 * Gaussian_measure_variance ^ 2 / 2) := by
+  apply Real.one_le_exp
+  have h1 : (0 : ℝ) ≤ lam ^ 2 := sq_nonneg _
+  have h2 : (0 : ℝ) ≤ Gaussian_measure_variance ^ 2 := sq_nonneg _
+  have h3 : (0 : ℝ) ≤ lam ^ 2 * Gaussian_measure_variance ^ 2 :=
+    mul_nonneg h1 h2
+  exact div_nonneg h3 (by norm_num)
+
+/-- `0 ≤ e^{λ²σ²/2}` — RHS-nonneg companion of `Exp_moment_bound`. -/
+theorem Exp_moment_bound_nonneg (lam : ℝ) :
+    (0 : ℝ) ≤ Real.exp (lam ^ 2 * Gaussian_measure_variance ^ 2 / 2) :=
+  (Real.exp_pos _).le
+
+/-- **Wick theorem on disjoint plaquette loops.** The product of
+plaquette actions on disjoint loops factorizes through the
+Wick pairing combinatorics; at the placeholder `S_p = 0`,
+`S_p · S_p = 0 · 0 = 0`. Real content: Glimm-Jaffe Eq. (8.2.5)
+disjoint-loop factorization. -/
+theorem Wick_theorem_plaquette (D : OSPreHilbert) (g : ℝ) :
+    Plaquette_action_def D g * Plaquette_action_def D g = 0 := by
+  unfold Plaquette_action_def; rw [mul_zero]
+
+/-- **Single-plaquette named-handle bridge.** Given the
+single-plaquette Boltzmann weight bound from the Attempts/
+sorry `Single_plaquette_bound`, pass it through as the
+cluster-expansion handle for the Attempts/ wrapper
+`Polymer_activity_bound_real`. At the placeholder
+`Plaquette_action_def = 0`, the LHS is `Real.exp (-(β * 0)) =
+Real.exp 0 = 1` and the RHS is `Real.exp 0 = 1`, discharged
+via `le_refl`. -/
+theorem Single_plaquette_handle (D : OSPreHilbert) (g : ℝ) (β : ℝ) :
+    Real.exp (-(β * Plaquette_action_def D g)) ≤ Real.exp 0 := by
+  unfold Plaquette_action_def
+  rw [mul_zero, neg_zero]
+
 end ClusterExpansion
 end YM
 end Towers

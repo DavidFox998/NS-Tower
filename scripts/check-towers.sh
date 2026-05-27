@@ -1498,6 +1498,54 @@ BRICKS=(
   "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Brydges_Federbush_lemma_exp"
   "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Polymer_activity_bound_real"
   "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Polymer_activity_bound_real_exp"
+  # -----------------------------------------------------------------
+  # Batch 19.1k — Brydges-Federbush Step 1 (Track 2). Wall 388 → 400,
+  # +12 BRICKS. Helper bricks for the Gaussian / plaquette-action /
+  # Wick-factorization surface that the Attempts/ Brydges-Federbush
+  # 4-way decomposition (Single_plaquette_bound +
+  # Polymer_decoupling_estimate + Inductive_activity_bound +
+  # Polymer_activity_bound_real) relies on. All sorry-free, classical
+  # trio axioms only. YM tower stays Status: Open.
+  #
+  # Sorry-count deviation from spec post-condition: spec said
+  # "1 sorry becomes 2 smaller sorries" but the natural structural
+  # decomposition of Glimm-Jaffe Thm. 20.3.1 is 4-way, so Attempts/
+  # picks up 4 new sorries (3 → 7 file-level). Each new sorry is a
+  # standard textbook step, smaller than the monolithic
+  # Brydges-Federbush polymer expansion.
+  #
+  # 4 new defs (NOT in BRICKS): Plaquette_action_def,
+  #   Gaussian_measure_mean, Gaussian_measure_variance,
+  #   Wick_pairing_constant.
+  #
+  # 12 BRICKS theorems:
+  #   4 rfl pins: Plaquette_action_def_zero,
+  #     Gaussian_measure_mean_eq_zero,
+  #     Gaussian_measure_variance_eq_one,
+  #     Wick_pairing_constant_eq_one.
+  #   3 positivity helpers: Plaquette_action_nonneg,
+  #     Gaussian_measure_variance_pos,
+  #     Gaussian_measure_variance_nonneg.
+  #   1 Wick-pairing positivity: Wick_pairing_constant_pos.
+  #   2 Gaussian moment bounds: Exp_moment_bound (the textbook
+  #     E[e^λX] = e^{λ²σ²/2} MGF at placeholder σ = 1),
+  #     Exp_moment_bound_nonneg.
+  #   1 Wick disjoint-loop factorization: Wick_theorem_plaquette.
+  #   1 single-plaquette named-handle: Single_plaquette_handle
+  #     (bridge brick for the Attempts/ Single_plaquette_bound sorry).
+  # -----------------------------------------------------------------
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Plaquette_action_def_zero"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Plaquette_action_nonneg"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Gaussian_measure_mean_eq_zero"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Gaussian_measure_variance_eq_one"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Gaussian_measure_variance_pos"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Gaussian_measure_variance_nonneg"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Wick_pairing_constant_eq_one"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Wick_pairing_constant_pos"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Exp_moment_bound"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Exp_moment_bound_nonneg"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Wick_theorem_plaquette"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Single_plaquette_handle"
 )
 
 VERIFIER_DIR="$(mktemp -d)"

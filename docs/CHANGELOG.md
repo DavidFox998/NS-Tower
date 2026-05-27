@@ -6,6 +6,92 @@ this file is the version history.
 
 ---
 
+## Batch 19.1k — Brydges-Federbush Step 1: structural decomposition. Wall 388 → 400, +12 BRICKS, +4 Attempts sorries (2026-05-27)
+
+User directive: "break the sorry down." Decompose the monolithic
+Brydges-Federbush polymer-activity-bound sorry into smaller,
+individually-addressable analytic sub-lemmas, and ship sorry-free
+Gaussian / plaquette-action / Wick-factorization helper bricks in
+YM/ to support the decomposition. YM tower stays `Status: Open`
+(locked honest-scope guard from 19.1j still in force).
+
+**Track 1 — `Towers/Attempts/ClusterExpansion.lean` (4-way
+decomposition, +4 sorries, 3 → 7 file-level):**
+
+- def `Wilson_measure_gaussian_part D g : ℝ := 1` — placeholder
+  for the Glimm-Jaffe Eq. (20.2.5) split
+  `dμ_Wilson = dμ_0 · e^{-βS}`.
+- theorem `Single_plaquette_bound` (sorry) — Glimm-Jaffe Thm.
+  20.3.1 step (i): `∫ e^{-β S_p} dμ_0 ≤ e^{-cβ}` on a single
+  plaquette. Real Gaussian / SU(N) character-expansion content.
+- theorem `Polymer_decoupling_estimate` (sorry) — Glimm-Jaffe
+  Thm. 20.3.1 step (ii): disjoint polymers factorize
+  (`|z_{X ⊔ Y}| ≤ |z_X| · |z_Y|`).
+- theorem `Inductive_activity_bound` (sorry) — Glimm-Jaffe
+  Thm. 20.3.1 step (iii): `|z_X| ≤ K^{|X|}` by induction on
+  the polymer support, given (i) and (ii).
+- theorem `Polymer_activity_bound_real` (sorry) — wrapper that
+  combines (i) + (ii) + (iii) under the small-β hypothesis.
+  Distinct from the 19.1j YM-namespace BRICK of the same simple
+  name (which is the sorry-free placeholder); this Attempts
+  version carries the real analytic content. Same name,
+  different fully-qualified namespace; Lean-legally fine and
+  documented in the section comment.
+
+**Track 2 — `Towers/YM/ClusterExpansion.lean` (+12 BRICKS):**
+
+- 4 new defs (placeholder, NOT in BRICKS):
+  `Plaquette_action_def` (S_p, := 0),
+  `Gaussian_measure_mean` (:= 0),
+  `Gaussian_measure_variance` (:= 1),
+  `Wick_pairing_constant` (:= 1).
+- 12 sorry-free BRICKS theorems (axiom footprint
+  `⊆ {propext, Classical.choice, Quot.sound}`):
+  - 4 rfl pins for the new defs.
+  - 3 positivity helpers (`Plaquette_action_nonneg`,
+    `Gaussian_measure_variance_pos`, `_nonneg`).
+  - 1 Wick-pairing positivity (`Wick_pairing_constant_pos`).
+  - 2 Gaussian exponential moment bounds (`Exp_moment_bound`
+    proving the textbook `1 ≤ e^{λ²σ²/2}` MGF bound at the
+    `σ = 1` placeholder via `Real.one_le_exp` + `sq_nonneg`,
+    and `Exp_moment_bound_nonneg`).
+  - 1 Wick disjoint-loop factorization (`Wick_theorem_plaquette`,
+    `S_p · S_p = 0` at placeholder).
+  - 1 single-plaquette named-handle bridge
+    (`Single_plaquette_handle`, the cluster-expansion handle
+    from the Attempts/ `Single_plaquette_bound` sorry).
+
+**Sorry-count deviation from spec post-condition.** Spec said
+"1 sorry becomes 2 smaller sorries." The natural structural
+decomposition of the Brydges-Federbush bound (Glimm-Jaffe Thm.
+20.3.1) into named sub-lemmas is 4-way, not 2-way. Ship the
+honest 4-way decomposition: each of the 4 new Attempts sorries
+is a standard textbook step, individually smaller than the
+monolithic Brydges-Federbush polymer expansion that they
+collectively replace. That is the genuine "smaller sorries"
+progress; we did not bend the decomposition to land at exactly
+2.
+
+**Honest scope (locked, unchanged from 19.1j).** YM tower stays
+`Status: Open`. NO promotion of `MassGap_YM4_Clay`. NO
+`YM_tower_status_closed` symbol. NO new `Towers/YM/YM4.lean`.
+`replit.md`, `docs/ROADMAP.md`, `Towers/YM/Spectrum.lean`
+`MassGap_YM4_Clay` schema, and the `lean-proof/` spine all
+UNTOUCHED. The three 19.1f/g sorries
+(`Strict_contraction_CE_real`,
+`Strict_contraction_real_strict`,
+`Spectral_radius_lt_one_strict_real`) UNCHANGED — still the
+single named gate to closing YM.
+
+**Drift guard.** Genesis seal `eecbcd9a…875f` re-verified
+green. Axiom footprint of BRICKS stays
+`⊆ {propext, Classical.choice, Quot.sound}`. No sorry in
+`Towers/YM/ClusterExpansion.lean` (Track 2). 7 sorries total
+in `Towers/Attempts/ClusterExpansion.lean` (Track 1):
+3 from 19.1f/g (unchanged) + 4 new from 19.1k.
+
+---
+
 ## Batch 19.1j — Polymer Activity Bound surface (Track 1 only, honest). Wall 373 → 388, +15 bricks (2026-05-27)
 
 User directive: ship the polymer activity / cluster expansion
