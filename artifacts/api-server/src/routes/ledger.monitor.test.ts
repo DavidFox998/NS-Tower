@@ -567,6 +567,132 @@ describe("startLedgerMonitor", () => {
     expect(modes).toEqual(["checkpoint_stale", "hits_truncated"]);
   });
 
+  it("fires a 'monitor_stalled' watchdog alert when no tick completes in 2× interval, dedupes while stalled (task #113)", async () => {
+    const sealed = "line1\nline2\n";
+    const { size, sha } = writeHits(sealed);
+    writeCheckpoint(size, sha);
+
+    const { buildStatus, hitsPath: hp, checkpointPath: cp } =
+      createLedgerChecker({ hitsPath, checkpointPath, lastOkPath });
+    const { sink, calls } = makeRecordingSink();
+    let clockMs = 1_000_000;
+    monitor = startLedgerMonitor({
+      buildStatus,
+      sink,
+      intervalMs: 60_000,
+      hitsPath: hp,
+      checkpointPath: cp,
+      logger: silentLogger(),
+      now: () => clockMs,
+    });
+
+    // No tick has run yet, but only an instant has passed: not stalled.
+    await monitor.checkWatchdog();
+    expect(calls).toHaveLength(0);
+
+    // Advance just past the threshold (2× 60_000ms = 120_000ms).
+    clockMs += 121_000;
+    await monitor.checkWatchdog();
+    expect(calls).toHaveLength(1);
+    expect(calls[0].kind).toBe("alert");
+    expect(calls[0].context.failure_mode).toBe("monitor_stalled");
+    expect(calls[0].context.source).toBe("api-server-monitor-watchdog");
+    expect(calls[0].context.hits_path).toBe(hp);
+    expect(calls[0].context.checkpoint_path).toBe(cp);
+    expect(calls[0].context["stall_threshold_seconds"]).toBe(120);
+    expect(calls[0].context["monitor_interval_seconds"]).toBe(60);
+    expect(typeof calls[0].context["stall_age_seconds"]).toBe("number");
+    expect(calls[0].message).toMatch(/watchdog/i);
+    expect(calls[0].message).toMatch(/stalled/i);
+
+    // Stays stalled across more checks: silent (dedup).
+    clockMs += 60_000;
+    await monitor.checkWatchdog();
+    clockMs += 60_000;
+    await monitor.checkWatchdog();
+    expect(calls).toHaveLength(1);
+  });
+
+  it("fires a 'monitor_recovered' watchdog alert once ticks resume after a stall (task #113)", async () => {
+    const sealed = "line1\n";
+    const { size, sha } = writeHits(sealed);
+    writeCheckpoint(size, sha);
+
+    const { buildStatus } = createLedgerChecker({
+      hitsPath,
+      checkpointPath,
+      lastOkPath,
+    });
+    const { sink, calls } = makeRecordingSink();
+    let clockMs = 5_000_000;
+    monitor = startLedgerMonitor({
+      buildStatus,
+      sink,
+      intervalMs: 60_000,
+      logger: silentLogger(),
+      now: () => clockMs,
+    });
+
+    // Stall.
+    clockMs += 200_000;
+    await monitor.checkWatchdog();
+    expect(calls).toHaveLength(1);
+    expect(calls[0].context.failure_mode).toBe("monitor_stalled");
+
+    // A real tick lands.
+    await monitor.tick();
+
+    // Watchdog notices the recovery on its next pass and fires exactly
+    // one recovered alert.
+    await monitor.checkWatchdog();
+    expect(calls).toHaveLength(2);
+    expect(calls[1].kind).toBe("recovered");
+    expect(calls[1].context.failure_mode).toBe("recovered");
+    expect(calls[1].context.previous_failure_mode).toBe("monitor_stalled");
+    expect(calls[1].context.source).toBe("api-server-monitor-watchdog");
+    expect(calls[1].message).toMatch(/RECOVERED/);
+
+    // Further healthy checks: silent.
+    await monitor.checkWatchdog();
+    await monitor.checkWatchdog();
+    expect(calls).toHaveLength(2);
+
+    // If the monitor stalls AGAIN later, a fresh stalled alert fires.
+    clockMs += 300_000;
+    await monitor.checkWatchdog();
+    expect(calls).toHaveLength(3);
+    expect(calls[2].kind).toBe("alert");
+    expect(calls[2].context.failure_mode).toBe("monitor_stalled");
+  });
+
+  it("watchdog stays quiet while ticks land regularly (task #113)", async () => {
+    const sealed = "line1\n";
+    const { size, sha } = writeHits(sealed);
+    writeCheckpoint(size, sha);
+
+    const { buildStatus } = createLedgerChecker({
+      hitsPath,
+      checkpointPath,
+      lastOkPath,
+    });
+    const { sink, calls } = makeRecordingSink();
+    let clockMs = 9_000_000;
+    monitor = startLedgerMonitor({
+      buildStatus,
+      sink,
+      intervalMs: 60_000,
+      logger: silentLogger(),
+      now: () => clockMs,
+    });
+
+    for (let i = 0; i < 5; i++) {
+      clockMs += 60_000;
+      await monitor.tick();
+      await monitor.checkWatchdog();
+    }
+    expect(calls).toHaveLength(0);
+  });
+
   it("stop() halts the interval", async () => {
     const sealed = "line1\n";
     const { size, sha } = writeHits(sealed);

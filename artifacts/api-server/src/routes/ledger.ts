@@ -1042,11 +1042,25 @@ export interface LedgerMonitorOptions {
   consumeBootForgedAlert?: () => boolean;
   /** Friendly tag for the boot-forged alert context (defaults to the hits path). */
   sidecarPath?: string;
+  /**
+   * Task #113: clock source for the watchdog and tick timestamps.
+   * Defaults to `Date.now`. Injected by tests so the stalled/recovered
+   * transitions can be driven deterministically without real sleeps.
+   */
+  now?: () => number;
 }
 
 export interface LedgerMonitorHandle {
   stop: () => void;
   tick: () => Promise<void>;
+  /**
+   * Task #113: manual watchdog entry-point. The watchdog also runs on
+   * its own `setInterval` (at `intervalMs` cadence) so a wedged tick
+   * still triggers a push alert, but exposing it lets tests drive the
+   * stalled/recovered transitions deterministically against an
+   * injected `now()` clock without sleeping.
+   */
+  checkWatchdog: () => Promise<void>;
   /**
    * Task #97: ledger-monitor observability. `enabled` is always true
    * for a started monitor; `intervalSeconds` reflects the configured
@@ -1078,6 +1092,7 @@ export function startLedgerMonitor(
   opts: LedgerMonitorOptions,
 ): LedgerMonitorHandle {
   const log = opts.logger ?? defaultLogger;
+  const now = opts.now ?? (() => Date.now());
   let lastAlerted: "none" | "alerted" = "none";
   let lastFailureMode: string | null = null;
   let lastFiredAlertId: string | null = null;
@@ -1090,11 +1105,23 @@ export function startLedgerMonitor(
   // can distinguish it from hits_truncated / hits_rewritten_in_place.
   let lastCheckpointStaleAlerted = false;
   let lastTickAt: string | null = null;
+  let lastTickMs: number | null = null;
   let inFlight = false;
   const intervalSeconds = Math.max(
     1,
     Math.floor(opts.intervalMs / 1000),
   );
+  // Task #113: watchdog state. The watchdog fires `monitor_stalled`
+  // when no tick has completed in 2× the configured interval, and
+  // `monitor_recovered` once ticks resume. Dedup is the same as the
+  // tamper-status state machine — one alert per state transition.
+  // The baseline for "how long has it been since the last tick" is
+  // the monitor's own start time until the first tick completes; that
+  // way a monitor whose setInterval never even fires once is caught.
+  const monitorStartedMs = now();
+  const watchdogStallThresholdMs = opts.intervalMs * 2;
+  let watchdogState: "ok" | "stalled" = "ok";
+  let watchdogInFlight = false;
 
   function checkAcknowledged(): boolean {
     if (!opts.isAcknowledged) return false;
@@ -1382,8 +1409,87 @@ export function startLedgerMonitor(
         lastCheckpointStaleAlerted = false;
       }
     } finally {
-      lastTickAt = new Date().toISOString();
+      const tickMs = now();
+      lastTickMs = tickMs;
+      lastTickAt = new Date(tickMs).toISOString();
       inFlight = false;
+    }
+  }
+
+  async function checkWatchdog(): Promise<void> {
+    if (watchdogInFlight) return;
+    watchdogInFlight = true;
+    try {
+      const baselineMs = lastTickMs ?? monitorStartedMs;
+      const ageMs = now() - baselineMs;
+      const stalled = ageMs > watchdogStallThresholdMs;
+      if (stalled && watchdogState === "ok") {
+        const ageSeconds = Math.floor(ageMs / 1000);
+        const thresholdSeconds = Math.floor(watchdogStallThresholdMs / 1000);
+        const alertTimestamp = new Date(now()).toISOString();
+        const message =
+          `Ledger monitor watchdog: no integrity tick has completed in ` +
+          `${ageSeconds}s (threshold ${thresholdSeconds}s = 2 × ${intervalSeconds}s interval). ` +
+          `The auto-integrity check has stalled — push alerts on ledger tamper may not fire ` +
+          `until the api-server is restarted.`;
+        const context: LedgerAlertContext = {
+          failure_mode: "monitor_stalled",
+          source: "api-server-monitor-watchdog",
+          checked_at: alertTimestamp,
+          timestamp: alertTimestamp,
+          hits_path: opts.hitsPath,
+          checkpoint_path: opts.checkpointPath,
+          last_tick_at: lastTickAt,
+          stall_age_seconds: ageSeconds,
+          stall_threshold_seconds: thresholdSeconds,
+          monitor_interval_seconds: intervalSeconds,
+        };
+        log.warn(
+          { ageSeconds, thresholdSeconds, lastTickAt },
+          "ledger monitor: firing watchdog stalled alert",
+        );
+        try {
+          await opts.sink({ kind: "alert", message, context });
+        } catch (err) {
+          log.warn(
+            { err },
+            "ledger monitor: watchdog stalled sink threw (best-effort, swallowed)",
+          );
+        }
+        watchdogState = "stalled";
+      } else if (!stalled && watchdogState === "stalled") {
+        const ageSeconds = Math.floor(ageMs / 1000);
+        const alertTimestamp = new Date(now()).toISOString();
+        const message =
+          `Ledger monitor watchdog RECOVERED: integrity ticks have resumed ` +
+          `(last tick ${ageSeconds}s ago).`;
+        const context: LedgerAlertContext = {
+          failure_mode: "recovered",
+          previous_failure_mode: "monitor_stalled",
+          source: "api-server-monitor-watchdog",
+          checked_at: alertTimestamp,
+          timestamp: alertTimestamp,
+          hits_path: opts.hitsPath,
+          checkpoint_path: opts.checkpointPath,
+          last_tick_at: lastTickAt,
+          monitor_interval_seconds: intervalSeconds,
+        };
+        log.info(
+          { ageSeconds, lastTickAt },
+          "ledger monitor: firing watchdog recovery alert",
+        );
+        try {
+          await opts.sink({ kind: "recovered", message, context });
+        } catch (err) {
+          log.warn(
+            { err },
+            "ledger monitor: watchdog recovery sink threw (best-effort, swallowed)",
+          );
+        }
+        watchdogState = "ok";
+      }
+    } finally {
+      watchdogInFlight = false;
     }
   }
 
@@ -1392,11 +1498,22 @@ export function startLedgerMonitor(
   }, opts.intervalMs);
   handle.unref?.();
 
+  // Task #113: separate watchdog timer so a wedged tick still gets a
+  // push alert. We poll at the configured tick cadence — the stall
+  // threshold is 2× that, so the watchdog can detect a stall within
+  // one extra interval of it happening.
+  const watchdogHandle = setInterval(() => {
+    void checkWatchdog();
+  }, opts.intervalMs);
+  watchdogHandle.unref?.();
+
   return {
     stop() {
       clearInterval(handle);
+      clearInterval(watchdogHandle);
     },
     tick,
+    checkWatchdog,
     getInfo(): LedgerMonitorInfo {
       return {
         enabled: true,
