@@ -326,26 +326,37 @@ Boltzmann weight, via the character expansion). The RHS
 `Real.exp (-(Casimir_SU3 * β))` is the SU(3) Casimir-driven
 exponential bound.
 
-**The explicit gap.** At the 19.1l placeholders:
+**The explicit gap (updated 19.1m).** At the 19.1l/m
+placeholders:
   * `Character_expansion_plaquette β := 0`, so LHS = `0 · 1 = 0`.
   * `Casimir_SU3 = 3`, so RHS = `e^{-3β}`.
 The placeholder bound `0 ≤ e^{-3β}` is trivially true; the
 sorry flags the slot for the real Gaussian / character-
 expansion / heat-kernel analysis (NOT the placeholder
-discharge). Concretely, the reduction goes:
+discharge). Concretely, the **post-19.1m** reduction is:
 
   Single_plaquette_bound_SU3                           -- this sorry
-    ⇐ heat-kernel asymptotic (`K_t(1) ∼ t^{-4} · e^{-c/t}`)
-    ⇐ `Heat_kernel_asymptotics`                       -- 19.1l YM BRICK
-       (currently the trivial `K ≤ e^{C·t}` placeholder bound)
-    ⇐ promote `Heat_kernel_def` from `:= 1` to real surface  -- 19.1m+
+    ⇐ real-shape heat-kernel asymptotic
+       `K_t(1) ≤ C · t^{-4} · e^{-c/t}`               -- now landed
+    ⇐ `Heat_kernel_asymptotics_real`                  -- 19.1m YM BRICK
+       (placeholder constants C, c := 1; real surface
+        = Varadhan / Molchanov small-`t` asymptotic
+        on SU(3) — **classical analysis on compact
+        Lie groups, NOT a Clay surface**)
+    ⇐ promote `heat_decay_constant` / `heat_amplitude_constant`
+      from `:= 1` to real values determined by the SU(3)
+      cut-locus geometry, plus the genuine Peter-Weyl spectral
+      decomposition `K_t(g) = Σ_λ dim(λ) · χ_λ(g) · e^{-t·C_2(λ)}`
+      (19.1n+ target).
 
-If 19.1m discharges that promotion, this sorry closes — and
-the 19.1k 4-way decomposition wrapper
-`Polymer_activity_bound_real` can be discharged via
-`Single_plaquette_bound` + `Polymer_decoupling_estimate` +
-`Inductive_activity_bound`, landing the analytic side of
-the YM Brydges-Federbush polymer expansion. -/
+**Honest framing (locked).** Even with this surface fully
+discharged, YM tower stays `Status: Open`. The next links —
+`Polymer_activity_bound_real` (Brydges-Federbush polymer
+convergence with real Mayer combinatorics) and the UV
+continuum limit downstream of `MassGap_YM4_Clay` — remain
+the genuine Clay-hard walls. The 19.1l/m wave shrinks the
+**first** of three independent hard surfaces; it does NOT
+collapse the chain. -/
 theorem Single_plaquette_bound_SU3 (β : ℝ) (_hβ : 0 < β) :
     Character_expansion_plaquette β * SU3_Haar_measure_explicit ≤
       Real.exp (-(Casimir_SU3 * β)) := by

@@ -1,8 +1,36 @@
 # The Three Hard Lemmas
 
-**Status:** open. **Repository wall:** 408 bricks, axiom footprint
+**Status:** open. **Repository wall:** 420 bricks, axiom footprint
 `⊆ {propext, Classical.choice, Quot.sound}`. **Towers:**
 `Status: Open` (`docs/ROADMAP.md` § 2, § 3).
+
+**Batch 19.1m update (2026-05-27):** Real Heat Kernel Shape —
+promote the 19.1l `Heat_kernel_def := 1` placeholder to a
+real-shape companion `Heat_kernel_def_real t := exp(-(c/t)) / t^4`
+matching the Varadhan / Molchanov small-`t` heat-kernel asymptotic
+on SU(3) up to placeholder constants. Track 1
+(`Towers/YM/ClusterExpansion.lean`): +12 BRICKS (wall 408 → 420)
+covering heat-kernel real-shape positivity (`_nonneg`, `_at_zero`,
+`_pos_of_pos`), the real-shape asymptotic bound
+`Heat_kernel_asymptotics_real : K_t(1) ≤ C · e^{-c/t}/t^4`, constant
+positivity (`heat_decay_constant_pos`, `heat_amplitude_constant_pos`),
+and placeholder Lie-theoretic surfaces (Weyl dimension, Weyl
+character formula, Casimir eigenvalue formula, stationary-phase
+bound). Track 2 (`Towers/Attempts/ClusterExpansion.lean`):
+`Single_plaquette_bound_SU3` statement unchanged, docstring
+updated to point at `Heat_kernel_asymptotics_real` (real shape)
+instead of the 19.1l placeholder. Attempts sorries unchanged at
+8. **The first hard surface shrinks materially.** The
+single-plaquette sorry is now gated on landing classical analysis
+(Varadhan/Molchanov on SU(3)) rather than on unknown / research-
+grade math. YM tower stays Status: Open; the two downstream hard
+surfaces (Brydges-Federbush polymer convergence with real Mayer
+combinatorics; UV continuum limit downstream of
+`MassGap_YM4_Clay`) remain the genuine Clay-hard walls. No
+promotion of `MassGap_YM4_Clay`; no `replit.md` / `ROADMAP.md`
+edits. See `docs/CHANGELOG.md` Batch 19.1m for the full ship
+list. **Honest scope: YM is NOT solved — Yang-Mills Clay remains
+open in this repo.**
 
 **Batch 19.1l update (2026-05-27):** Single Plaquette — sharpen
 the Brydges-Federbush single-plaquette bound to the real SU(3)

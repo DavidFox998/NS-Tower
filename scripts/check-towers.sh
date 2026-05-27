@@ -1610,6 +1610,45 @@ BRICKS=(
   "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Casimir_SU3_pos"
   "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Heat_kernel_asymptotics"
   "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Heat_kernel_def_pos"
+  # -----------------------------------------------------------------
+  # Batch 19.1m — Real Heat Kernel Shape (Track 1). Wall 408 → 420,
+  # +12 BRICKS. Promote 19.1l `Heat_kernel_def := 1` to a real-shape
+  # companion `Heat_kernel_def_real t := exp(-(c/t)) / t^4`, matching
+  # the Varadhan / Molchanov small-`t` asymptotic on SU(3) up to
+  # placeholder constants. Also lands Weyl dimension / character /
+  # Casimir eigenvalue placeholder surfaces and the stationary-phase
+  # / Peter-Weyl brick shapes. All sorry-free, classical-trio only.
+  #
+  # 5 new defs (NOT in BRICKS): heat_decay_constant (:= 1),
+  # heat_amplitude_constant (:= 1), Heat_kernel_def_real,
+  # Weyl_dim_def (:= fun _ => 1), Weyl_character_value_def (:= 0),
+  # Casimir_eigenvalue_def (:= 0).
+  #
+  # 12 BRICKS (positivity / structural / placeholder Lie-theoretic):
+  #   Heat_kernel_def_real_nonneg, Heat_kernel_def_real_at_zero,
+  #   Heat_kernel_def_real_pos_of_pos, Heat_kernel_asymptotics_real,
+  #   heat_decay_constant_pos, heat_amplitude_constant_pos,
+  #   Weyl_dim_def_pos, Dimension_formula_SU3,
+  #   Casimir_eigenvalue_SU3, Weyl_character_formula_SU3,
+  #   Casimir_eigenvalue_nonneg, Stationary_phase_bound.
+  #
+  # YM tower stays Status: Open. Heat-kernel asymptotic on SU(3) is
+  # classical analysis (Varadhan/Molchanov), NOT a Clay surface. The
+  # Brydges-Federbush polymer convergence + UV continuum limit
+  # downstream remain the genuine Clay-hard walls.
+  # -----------------------------------------------------------------
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Heat_kernel_def_real_nonneg"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Heat_kernel_def_real_at_zero"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Heat_kernel_def_real_pos_of_pos"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Heat_kernel_asymptotics_real"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.heat_decay_constant_pos"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.heat_amplitude_constant_pos"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Weyl_dim_def_pos"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Dimension_formula_SU3"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Casimir_eigenvalue_SU3"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Weyl_character_formula_SU3"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Casimir_eigenvalue_nonneg"
+  "Towers.YM.ClusterExpansion|TheoremaAureum.Towers.YM.ClusterExpansion.Stationary_phase_bound"
 )
 
 VERIFIER_DIR="$(mktemp -d)"

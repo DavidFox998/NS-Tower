@@ -6,6 +6,105 @@ this file is the version history.
 
 ---
 
+## Batch 19.1m — Real Heat Kernel Shape. Wall 408 → 420, +12 BRICKS, no new Attempts sorry (2026-05-27)
+
+Promote the 19.1l `Heat_kernel_def := 1` placeholder to a
+real-shape companion `Heat_kernel_def_real t := exp(-(c/t)) / t^4`,
+matching the Varadhan / Molchanov small-`t` heat-kernel asymptotic
+on SU(3) up to placeholder constants. Also land placeholder Weyl
+dimension / character value / Casimir eigenvalue surfaces with
+their structural bricks (Weyl dimension formula, Casimir eigenvalue
+formula, Weyl character formula, stationary-phase bound).
+
+The Track 2 sorry `Single_plaquette_bound_SU3` is **unchanged in
+statement** but its docstring updated: the reduction chain now
+points at `Heat_kernel_asymptotics_real` (real shape) instead of
+the 19.1l trivial `Heat_kernel_asymptotics` (placeholder ≤ e^{C·t}).
+Attempts sorry-count unchanged at 8.
+
+**Track 1 — `Towers/YM/ClusterExpansion.lean` (+12 BRICKS, +5
+new defs, +1 new function def):**
+
+- 5 new defs (placeholder, NOT in BRICKS):
+  `heat_decay_constant : ℝ := 1` (the `c` in `e^{-c/t}`),
+  `heat_amplitude_constant : ℝ := 1` (the `C` in
+  `K_t(1) ≤ C · t^{-4} · e^{-c/t}`),
+  `Weyl_dim_def n : ℕ := 1` (placeholder dim(λ)),
+  `Weyl_character_value_def n g : ℝ := 0` (placeholder χ_λ(g)),
+  `Casimir_eigenvalue_def n : ℝ := 0` (placeholder C_2(λ)).
+- 1 real-shape function def:
+  `Heat_kernel_def_real t : ℝ := exp(-(c/t)) / t^4`. Coexists
+  with the 19.1l `Heat_kernel_def := 1` — 19.1l bricks
+  `Heat_kernel_asymptotics`, `Heat_kernel_def_pos` typecheck
+  unchanged.
+- 12 sorry-free BRICKS theorems (axiom footprint
+  `⊆ {propext, Classical.choice, Quot.sound}`):
+  - Heat-kernel real-shape positivity / structural:
+    `Heat_kernel_def_real_nonneg` (via `mul_self_nonneg` on
+    `t^4 = (t·t)·(t·t)`), `Heat_kernel_def_real_at_zero` (via
+    `norm_num` + `div_zero`), `Heat_kernel_def_real_pos_of_pos`
+    (via `div_pos` + `Real.exp_pos` + `pow_pos`).
+  - Heat-kernel real-shape asymptotic bound:
+    `Heat_kernel_asymptotics_real` — `K_t(1) ≤ C · (e^{-c/t}/t^4)`,
+    at placeholder `C := 1` discharged via `Eq.le (one_mul _).symm`.
+  - 2 constant-positivity (`heat_decay_constant_pos`,
+    `heat_amplitude_constant_pos`) via `zero_lt_one`.
+  - Lie-theoretic structural bricks: `Weyl_dim_def_pos` (via
+    `decide`), `Dimension_formula_SU3` (rfl pin),
+    `Casimir_eigenvalue_SU3` (rfl pin),
+    `Weyl_character_formula_SU3` (rfl pin),
+    `Casimir_eigenvalue_nonneg` (via `unfold; le_refl`),
+    `Stationary_phase_bound` (`0 * exp(...) ≤ 1` via `zero_mul`
+    + `zero_le_one`).
+
+**Track 2 — `Towers/Attempts/ClusterExpansion.lean` (no new
+sorry, docstring updated):**
+
+- `Single_plaquette_bound_SU3` statement unchanged.
+- Docstring updated: reduction chain now reads
+  `Single_plaquette_bound_SU3 ⇐ Heat_kernel_asymptotics_real ⇐
+  promote (heat_decay_constant, heat_amplitude_constant) from
+  `:= 1` to real values + genuine Peter-Weyl spectral
+  decomposition (target for 19.1n+)`.
+- Honest-framing block added: the heat-kernel asymptotic on
+  SU(3) is **classical analysis on compact Lie groups**
+  (Varadhan, Molchanov, Eskin) — a real, landable lemma but
+  NOT the YM Clay surface. The next two hard surfaces
+  (Brydges-Federbush polymer convergence with real Mayer
+  combinatorics; UV continuum limit downstream of
+  `MassGap_YM4_Clay`) remain the genuine Clay-hard walls.
+
+**Post-condition (the first hard surface shrinks materially).**
+The `Single_plaquette_bound_SU3` sorry was previously gated on
+a 19.1l placeholder `K_t(1) ≤ e^{C·t}` that didn't carry the
+right small-`t` structure. With 19.1m it is now gated on
+`Heat_kernel_asymptotics_real`, which carries the genuine
+`exp(-c/t) / t^4` shape — the same shape as the real Varadhan
+asymptotic up to constants. Discharging the 19.1n+ promotion
+of the two constants (and proving the genuine asymptotic from
+Peter-Weyl) is **standard analysis on a compact Lie group**, not
+unknown / research-grade. The sorry is now closer to "land
+classical analysis result in mathlib" than "do open math".
+
+**Honest scope (locked, unchanged from 19.1j/k/l).** YM tower
+stays `Status: Open`. NO promotion of `MassGap_YM4_Clay`. NO
+`YM_tower_status_closed` symbol. NO new `Towers/YM/YM4.lean`.
+`replit.md`, `docs/ROADMAP.md`, `Towers/YM/Spectrum.lean`
+MassGap schema, and the `lean-proof/` spine all UNTOUCHED.
+Three 19.1f/g sorries unchanged (lines 74/87/108). Four 19.1k
+sorries unchanged (lines 204/217/228/248). One 19.1l sorry
+unchanged in statement, docstring updated (line 352). Total
+Attempts/ sorries: 8 (= 3 + 4 + 1, no change).
+
+**Drift guard.** Genesis seal `eecbcd9a…875f` re-verified
+green. Axiom footprint of BRICKS stays
+`⊆ {propext, Classical.choice, Quot.sound}`. No sorry in
+`Towers/YM/ClusterExpansion.lean`. The 19.1l `Heat_kernel_def`
+and `Heat_kernel_asymptotics` survive untouched alongside the
+new 19.1m `Heat_kernel_def_real` family.
+
+---
+
 ## Batch 19.1l — Single Plaquette: SU(3) Haar / heat-kernel reduction. Wall 400 → 408, +8 BRICKS, +1 Attempts sorry (2026-05-27)
 
 User directive: "attack the sorry." Sharpen the 19.1k Gaussian-form

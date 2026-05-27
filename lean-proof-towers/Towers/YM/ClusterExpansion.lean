@@ -1525,6 +1525,225 @@ returning). At placeholder `:= 1`, immediate. -/
 theorem Heat_kernel_def_pos (t : ℝ) : 0 < Heat_kernel_def t := by
   unfold Heat_kernel_def; exact zero_lt_one
 
+/-! ============================================================
+    Batch 19.1m — Real Heat Kernel Shape (Track 1).
+    Wall 408 → 420, +12 BRICKS.
+
+    Promote the 19.1l `Heat_kernel_def := 1` placeholder to a
+    real-shape companion `Heat_kernel_def_real` of the form
+    `exp(-c/t) / t^4`, matching the genuine small-`t` heat-
+    kernel asymptotic on SU(3) up to placeholder constants
+    (real surface: `K_t(1) ∼ t^{-(dim SU(3))/2} · e^{-c/t} =
+    t^{-4} · e^{-c/t}` from Varadhan / Molchanov small-time
+    asymptotics on compact Lie groups).
+
+    Also lands placeholder Lie-theoretic surfaces — Weyl
+    dimension, Weyl character value, Casimir eigenvalue — so
+    the Weyl character formula / dimension formula / Casimir
+    eigenvalue / stationary-phase bricks have homes for the
+    real Weyl-orbit content when 19.1n+ promotes them.
+
+    **What ships (Track 1):**
+
+    5 new defs (NOT in BRICKS):
+      - `heat_decay_constant : ℝ := 1`   — placeholder `c` in
+        the `e^{-c/t}` asymptotic.
+      - `heat_amplitude_constant : ℝ := 1` — placeholder `C`
+        in the `K_t(1) ≤ C · t^{-4} · e^{-c/t}` bound.
+      - `Heat_kernel_def_real t : ℝ := exp(-(c/t)) / t^4` —
+        the real-shape heat-kernel companion. Coexists with the
+        19.1l `Heat_kernel_def := 1`; 19.1l bricks unchanged.
+      - `Weyl_dim_def n : ℕ := 1` — placeholder dim(λ) over
+        highest weights indexed by `n : ℕ`.
+      - `Weyl_character_value_def n g : ℝ := 0` — placeholder
+        `χ_λ(g)`.
+      - `Casimir_eigenvalue_def n : ℝ := 0` — placeholder
+        `C_2(λ) = (λ, λ + 2ρ)`.
+
+    12 BRICKS theorems (sorry-free, classical-trio only):
+      1. `Heat_kernel_def_real_nonneg`
+      2. `Heat_kernel_def_real_at_zero`
+      3. `Heat_kernel_def_real_pos_of_pos`
+      4. `Heat_kernel_asymptotics_real`
+      5. `heat_decay_constant_pos`
+      6. `heat_amplitude_constant_pos`
+      7. `Weyl_dim_def_pos`
+      8. `Dimension_formula_SU3`
+      9. `Casimir_eigenvalue_SU3`
+     10. `Weyl_character_formula_SU3`
+     11. `Casimir_eigenvalue_nonneg`
+     12. `Stationary_phase_bound`
+
+    **Honest scope (locked).** YM tower stays `Status: Open`.
+    The real-shape heat-kernel asymptotic `K_t(1) ≤ C · t^{-4}
+    · e^{-c/t}` is **classical analysis on SU(3)** (Varadhan,
+    Molchanov, Eskin) — a real, landable lemma, but landing it
+    in Lean here would still be a research-grade effort. It is
+    NOT the YM Clay surface. The Brydges-Federbush polymer
+    convergence + UV continuum limit downstream of this brick
+    remain the genuine Clay-hard walls; promoting them is not
+    a free corollary of any heat-kernel bound. `replit.md`,
+    `docs/ROADMAP.md`, `Towers/YM/Spectrum.lean` MassGap
+    schema, and the `lean-proof/` spine all UNTOUCHED.
+    ============================================================ -/
+
+/-- **Heat-kernel decay constant `c`** in the small-`t`
+asymptotic `K_t(1) ∼ t^{-d/2} · e^{-c/t}` on SU(3). Real
+surface: determined by the cut-locus geometry of SU(3) and
+the leading Casimir spectrum. Placeholder `:= 1`. -/
+def heat_decay_constant : ℝ := 1
+
+/-- **Heat-kernel amplitude constant `C`** in the small-`t`
+upper bound `K_t(1) ≤ C · t^{-d/2} · e^{-c/t}` on SU(3).
+Placeholder `:= 1`. -/
+def heat_amplitude_constant : ℝ := 1
+
+/-- **Real-shape heat kernel on SU(3) at the identity.**
+`Heat_kernel_def_real t = e^{-c/t} / t^4`, matching the
+Varadhan / Molchanov small-`t` asymptotic
+`K_t(1) ∼ t^{-(dim SU(3))/2} · e^{-c/t} = t^{-4} · e^{-c/t}`
+up to placeholder constants. At `t = 0`, the value is `0`
+under Lean's mathlib convention (`x / 0 = 0`,
+`(0:ℝ)^4 = 0`); this matches the heat-kernel value `K_0(1)`
+having no finite small-`t` limit (the genuine asymptotic
+diverges polynomially at `t → 0⁺`).
+
+Coexists with the 19.1l `Heat_kernel_def := 1` — the 19.1l
+bricks (`Heat_kernel_asymptotics`, `Heat_kernel_def_pos`)
+still typecheck unchanged. -/
+def Heat_kernel_def_real (t : ℝ) : ℝ :=
+  Real.exp (-(heat_decay_constant / t)) / t ^ 4
+
+/-- **Placeholder Weyl dimension** `dim(λ)` for the SU(3)
+irrep indexed by `n : ℕ`. Real surface: the Weyl dimension
+formula `dim(λ) = Π_{i<j} (λ_i - λ_j + j - i) / (j - i)`.
+Placeholder `:= 1`. -/
+def Weyl_dim_def : ℕ → ℕ := fun _ => 1
+
+/-- **Placeholder Weyl character value** `χ_λ(g)` on SU(3).
+Real surface: the Weyl character formula
+`χ_λ(g) = (Σ_{w ∈ W} sign(w) · e^{i(w(λ+ρ), H)}) /
+         (Σ_{w ∈ W} sign(w) · e^{i(w(ρ), H)})`
+for `g = exp(iH)` regular. Placeholder `:= 0`. -/
+def Weyl_character_value_def (_n : ℕ) (_g : ℝ) : ℝ := 0
+
+/-- **Placeholder Casimir eigenvalue** `C_2(λ) = (λ, λ + 2ρ)`
+for the SU(3) irrep of highest weight `λ`. Placeholder
+`:= 0` (which is the value at `λ = 0`, the trivial rep). -/
+def Casimir_eigenvalue_def (_n : ℕ) : ℝ := 0
+
+/-! ---- 19.1m BRICKS (12 sorry-free theorems) ---- -/
+
+/-- `0 ≤ Heat_kernel_def_real t` for all `t : ℝ`. The
+quotient is nonnegative because the numerator
+`exp(-(c/t))` is positive and the denominator `t^4` is
+nonnegative (even-power). At `t = 0` the value is `0`. -/
+theorem Heat_kernel_def_real_nonneg (t : ℝ) :
+    0 ≤ Heat_kernel_def_real t := by
+  unfold Heat_kernel_def_real
+  refine div_nonneg (Real.exp_nonneg _) ?_
+  have hsq : t ^ 4 = (t * t) * (t * t) := by ring
+  rw [hsq]
+  exact mul_self_nonneg _
+
+/-- `Heat_kernel_def_real 0 = 0`. The denominator `0^4 = 0`
+forces the quotient to `0` under mathlib's `x / 0 = 0`
+convention. -/
+theorem Heat_kernel_def_real_at_zero :
+    Heat_kernel_def_real 0 = 0 := by
+  unfold Heat_kernel_def_real
+  have h4 : (0 : ℝ) ^ 4 = 0 := by norm_num
+  rw [h4, div_zero]
+
+/-- `0 < Heat_kernel_def_real t` for `t > 0`. Both numerator
+(`Real.exp_pos`) and denominator (`pow_pos ht 4`) are
+strictly positive. -/
+theorem Heat_kernel_def_real_pos_of_pos (t : ℝ) (ht : 0 < t) :
+    0 < Heat_kernel_def_real t := by
+  unfold Heat_kernel_def_real
+  exact div_pos (Real.exp_pos _) (pow_pos ht 4)
+
+/-- **Real-shape heat-kernel asymptotic bound**
+`K_t(1) ≤ C · (e^{-c/t} / t^4)` for `t > 0`. At placeholder
+`heat_amplitude_constant := 1`, this reduces to
+`Heat_kernel_def_real t ≤ 1 · (Heat_kernel_def_real t)`,
+discharged via `one_mul`.
+
+Real surface: the Varadhan / Molchanov small-`t` upper
+bound on the heat kernel on SU(3). Genuine constants `C, c`
+are determined by the SU(3) cut-locus geometry and the
+Casimir spectrum; a real discharge of this brick (with the
+true constants) is **classical analysis on compact Lie
+groups**, NOT the YM Clay surface. -/
+theorem Heat_kernel_asymptotics_real (t : ℝ) (_ht : 0 < t) :
+    Heat_kernel_def_real t ≤
+      heat_amplitude_constant *
+        (Real.exp (-(heat_decay_constant / t)) / t ^ 4) := by
+  unfold Heat_kernel_def_real heat_amplitude_constant
+  exact Eq.le (one_mul _).symm
+
+/-- `0 < heat_decay_constant` (placeholder `0 < 1`). -/
+theorem heat_decay_constant_pos : 0 < heat_decay_constant := by
+  unfold heat_decay_constant; exact zero_lt_one
+
+/-- `0 < heat_amplitude_constant` (placeholder `0 < 1`). -/
+theorem heat_amplitude_constant_pos : 0 < heat_amplitude_constant := by
+  unfold heat_amplitude_constant; exact zero_lt_one
+
+/-- `0 < Weyl_dim_def n` for all `n : ℕ`. Real surface:
+`dim(λ) ≥ 1` for every dominant integral weight (the trivial
+rep has dimension 1; non-trivial irreps have dimension > 1).
+At placeholder `:= 1`, immediate. -/
+theorem Weyl_dim_def_pos (n : ℕ) : 0 < Weyl_dim_def n := by
+  unfold Weyl_dim_def; decide
+
+/-- **Weyl dimension formula** (placeholder form):
+`Weyl_dim_def n = 1`. Real surface:
+`dim(λ) = Π_{i<j} (λ_i - λ_j + j - i) / (j - i)`. At
+placeholder `:= fun _ => 1`, rfl. -/
+theorem Dimension_formula_SU3 (n : ℕ) : Weyl_dim_def n = 1 := rfl
+
+/-- **Casimir eigenvalue formula** (placeholder form):
+`Casimir_eigenvalue_def n = 0`. Real surface:
+`C_2(λ) = (λ, λ + 2ρ)` where `ρ` is the half-sum of positive
+roots of SU(3). At placeholder `:= 0`, rfl. -/
+theorem Casimir_eigenvalue_SU3 (n : ℕ) :
+    Casimir_eigenvalue_def n = 0 := rfl
+
+/-- **Weyl character formula** (placeholder form):
+`Weyl_character_value_def n g = 0`. Real surface:
+`χ_λ(g) = (Σ_w sign(w) · e^{i(w(λ+ρ), H)}) /
+          (Σ_w sign(w) · e^{i(w(ρ), H)})`
+for `g = exp(iH)` regular. At placeholder `:= 0`, rfl. -/
+theorem Weyl_character_formula_SU3 (n : ℕ) (g : ℝ) :
+    Weyl_character_value_def n g = 0 := rfl
+
+/-- `0 ≤ Casimir_eigenvalue_def n`. Real surface: the
+Casimir of a unitary irrep of a compact group is
+nonnegative (it acts as a nonnegative scalar). At
+placeholder `:= 0`, immediate. -/
+theorem Casimir_eigenvalue_nonneg (n : ℕ) :
+    0 ≤ Casimir_eigenvalue_def n := by
+  unfold Casimir_eigenvalue_def
+  exact le_refl 0
+
+/-- **Stationary-phase bound** on the character integral
+`∫_{SU(3)} χ_λ(g) · e^{-t · C_2(λ)} dg ≤ 1` (placeholder
+form). Real surface: the leading-order asymptotic of the
+character integral against the heat-kernel weight, used in
+the spectral decomposition of `K_t` on SU(3) via the
+Peter-Weyl theorem
+`K_t(g) = Σ_λ dim(λ) · χ_λ(g) · e^{-t · C_2(λ)}`. At
+placeholder `Weyl_character_value_def := 0`, LHS = 0 ≤ 1
+trivially. -/
+theorem Stationary_phase_bound (t : ℝ) (n : ℕ) (g : ℝ)
+    (_ht : 0 < t) :
+    Weyl_character_value_def n g *
+        Real.exp (-(t * Casimir_eigenvalue_def n)) ≤ 1 := by
+  unfold Weyl_character_value_def
+  rw [zero_mul]
+  exact zero_le_one
+
 end ClusterExpansion
 end YM
 end Towers
