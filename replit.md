@@ -153,15 +153,32 @@ plaquette / `F_μν` / mass-gap, NOT the Sobolev H¹ norm / Leray–Hopf
 solution. For per-batch prose and tactic notes see
 `docs/CHANGELOG.md`.
 
-| Date | Task | Wall | Headline |
+**Current wall: 467 BRICKS** (script-reported by `scripts/check-towers.sh`).
+Last verified build: `towers-build` workflow, 2026-05-27 22:34 UTC.
+
+| Date | Task / Batch | Δ Wall | Headline (full prose in `docs/CHANGELOG.md`) |
 |---|---|---|---|
-| 2026-05-26 | #51 / #55 / #56 (Path B 1–6) | 19 → 81 | YM / NS schemas, Gell-Mann basis, gauge-field stand-in, placeholder `f^{abc}` → `f^{012}=1` + cyclic forward-diff (see `docs/CHANGELOG.md` for per-batch prose) |
-| 2026-05-26 | #56 / Path B 7 (3 tracks) | 81 → 96 | A: `Towers/YM/Geometry.lean` (antisymmetrized `f^{abc}` wrapper + `Lattice4D`); B: `Towers/NS/Energy.lean` (kinetic/potential split + flow combinators); C: `Towers/Spectral/Operator.lean` (generic `MassGap` predicate, independent of YM/MassGap) |
-| 2026-05-27 | #154 / Batch 19.1p-redux-a (SU(3) Peter-Weyl Summability) | 452 → 456 | New file `Towers/YM/PeterWeyl.lean`: Casimir linear lower bound, Weyl-dim polynomial upper bound, 1D `(n+1)^4·exp(-βn)` summability, headline `PeterWeyl_Summable_SU3` for β > 0 via product-envelope squeeze (see `docs/CHANGELOG.md` for per-batch prose). YM tower stays `Status: Open`. |
-| 2026-05-27 | Batch 20.1a / "Plan #156" (Surface #3 setup — define the continuum) | 460 → 464 | New files `Towers/YM/Continuum.lean` (4 trio-clean defs: `YM4_Continuum`, `IsMassGap`, `lattice_to_continuum`, `AsymptoticFreedom`) and `Towers/Attempts/Clay.lean` (parked `MassGap_YM4_Clay : ∀ T, AsymptoticFreedom T → ∃ Δ, IsMassGap T Δ` — the only new sorry, NOT a brick). Zero theorems landed. No Varadhan assumed (separate track, task #156). YM tower stays `Status: Open`. Dragons ahead: 20.1b limit existence, 20.1c OS axioms, 20.1d mass gap. |
-| 2026-05-27 | Batch 20.2a / Task #156 file 1 of 6 (Varadhan scaffolding — Casimir quadratic lower bound) | 464 → 465 | New file `Towers/YM/Casimir.lean`: `Casimir_SU3_explicit_real_ge_quadratic` proves `¾·(m+n)² + 3·(m+n) ≤ C₂(m,n)` with explicit `k₀ = 0`, via `(m − n)² ≥ 0` after `unfold + push_cast; nlinarith`. **Strengthens** (does not replace) the linear bound `Casimir_SU3_explicit_real_ge_linear` from Batch 19.1p-redux-a. Target shape for Task #156 is **(C) integrated tail** `∫_{d(g,e)≥δ} K_t(g,e) dg ≤ C·t⁻⁴·e⁻ᶜᵟ²ᐟᵗ`, NOT the false trace shape `K(t) ≤ C·t⁻⁴·e⁻ᶜᐟᵗ`. Files 2–6 NOT shipped (file 4 needs bi-invariant Riemannian metric on SU(3), absent from mathlib v4.12.0). YM tower stays `Status: Open`; Surface #2 stays OPEN; `kotecky_preiss_criterion` still a `sorry`. |
-| 2026-05-27 | Batch 156.2 / Task #156 file 2 of 6 (Varadhan scaffolding — Weyl-dim cubic upper bound) | 465 → 467 (+1 this batch + 1 previously-registered NS brick) | New file `Towers/YM/WeylDim.lean`: `dim_cubic_bound` proves `dim_SU3 m n ≤ 8·(m+n+1)³` with explicit `k₀ = 0`, where `dim_SU3 m n := (m+1)(n+1)(m+n+2)/2` (standard SU(3) Weyl-dim formula on the (m,n) highest-weight lattice, ℕ floor division). Proof: `zify; nlinarith [sq_nonneg ((m:ℤ)−n), …]` closes the polynomial `(m+1)(n+1)(m+n+2) ≤ 16·(m+n+1)³`, then `set R := (m+n+1)^3` and `omega` discharges `A/2 ≤ 8·R` from `A ≤ 16·R` via `Nat.div_le_div_right`. Pairs with file 1's quadratic Casimir lower bound; the future file 3 (`HeatTraceBound`) will combine the two for the Weyl-law `K(t) ≤ C·t⁻⁴` heat-trace shape (`d = dim_ℝ SU(3) = 8` ⇒ `t⁻ᵈᐟ²`). NOT a heat-kernel statement. NOT Varadhan. ℕ-polynomial only. Coexists with `Weyl_dim_SU3_explicit_real_le_poly` (degree-4 bound on (m,n) separately) in `PeterWeyl.lean` — different shape needed because Weyl-law summation is on the `m+n = k` antidiagonal. Files 3–6 NOT shipped. YM tower stays `Status: Open`; Surface #2 stays OPEN; `kotecky_preiss_criterion` still a `sorry`. mathlib v4.12.0 only; axiom footprint = classical trio. Wall-jump honesty: this batch's brick delta is +1 (`dim_cubic_bound`); the other +1 is `Towers.NS.HasFiniteEnergy_galilean_group` (Task #146 context, registered in BRICKS line 442 but first axiom-debt-checked in this build because the 21:46 UTC log was stale). See `docs/CHANGELOG.md` Batch 156.2 § "Script-count drift" for the full diff. |
-| 2026-05-27 | #155 / Batch 19.1p-redux-b (Truncated Peter-Weyl ≤ heat-kernel envelope) | 456 → 460 | New file `Towers/YM/PeterWeylHeat.lean`: genuine envelope `Heat_kernel_envelope_real := ∑'_{(m,n) : ℕ²} (dim)² · exp(-(t · C₂))`, nonneg, finite truncation ≤ envelope for `t > 0` via mathlib `sum_le_tsum` + redux-a's `PeterWeyl_Summable_SU3`, `1 ≤ envelope` for `t > 0` (trivial-rep contribution), Attempts forwarder alias. Discharges parked sorry `Attempts/ClusterExpansion.lean:693` (sorry count 10 → 9) by retargeting the **false** original RHS `Heat_kernel_def_real` (Varadhan asymptotic placeholder — false at `N = 0, t = 1`: 1 vs ≈ 0.368) at the **true** envelope `tsum`. Varadhan small-`t` asymptotic remains a separate open gap. YM tower stays `Status: Open`. |
+| 2026-05-26 | #51 / #55 / #56 — Path B 1–6 | 19 → 81 | YM / NS schemas, Gell-Mann basis, gauge-field stand-in |
+| 2026-05-26 | #56 — Path B 7 (3 tracks) | 81 → 96 | Geometry / NS.Energy / Spectral.Operator |
+| 2026-05-27 | #154 / Batch 19.1p-redux-a | 452 → 456 | `Towers/YM/PeterWeyl.lean` (SU(3) Peter-Weyl Summability) |
+| 2026-05-27 | #155 / Batch 19.1p-redux-b | 456 → 460 | `Towers/YM/PeterWeylHeat.lean` (truncated PW ≤ heat-kernel envelope) |
+| 2026-05-27 | Batch 20.1a / Plan #156 | 460 → 464 | `Towers/YM/Continuum.lean` + parked `Attempts/Clay.lean` (no new theorems) |
+| 2026-05-27 | Batch 20.2a / Task #156 file 1 of 6 | 464 → 465 | `Towers/YM/Casimir.lean` — `Casimir_SU3_explicit_real_ge_quadratic` (Varadhan scaffolding) |
+| 2026-05-27 | Batch 156.2 / Task #156 file 2 of 6 | 465 → 467 ¹ | `Towers/YM/WeylDim.lean` — `dim_cubic_bound` (Varadhan scaffolding) |
+
+¹ Batch 156.2's own brick delta is **+1**; the extra +1 reconciles
+`Towers.NS.HasFiniteEnergy_galilean_group` (Task #146, already in
+BRICKS line 442, first axiom-checked in this build). Full diff in
+`docs/CHANGELOG.md` Batch 156.2 § "Script-count drift".
+
+**Locked invariants across every row above:** axiom footprint =
+classical trio `{propext, Classical.choice, Quot.sound}`; mathlib
+v4.12.0 only; no new research-grade axioms; YM and NS towers stay
+`Status: Open` in `docs/ROADMAP.md`; Surface #2 stays OPEN;
+`kotecky_preiss_criterion` remains a `sorry` in
+`Towers/Attempts/ClusterExpansion.lean`. Per-batch tactic notes,
+proof sketches, scope caveats, and wall-jump attribution all live
+in `docs/CHANGELOG.md`.
 
 **Hardening notes:**
 
