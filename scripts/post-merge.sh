@@ -106,4 +106,14 @@ else
   nohup bash scripts/deep-audit.sh >/dev/null 2>&1 &
 fi
 
+# Re-run the theorema-certs dashboard Playwright suite (sidecar
+# tamper banner, Acknowledge button, strict-mode badge, …). Task #149:
+# previously these only ran by hand. In strict mode a missing browser
+# or a chromium launch failure is a HARD FAIL — same blocking semantics
+# as `lean-proof`. The script is lenient by default for fresh clones
+# without browsers; STRICT_E2E_CHECK=1 here promotes that to a merge
+# gate.
+echo ">> running scripts/check-theorema-certs-e2e.sh (dashboard Playwright suite)" >&2
+STRICT_E2E_CHECK=1 ./scripts/check-theorema-certs-e2e.sh
+
 ./scripts/print-direction.sh >&2

@@ -36,6 +36,10 @@ args = "towers-build"
 task = "workflow.run"
 args = "lake-recovery"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "theorema-certs-e2e"
+
 [[workflows.workflow]]
 name = "lean-proof"
 author = "agent"
@@ -90,6 +94,17 @@ args = "cd lean-proof-towers && rm -rf .lake/packages/mathlib && lake update mat
 
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow]]
+name = "theorema-certs-e2e"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "STRICT_E2E_CHECK=1 bash scripts/check-theorema-certs-e2e.sh"
+
+[workflows.workflow.metadata]
+isValidation = true
 
 [agent]
 stack = "PNPM_WORKSPACE"

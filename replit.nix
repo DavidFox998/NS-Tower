@@ -1,5 +1,12 @@
 {pkgs}: {
   deps = [
+    pkgs.xorg.libXtst
+    pkgs.xorg.libXScrnSaver
+    pkgs.xorg.libXrender
+    pkgs.xorg.libXi
+    pkgs.xorg.libXcursor
+    pkgs.gtk3
+    pkgs.at-spi2-atk
     pkgs.libGL
     pkgs.libgbm
     pkgs.udev

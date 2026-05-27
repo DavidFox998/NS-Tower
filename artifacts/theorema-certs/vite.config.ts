@@ -66,6 +66,20 @@ export default defineConfig({
     fs: {
       strict: true,
     },
+    // Task #149: when the Playwright validation harness boots a
+    // self-contained Vite + api-server pair, the SPA still needs
+    // `/api/*` to reach the api-server. The Replit dev shell normally
+    // does this via the global proxy on :80; under managed e2e we
+    // proxy it through Vite instead. Opt-in via env so production
+    // builds and the normal dev workflow are unaffected.
+    proxy: process.env.E2E_API_PROXY_TARGET
+      ? {
+          "/api": {
+            target: process.env.E2E_API_PROXY_TARGET,
+            changeOrigin: true,
+          },
+        }
+      : undefined,
   },
   preview: {
     port,
