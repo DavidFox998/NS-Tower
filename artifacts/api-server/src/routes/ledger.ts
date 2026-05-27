@@ -239,10 +239,45 @@ interface SidecarPayload {
  * not meaningful (e.g. Windows, some FUSE mounts) we skip silently
  * rather than spamming warnings.
  */
+/**
+ * Task #123: thrown by `loadOrCreateSecret` when strict mode is on
+ * and the on-disk keyfile is group/world-readable. Surfaces as a
+ * hard startup failure from `createLedgerChecker` so the API server
+ * refuses to boot rather than silently logging a warning that may
+ * get lost in production log noise.
+ */
+export class SidecarSecretLooseModeError extends Error {
+  readonly secretPath: string;
+  readonly mode: string;
+  constructor(secretPath: string, mode: string) {
+    super(
+      `ledger sidecar: secret file ${secretPath} is group/world-readable (mode ${mode}) and LEDGER_SIDECAR_SECRET_STRICT_MODE is enabled — chmod 600, relocate via LEDGER_SIDECAR_SECRET_PATH, or supply LEDGER_SIDECAR_SECRET as an inline hex value`,
+    );
+    this.name = "SidecarSecretLooseModeError";
+    this.secretPath = secretPath;
+    this.mode = mode;
+  }
+}
+
+/**
+ * Task #109: warn loudly if the on-disk keyfile is readable by anyone
+ * other than the owner. The HMAC scheme protects against an attacker
+ * who can write the sidecar but NOT read the key; a group/world-
+ * readable keyfile collapses that protection because the attacker can
+ * forge a valid MAC. We surface this on startup so the operator can
+ * `chmod 600` (or move the secret out of the data dir entirely via
+ * `LEDGER_SIDECAR_SECRET_PATH` / `LEDGER_SIDECAR_SECRET`) before the
+ * next deploy. Best-effort: on platforms where `statSync().mode` is
+ * not meaningful (e.g. Windows, some FUSE mounts) we skip silently
+ * rather than spamming warnings.
+ *
+ * Task #123: returns `{ loose, mode }` so the caller can promote the
+ * warning to a hard startup failure when strict mode is enabled.
+ */
 function warnIfSecretFileLoose(
   secretPath: string,
   logger?: { warn: (...args: unknown[]) => void },
-): void {
+): { loose: boolean; mode: string | null } {
   try {
     const st = statSync(secretPath);
     // Low 9 bits = rwxrwxrwx. We only care about group + other read bits.
@@ -253,10 +288,25 @@ function warnIfSecretFileLoose(
         { secretPath, mode: modeOctal },
         "ledger sidecar: secret file is group/world-readable — an attacker with read access can forge sidecar HMACs; chmod 600 or move the secret out of the data dir (set LEDGER_SIDECAR_SECRET_PATH to a tighter-ACL path, or LEDGER_SIDECAR_SECRET to an inline hex value with no on-disk fallback)",
       );
+      return { loose: true, mode: modeOctal };
     }
+    return { loose: false, mode: (st.mode & 0o777).toString(8).padStart(3, "0") };
   } catch {
     /* best-effort — stat may be unsupported, that's fine */
+    return { loose: false, mode: null };
   }
+}
+
+/**
+ * Task #123: parse `LEDGER_SIDECAR_SECRET_STRICT_MODE`. Truthy values
+ * (`1`, `true`, `yes`, `on`, case-insensitive) enable strict mode.
+ * Anything else (including unset / empty / `0` / `false`) leaves the
+ * existing lenient-warn posture in place — backward compatible.
+ */
+export function isSidecarSecretStrictMode(raw: string | undefined): boolean {
+  if (raw == null) return false;
+  const v = raw.trim().toLowerCase();
+  return v === "1" || v === "true" || v === "yes" || v === "on";
 }
 
 /**
@@ -285,12 +335,22 @@ function loadOrCreateSecret(
   secretPath: string,
   logger?: { warn: (...args: unknown[]) => void },
   inlineSecret?: string | undefined,
+  strictMode: boolean = false,
 ): Buffer {
   const inline = loadInlineSecret(inlineSecret, logger);
   if (inline != null) return inline;
   try {
     if (existsSync(secretPath)) {
-      warnIfSecretFileLoose(secretPath, logger);
+      const looseResult = warnIfSecretFileLoose(secretPath, logger);
+      if (strictMode && looseResult.loose) {
+        // Task #123: hard-fail boot in strict mode. We deliberately
+        // throw a typed error before reading the keyfile so a forged
+        // secret can never reach the HMAC verifier in this posture.
+        throw new SidecarSecretLooseModeError(
+          secretPath,
+          looseResult.mode ?? "???",
+        );
+      }
       const raw = readFileSync(secretPath, "utf-8").trim();
       if (/^[0-9a-f]{64}$/i.test(raw)) {
         return Buffer.from(raw, "hex");
@@ -301,6 +361,10 @@ function loadOrCreateSecret(
       );
     }
   } catch (err) {
+    // Task #123: strict-mode loose-keyfile failure must propagate.
+    // Anything else (e.g. transient read errors) falls through to the
+    // existing "regenerate the secret" recovery path.
+    if (err instanceof SidecarSecretLooseModeError) throw err;
     logger?.warn?.(
       { err, secretPath },
       "ledger sidecar: secret file unreadable; regenerating",
@@ -588,10 +652,14 @@ export function createLedgerChecker(opts: LedgerRouterOptions): LedgerChecker {
       : resolveCheckedStaleThresholdSecondsFromEnv(
           process.env.LEDGER_CHECKED_STALE_THRESHOLD_SECONDS,
         );
+  const STRICT_MODE = isSidecarSecretStrictMode(
+    process.env.LEDGER_SIDECAR_SECRET_STRICT_MODE,
+  );
   const SIDECAR_SECRET = loadOrCreateSecret(
     SECRET_PATH,
     defaultLogger,
     process.env.LEDGER_SIDECAR_SECRET,
+    STRICT_MODE,
   );
   const persisted = readPersistedState(
     LAST_OK_PATH,

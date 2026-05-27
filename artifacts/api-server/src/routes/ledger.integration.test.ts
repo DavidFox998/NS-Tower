@@ -741,6 +741,90 @@ describe("GET /api/ledger/integrity", () => {
     }
   });
 
+  it("Task #123: strict mode hard-fails boot when secret keyfile is group/world-readable", async () => {
+    const sealed = "line1\nline2\n";
+    const { size, sha } = writeHits(sealed);
+    writeCheckpoint(size, sha);
+
+    const lastOkPath = path.join(tmpDir, "hits.txt.strict.lastok");
+    const secretPath = path.join(tmpDir, "hits.txt.strict.lastok.key");
+    try { unlinkSync(lastOkPath); } catch { /* ignore */ }
+    try { unlinkSync(secretPath); } catch { /* ignore */ }
+
+    const secretHex = "ab".repeat(32);
+    writeFileSync(secretPath, secretHex + "\n");
+    try {
+      chmodSync(secretPath, 0o644);
+    } catch {
+      return;
+    }
+    const mode = statSync(secretPath).mode & 0o777;
+    if ((mode & 0o044) === 0) {
+      return;
+    }
+
+    const prev = process.env.LEDGER_SIDECAR_SECRET_STRICT_MODE;
+    process.env.LEDGER_SIDECAR_SECRET_STRICT_MODE = "1";
+    try {
+      const { createLedgerChecker, SidecarSecretLooseModeError } = await import("./ledger.js");
+      expect(() =>
+        createLedgerChecker({ hitsPath, checkpointPath, lastOkPath, secretPath }),
+      ).toThrow(SidecarSecretLooseModeError);
+    } finally {
+      if (prev === undefined) {
+        delete process.env.LEDGER_SIDECAR_SECRET_STRICT_MODE;
+      } else {
+        process.env.LEDGER_SIDECAR_SECRET_STRICT_MODE = prev;
+      }
+      try { unlinkSync(lastOkPath); } catch { /* ignore */ }
+      try { unlinkSync(secretPath); } catch { /* ignore */ }
+    }
+  });
+
+  it("Task #123: lenient mode (default) boots successfully when secret keyfile is group/world-readable", async () => {
+    const sealed = "line1\nline2\n";
+    const { size, sha } = writeHits(sealed);
+    writeCheckpoint(size, sha);
+
+    const lastOkPath = path.join(tmpDir, "hits.txt.lenient.lastok");
+    const secretPath = path.join(tmpDir, "hits.txt.lenient.lastok.key");
+    try { unlinkSync(lastOkPath); } catch { /* ignore */ }
+    try { unlinkSync(secretPath); } catch { /* ignore */ }
+
+    const secretHex = "cd".repeat(32);
+    writeFileSync(secretPath, secretHex + "\n");
+    try {
+      chmodSync(secretPath, 0o644);
+    } catch {
+      return;
+    }
+    const mode = statSync(secretPath).mode & 0o777;
+    if ((mode & 0o044) === 0) {
+      return;
+    }
+
+    const prev = process.env.LEDGER_SIDECAR_SECRET_STRICT_MODE;
+    delete process.env.LEDGER_SIDECAR_SECRET_STRICT_MODE;
+    try {
+      const app = express();
+      app.use("/api", createLedgerRouter({ hitsPath, checkpointPath, lastOkPath, secretPath }));
+      const srv = http.createServer(app);
+      await new Promise<void>((resolve) => srv.listen(0, "127.0.0.1", resolve));
+      const port = (srv.address() as AddressInfo).port;
+      const r = await (await fetch(`http://127.0.0.1:${port}/api/ledger/integrity`)).json() as any;
+      expect(r.status).toBe("ok");
+      await new Promise<void>((resolve, reject) =>
+        srv.close((err) => (err ? reject(err) : resolve())),
+      );
+    } finally {
+      if (prev !== undefined) {
+        process.env.LEDGER_SIDECAR_SECRET_STRICT_MODE = prev;
+      }
+      try { unlinkSync(lastOkPath); } catch { /* ignore */ }
+      try { unlinkSync(secretPath); } catch { /* ignore */ }
+    }
+  });
+
   it("reports stale=true with lastOkAgeSeconds=null when no successful check has ever been recorded", async () => {
     // Fresh router pointing at a sidecar that does not exist, with the
     // ledger broken so no ok check fires.
