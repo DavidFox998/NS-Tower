@@ -2448,6 +2448,51 @@ BRICKS=(
   "Towers.YM.TranslateDistance|TheoremaAureum.Towers.YM.LatticeGauge.latticeDist_self"
   "Towers.YM.ClusterAxiom|TheoremaAureum.Towers.YM.LatticeGauge.clustering_of_factor"
   "Towers.YM.ClusteringDirac|TheoremaAureum.Towers.YM.LatticeGauge.os4_clustering_dirac"
+  # TRI PARALLEL #14 / Batches 174.1, 174.2, 174.3 — OS Hilbert
+  # space + transfer operator + spectral-gap quantities, all
+  # under the Dirac haar stand-in (Batch 168.3). **Surface #1
+  # stays OPEN.** This batch is the *stand-in* form of the
+  # mass-gap chain; it does NOT prove the Yang-Mills mass gap.
+  # HilbertSpace defines `mu_plus` (positive-time measure, Dirac
+  # stand-in) and `H_OS` (= `Lp ℂ 2 (mu_plus …)`, abbrev so
+  # `InnerProductSpace ℂ` / `CompleteSpace` instances flow
+  # transparently — snippet's `def` pivoted to `abbrev` and
+  # redundant `infer_instance` blocks dropped); brick
+  # `mu_plus_eq_gibbs` (rfl rename identity). TransferOperatorOS
+  # defines `T_OS := 0` (stand-in; snippet's `sorry`s in `T`,
+  # `T_positive`, `T_selfAdjoint` eliminated via the zero-
+  # operator pivot — the only honestly-buildable CLM on the
+  # Dirac singleton support without inventing a kernel);
+  # bricks `T_OS_positive` (via `zero_apply` + `inner_zero_right`,
+  # under `open scoped ComplexOrder`) and `T_OS_selfAdjoint`
+  # (via `IsSelfAdjoint.zero _`, using the `Star` instance from
+  # `Mathlib.Analysis.InnerProductSpace.Adjoint`). Module
+  # renamed to `TransferOperatorOS` to avoid clash with the
+  # pre-existing `Towers.YM.TransferOperator` (Batch 162.3).
+  # SpectralGapOS defines `mass_gap := -Real.log ‖T_OS‖`;
+  # bricks `spectral_gap` (`‖T_OS‖ < 1`, **trivially true**
+  # because `T_OS = 0`, snippet's `sorry` — the Clay-statement
+  # Yang-Mills mass gap — eliminated by the stand-in pivot,
+  # **does NOT prove the YM mass gap**), `mass_gap_dirac`
+  # (`mass_gap = 0` — **the explicit tripwire** showing the
+  # Dirac mass gap is exactly zero, NOT positive), and
+  # `mass_gap_pos` (parameterized on *both* `0 < ‖T_OS‖` and
+  # `‖T_OS‖ < 1`; snippet's `Real.neg_log_pos_iff` doesn't
+  # exist in v4.12.0 — pivoted to `neg_pos.mpr (Real.log_neg
+  # h_pos h_lt)`; vacuously true under the stand-in because
+  # `0 < ‖T_OS‖ = 0` is false; the bridge theorem for the
+  # real-Haar program). Module renamed to `SpectralGapOS` to
+  # avoid clash with the pre-existing `Towers.YM.SpectralGap`.
+  # **Genuine mass gap requires**: real Wilson kernel + real
+  # Haar + cluster expansion (Kotecký–Preiss, still a `sorry`
+  # in `Towers/Attempts/ClusterExpansion.lean`, invariant-
+  # locked) + correlation inequalities — none landed.
+  "Towers.YM.HilbertSpace|TheoremaAureum.Towers.YM.LatticeGauge.mu_plus_eq_gibbs"
+  "Towers.YM.TransferOperatorOS|TheoremaAureum.Towers.YM.LatticeGauge.T_OS_positive"
+  "Towers.YM.TransferOperatorOS|TheoremaAureum.Towers.YM.LatticeGauge.T_OS_selfAdjoint"
+  "Towers.YM.SpectralGapOS|TheoremaAureum.Towers.YM.LatticeGauge.spectral_gap"
+  "Towers.YM.SpectralGapOS|TheoremaAureum.Towers.YM.LatticeGauge.mass_gap_dirac"
+  "Towers.YM.SpectralGapOS|TheoremaAureum.Towers.YM.LatticeGauge.mass_gap_pos"
 )
 
 VERIFIER_DIR="$(mktemp -d)"

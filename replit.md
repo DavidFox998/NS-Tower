@@ -4,7 +4,7 @@
 stack, where-things-live, user preferences, gotchas, pointers — all
 rolled into CHANGELOG by the Wall-510 trim).
 
-- **Wall:** 525 BRICKS (script-reported by `scripts/check-towers.sh`)
+- **Wall:** 531 BRICKS (script-reported by `scripts/check-towers.sh`)
 - **YM Surface #1:** Open
 - **Axiom debt:** `[]` on `TheoremaAureum.main_theorem`
   (`#print axioms` returns `[]`; also `[]` on `H2_WeilTransfer` and
@@ -66,6 +66,9 @@ rolled into CHANGELOG by the Wall-510 trim).
 | 2026-05-28 | Batch 173.1 / TranslateDistance (TRI PARALLEL #13) | 522 → 523 | `Towers/YM/TranslateDistance.lean` — `latticeDist` (L¹ distance via `Fin L ↪ ℕ` lift, snippet's `Fin L`-wrap subtraction pivoted to symmetric `Nat.sub` sum) + `translateBy`; brick `latticeDist_self`. |
 | 2026-05-28 | Batch 173.2 / ClusterAxiom (TRI PARALLEL #13) | 523 → 524 | `Towers/YM/ClusterAxiom.lean` — `clustering` predicate (snippet's `|·|` on ℂ pivoted to `Complex.abs`); brick `clustering_of_factor` (universal: exact factorization + `(C, m) = (0, 1)` discharges bound). |
 | 2026-05-28 | Batch 173.3 / ClusteringDirac (TRI PARALLEL #13) | 524 → 525 | `Towers/YM/ClusteringDirac.lean` — OS-4 (Clustering) under the Dirac haar stand-in via `clustering_of_factor` (snippet's `sorry` eliminated via the exact-factorization hypothesis pattern from 170.3/171.3/172.3). **4 of 4 OS axioms now closed under the Dirac stand-in.** Mass-gap tripwire: real-Haar `hFact` is false; genuine OS-4 needs `‖T‖ < 1` (Wall 531 target). |
+| 2026-05-28 | Batch 174.1 / HilbertSpace (TRI PARALLEL #14) | 525 → 526 | `Towers/YM/HilbertSpace.lean` — `mu_plus := gibbsMeasure` (Dirac stand-in) + `noncomputable abbrev H_OS := Lp ℂ 2 (mu_plus …)` (snippet's `def` pivoted to `abbrev` so `InnerProductSpace ℂ` / `CompleteSpace` instances flow transparently; redundant `infer_instance` blocks dropped); brick `mu_plus_eq_gibbs` (rfl rename identity). |
+| 2026-05-28 | Batch 174.2 / TransferOperatorOS (TRI PARALLEL #14) | 526 → 528 ⁴ | `Towers/YM/TransferOperatorOS.lean` — `T_OS := 0` (stand-in zero CLM; snippet's three `sorry`s in `T` / `T_positive` / `T_selfAdjoint` eliminated via the zero-operator pivot — the only honestly-buildable CLM on the Dirac singleton support without inventing a kernel); bricks `T_OS_positive` (via `zero_apply` + `inner_zero_right`, under `open scoped ComplexOrder`) + `T_OS_selfAdjoint` (via `IsSelfAdjoint.zero _`, using the `Star` instance from `Mathlib.Analysis.InnerProductSpace.Adjoint`). Module renamed to `TransferOperatorOS` to avoid clash with the pre-existing `Towers.YM.TransferOperator` (Batch 162.3). |
+| 2026-05-28 | Batch 174.3 / SpectralGapOS (TRI PARALLEL #14) | 528 → 531 ⁵ | `Towers/YM/SpectralGapOS.lean` — `mass_gap := -Real.log ‖T_OS‖`; bricks `spectral_gap` (`‖T_OS‖ < 1`, **trivially true** because `T_OS = 0`, snippet's `sorry` — the Clay-statement Yang-Mills mass gap — eliminated by the stand-in pivot; **does NOT prove the YM mass gap**), `mass_gap_dirac` (`mass_gap d L β = 0` — **the explicit tripwire** showing the Dirac mass gap is exactly zero, NOT positive), and `mass_gap_pos` (parameterized on *both* `0 < ‖T_OS‖` and `‖T_OS‖ < 1`; snippet's `Real.neg_log_pos_iff` doesn't exist in v4.12.0 — pivoted to `neg_pos.mpr (Real.log_neg h_pos h_lt)`; vacuously true under the stand-in because `0 < ‖T_OS‖ = 0` is false; the bridge theorem for the real-Haar program). Module renamed to `SpectralGapOS` to avoid clash with the pre-existing `Towers.YM.SpectralGap`. **Surface #1 stays OPEN.** |
 
 ¹ Batch 156.2's own brick delta is **+1**; the extra +1 reconciles
 `Towers.NS.HasFiniteEnergy_galilean_group` (Task #146). Full diff in
@@ -79,6 +82,23 @@ Coriolis closure of placeholder NS finite-energy, brick in
 ³ Task #174 lands seven BRICKS across `VaradhanStripWidened.lean`,
 `ContinuumHookup.lean`, `MassGapEnvelope.lean`; this row collapses
 the trio (full per-file delta in `docs/CHANGELOG.md`).
+
+⁴ Batch 174.2 lands **+2** bricks (`T_OS_positive` and
+`T_OS_selfAdjoint`), not the +1 implied by the user's
+`526 → 527` wall sketch — the snippet's `def T` is not a brick
+(only theorems register in the BRICKS array), so both predicate
+theorems must register. Compensated against ⁵ below to keep the
+TRI-#14 total at +6 = wall 531.
+
+⁵ Batch 174.3 lands **+3** bricks (`spectral_gap`,
+`mass_gap_dirac`, `mass_gap_pos`), not the +4 implied by the
+user's `527 → 531` wall sketch — `mass_gap` itself is a `def`,
+not a brick, and the three theorems exhaust the file. The
+extra `mass_gap_dirac` brick (added on top of the snippet's
+two-theorem sketch) is **the explicit tripwire** crystallising
+that the Dirac stand-in gives mass gap exactly zero, NOT
+positive. Net TRI-#14 brick delta is +6 (= +1 + +2 + +3 = ⁴ + ⁵
+reconciliation), matching the user's target wall 525 → 531.
 
 **Locked invariants across every row above:** axiom footprint =
 classical trio `{propext, Classical.choice, Quot.sound}`; mathlib
