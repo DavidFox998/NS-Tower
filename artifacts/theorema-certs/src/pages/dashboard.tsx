@@ -42,7 +42,7 @@ import {
   Activity,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const REBUILD_TOKEN_STORAGE_KEY = "lean-rebuild-token";
 const REBUILD_REFEREE_NAME_STORAGE_KEY = "lean-rebuild-referee-name";
@@ -433,6 +433,52 @@ export default function DashboardPage() {
   const [highlightedAlertId, setHighlightedAlertId] = useState<string | null>(
     null,
   );
+  // Task #163: parse `#alert-<id>` from the URL so a deep-linked load
+  // (paste/back/share) can fire the same scroll-into-view + transient
+  // amber highlight that the in-page ack link does on click.
+  const parseAlertHash = (): string | null => {
+    if (typeof window === "undefined") return null;
+    const m = window.location.hash.match(/^#alert-(.+)$/);
+    return m ? m[1] : null;
+  };
+  const [pendingHashAlertId, setPendingHashAlertId] = useState<string | null>(
+    () => parseAlertHash(),
+  );
+  const highlightAlertRow = useCallback((id: string): boolean => {
+    const row = document.getElementById(`alert-${id}`);
+    if (!row) return false;
+    row.scrollIntoView({ behavior: "smooth", block: "center" });
+    setHighlightedAlertId(id);
+    window.setTimeout(
+      () => setHighlightedAlertId((cur) => (cur === id ? null : cur)),
+      1600,
+    );
+    return true;
+  }, []);
+  useEffect(() => {
+    const onHashChange = () => {
+      setPendingHashAlertId(parseAlertHash());
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+  // Task #163: once the alerts query has settled (data present) and a
+  // hash like `#alert-<id>` is parked in `pendingHashAlertId`, try to
+  // highlight the target row. Debouncing on `ledgerAlertsData` ensures
+  // we don't fire before the row exists in the DOM. If the row still
+  // isn't there (e.g. it's acknowledged and the toggle is off), we
+  // leave the hash parked but don't retry on subsequent renders —
+  // matches the spec's "currently in the DOM" gate.
+  useEffect(() => {
+    if (!pendingHashAlertId) return;
+    if (!ledgerAlertsData) return;
+    const id = pendingHashAlertId;
+    const raf = window.requestAnimationFrame(() => {
+      highlightAlertRow(id);
+      setPendingHashAlertId((cur) => (cur === id ? null : cur));
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [pendingHashAlertId, ledgerAlertsData, highlightAlertRow]);
   const {
     data: ledgerIntegrity,
     error: ledgerIntegrityError,
@@ -2957,26 +3003,14 @@ export default function DashboardPage() {
                   data-testid="link-ledger-monitor-ack-id"
                   title={ackedId}
                   onClick={(e) => {
-                    const row = document.getElementById(`alert-${ackedId}`);
-                    if (!row) {
-                      // Row isn't in the DOM (e.g. acked alerts hidden);
-                      // let the default hash navigation fall through so
-                      // the URL still records the intent.
-                      return;
+                    // Task #163: route through the shared highlight
+                    // helper so click and deep-link load behave the
+                    // same. If the row isn't in DOM (acked alerts
+                    // toggle is off), let the default hash navigation
+                    // through so the URL still records the intent.
+                    if (highlightAlertRow(ackedId)) {
+                      e.preventDefault();
                     }
-                    e.preventDefault();
-                    row.scrollIntoView({
-                      behavior: "smooth",
-                      block: "center",
-                    });
-                    setHighlightedAlertId(ackedId);
-                    window.setTimeout(
-                      () =>
-                        setHighlightedAlertId((cur) =>
-                          cur === ackedId ? null : cur,
-                        ),
-                      1600,
-                    );
                   }}
                 >
                   {shortId}…

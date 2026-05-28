@@ -306,4 +306,66 @@ test.describe("dashboard: ledger monitor suppressed badge", () => {
     // implementation detail and flakily timing the disappearance
     // would add no real coverage.
   });
+
+  test("deep-linking to /#alert-<id> on a fresh page load highlights the row and brings it into view (task #163)", async ({
+    page,
+  }) => {
+    const ackedId =
+      "01HX9YQF8VABCDEF0123456789ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+    const overridesRef: { current: SuppressedOverrides } = {
+      current: {
+        status: "mismatch",
+        failureMode: "truncation",
+        lastAcknowledgedAlertId: ackedId,
+        lastAlertedFailureMode: "truncation",
+      },
+    };
+
+    await installLedgerIntegrityMock(page, overridesRef);
+    await page.route(LEDGER_ALERTS_URL, async (route: Route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(buildLedgerAlertsBody(ackedId)),
+      });
+    });
+
+    // Pre-flip the acked-alerts toggle via localStorage isn't an
+    // option (the dashboard initialises it to false on mount), so
+    // navigate first, flip the toggle, then navigate *back* to the
+    // same path with the hash baked into the URL. This mirrors the
+    // user pasting a `#alert-<id>` link they kept in chat.
+    await page.goto("/");
+    const acknowledgedToggle = page.locator(
+      '[data-testid="checkbox-show-acknowledged-alerts"]',
+    );
+    await expect(acknowledgedToggle).toBeVisible();
+    if (!(await acknowledgedToggle.isChecked())) {
+      await acknowledgedToggle.check();
+    }
+
+    // Now navigate fresh with the hash present from the start. The
+    // browser will do its default jump; the dashboard's task-#163
+    // useEffect must additionally fire the smooth-scroll +
+    // transient amber highlight once the alerts query settles.
+    await page.goto(`/#alert-${ackedId}`);
+
+    // Toggle survives the navigation only if it's been persisted —
+    // it isn't, so flip it again so the row enters the DOM.
+    await expect(acknowledgedToggle).toBeVisible();
+    if (!(await acknowledgedToggle.isChecked())) {
+      await acknowledgedToggle.check();
+    }
+
+    const targetRow = page.locator(`#alert-${ackedId}`);
+    await expect(targetRow).toHaveCount(1);
+    await expect(targetRow).toHaveAttribute("data-alert-id", ackedId);
+
+    // The deep-link load (no click) must light up the highlight
+    // attribute on its own. This is the core acceptance bit.
+    await expect(targetRow).toHaveAttribute("data-highlighted", "true");
+
+    // And the row must end up within the viewport.
+    await expect(targetRow).toBeInViewport();
+  });
 });
