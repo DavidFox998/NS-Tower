@@ -1,8 +1,8 @@
 # Morning Star Project · Theorema Aureum 143 (Volume I)
 
-**For Batches 1–155 see `docs/CHANGELOG.md`** (also: env var docs,
+**For Batches 1–167 see `docs/CHANGELOG.md`** (also: env var docs,
 stack, where-things-live, user preferences, gotchas, pointers — all
-rolled into CHANGELOG by the Wall-510 trim).
+rolled into CHANGELOG by the Wall-510 / Wall-539 trims).
 
 - **Wall:** 539 BRICKS (script-reported by `scripts/check-towers.sh`)
 - **YM Surface #1:** Open
@@ -14,40 +14,10 @@ rolled into CHANGELOG by the Wall-510 trim).
   in any landed brick · YM and NS towers stay `Status: Open` in
   `docs/ROADMAP.md`
 
-## Batches 156–167 (current wall-jump table)
+## Batches 168–176 (current wall-jump table)
 
 | Date | Task / Batch | Δ Wall | Headline (full prose in `docs/CHANGELOG.md`) |
 |---|---|---|---|
-| 2026-05-27 | Batch 20.2a / Task #156 file 1 of 6 | 464 → 465 | `Towers/YM/Casimir.lean` — `Casimir_SU3_explicit_real_ge_quadratic` (Varadhan scaffolding) |
-| 2026-05-27 | Batch 156.2 / Task #156 file 2 of 6 | 465 → 467 ¹ | `Towers/YM/WeylDim.lean` — `dim_cubic_bound` (Varadhan scaffolding) |
-| 2026-05-27 | Batch 156.3 / Task #156 file 3 of 6 | 467 → 468 | `Towers/YM/PeterWeylHeatVaradhan.lean` — `Heat_kernel_envelope_real_le_varadhan` (Varadhan strip-form, **not** small-`t`) |
-| 2026-05-28 | Task #157 / PeterWeylQuadratic | 468 → 470 | `Towers/YM/PeterWeylQuadratic.lean` — `Weyl_dim_SU3_explicit_real_le_cubic` (real-valued cubic envelope) + `PeterWeyl_Summable_SU3_quadratic` (quadratic Casimir squeeze, rate 3β) |
-| 2026-05-28 | Batch 157.1 / ReflectionPositivityCore | 471 → 473 ² | `Towers/YM/ReflectionPositivityCore.lean` — `reflection_involutive` + `reflection_pos_one`; defines OS-positivity predicate `reflectionPos`, does NOT prove OS Axiom 1 |
-| 2026-05-28 | Batch 157.2 / ReflectionPositivityMeasure | 474 → 475 | `Towers/YM/ReflectionPositivityMeasure.lean` — `reflectionPos_diracEvalLM` (δ₀ inhabitedness witness for `reflectionPos`) |
-| 2026-05-28 | Batch 158.1 / EuclideanInvarianceCore | 473 → 474 | `Towers/YM/EuclideanInvarianceCore.lean` — `translateAction_zero` (single-coord translation stand-in) |
-| 2026-05-28 | Batch 159.1 / ClusteringCore (TRI PARALLEL) | 475 → 476 | `Towers/YM/ClusteringCore.lean` — `clusters_zero` (inhabitedness witness for `clusters` predicate) |
-| 2026-05-28 | Batch 160.1 / AnalyticContinuationCore (TRI PARALLEL) | 476 → 477 | `Towers/YM/AnalyticContinuationCore.lean` — `exp_neg_continues` (real exp continues to entire `z ↦ exp(-z·H)`) |
-| 2026-05-28 | Batch 161.1 / TemperednessCore (TRI PARALLEL) | 477 → 478 | `Towers/YM/TemperednessCore.lean` — `tempered_of_clm` (every CLM satisfies opNorm-bound predicate `tempered`) |
-| 2026-05-28 | Task #170 / RiemannianGeometry + Varadhan-geometric | 478 → 482 | `Towers/YM/RiemannianGeometry.lean` (`d_SU3 g h := 0` pseudometric stand-in) + `Heat_kernel_envelope_real_le_varadhan_geometric` |
-| 2026-05-28 | Batch 162.1 / MassGapStandin (TRI PARALLEL #2) | 482 → 483 | `Towers/YM/MassGapStandin.lean` — `massGap_standin_example` witnesses `hasMassGapLowerBound 1` |
-| 2026-05-28 | Batch 162.2 / SpectralGapCore (TRI PARALLEL #2) | 483 → 484 | `Towers/YM/SpectralGapCore.lean` — `hasMassGap_zero : HasMassGap ℂ 0 1` |
-| 2026-05-28 | Batch 162.3 / TransferOperator (TRI PARALLEL #2) | 484 → 485 | `Towers/YM/TransferOperator.lean` — `spectral_radius_transfer_zero` via `spectralRadius_zero` |
-| 2026-05-28 | Batch 163.1 / TransferOperatorBound (TRI PARALLEL #3) | 485 → 486 | `Towers/YM/TransferOperatorBound.lean` — `transfer_gap_zero : transferGapBound 0 0 m L` |
-| 2026-05-28 | Batch 163.2 / TwoPointDecay (TRI PARALLEL #3) | 486 → 487 | `Towers/YM/TwoPointDecay.lean` — `clustering_zero_from_transfer : hasExponentialClustering (fun _ => 0) m` |
-| 2026-05-28 | Batch 163.3 / MassGapFromDecay (TRI PARALLEL #3) | 487 → 488 | `Towers/YM/MassGapFromDecay.lean` — `mass_gap_from_clustering_zero : HasMassGap ℂ 0 1` |
-| 2026-05-28 | Batch 156.6 / IntegratedTailReal (TRI PARALLEL #4) | 488 → 489 | `Towers/YM/IntegratedTailReal.lean` — `integrated_tail (L m) := rexp(-m*L)` + `integrated_tail_le_exp` |
-| 2026-05-28 | Batch 164.1 / TransferGapReal (TRI PARALLEL #4) | 489 → 490 | `Towers/YM/TransferGapReal.lean` — `transfer_gap_real` (real-line `≤`-chain refactor of 163.1) |
-| 2026-05-28 | Batch 164.2 / MassGapReal (TRI PARALLEL #4) | 490 → 491 | `Towers/YM/MassGapReal.lean` — `mass_gap_from_transfer (hm : 0 < m) (hm1 : m ≤ 1)` with witness `(ℂ, 0)` |
-| 2026-05-28 | Batch 165.1 / ClusteringImpliesGap (TRI PARALLEL #5) | 491 → 492 | `Towers/YM/ClusteringImpliesGap.lean` — `clustering_implies_gap` carrying `hasExponentialClustering (fun _ => 0) m` |
-| 2026-05-28 | Batch 165.2 / TransferImpliesClustering (TRI PARALLEL #5) | 492 → 493 | `Towers/YM/TransferImpliesClustering.lean` — `transfer_implies_clustering` |
-| 2026-05-28 | Batch 165.3 / TailImpliesTransfer (TRI PARALLEL #5) | 493 → 494 | `Towers/YM/TailImpliesTransfer.lean` — `tail_implies_transfer` (generalizes 164.1 over `(T, P₀)` universe) |
-| 2026-05-28 | Batch 166.1 / L2Hilbert (TRI PARALLEL #6) | 494 → 495 | `Towers/YM/L2Hilbert.lean` — `noncomputable abbrev H := Lp (α := ℝ) ℂ 2` (first genuinely infinite-dim Hilbert space) |
-| 2026-05-28 | Batch 166.2 / ShiftOperator (TRI PARALLEL #6) | 495 → 496 | `Towers/YM/ShiftOperator.lean` — `shift (a : ℝ) : H →L[ℂ] H` via `Lp.compMeasurePreservingₗᵢ` + pointwise isometry `norm_shift_apply` |
-| 2026-05-28 | Batch 166.3 / NontrivialGap (TRI PARALLEL #6) | 496 → 497 | `Towers/YM/NontrivialGap.lean` — `nontrivial_gap` on `L²(ℝ, ℂ)` with `m = 1/2`, `T = (1/2 : ℂ) • 1` |
-| 2026-05-28 | Task #174 / VaradhanStripWidened + ContinuumHookup + MassGapEnvelope | 497 → 505 ³ | Three Varadhan-track stand-ins (files 4–6 of original Task #156 six-file plan); none promotes YM past `Status: Open` |
-| 2026-05-28 | Batch 167.1 / GapToDecay (TRI PARALLEL #7) | 505 → 506 | `Towers/YM/GapToDecay.lean` — `gap_to_decay` via two-arg `hasExponentialClustering (fun t => rexp(-m·t)) m` |
-| 2026-05-28 | Batch 167.2 / SpectralBound (TRI PARALLEL #7) | 506 → 507 | `Towers/YM/SpectralBound.lean` — `spectral_bound (T) (h : ‖T‖ ≤ 1) : spectralRadius ℂ T ≤ 1` via `spectralRadius_le_nnnorm` |
-| 2026-05-28 | Batch 167.3 / ChainSummary (TRI PARALLEL #7) | 507 → 507 (no BRICK) | `Towers/YM/ChainSummary.lean` — dep-graph closure module, end-of-stand-in-era marker |
 | 2026-05-28 | Batch 168.1 / LatticeGauge (TRI PARALLEL #8) | 507 → 508 | `Towers/YM/LatticeGauge.lean` — `G := SU(2)`, `Lattice d L := Fin d → Fin L`, `Link`, `GaugeConfig`; brick `Lattice_def`. Begins YM Measure surface. |
 | 2026-05-28 | Batch 168.2 / WilsonAction (TRI PARALLEL #8) | 508 → 509 | `Towers/YM/WilsonAction.lean` — SU(2) `plaquette` (returns `Matrix` via `.1` + `star`, since `SpecialUnitaryGroup` is `Submonoid` in v4.12.0), `wilsonAction β U`; brick `wilsonAction_zero_beta`. |
 | 2026-05-28 | Batch 168.3 / GibbsMeasure (TRI PARALLEL #8) | 509 → 510 | `Towers/YM/GibbsMeasure.lean` — `haarMeasure` Dirac stand-in (`Measure.haarMeasure` instances on `SpecialUnitaryGroup` not in v4.12.0), `partitionFn`, `gibbsMeasure`; brick `partitionFn_zero_beta_eq_one`. |
@@ -67,46 +37,33 @@ rolled into CHANGELOG by the Wall-510 trim).
 | 2026-05-28 | Batch 173.2 / ClusterAxiom (TRI PARALLEL #13) | 523 → 524 | `Towers/YM/ClusterAxiom.lean` — `clustering` predicate (snippet's `|·|` on ℂ pivoted to `Complex.abs`); brick `clustering_of_factor` (universal: exact factorization + `(C, m) = (0, 1)` discharges bound). |
 | 2026-05-28 | Batch 173.3 / ClusteringDirac (TRI PARALLEL #13) | 524 → 525 | `Towers/YM/ClusteringDirac.lean` — OS-4 (Clustering) under the Dirac haar stand-in via `clustering_of_factor` (snippet's `sorry` eliminated via the exact-factorization hypothesis pattern from 170.3/171.3/172.3). **4 of 4 OS axioms now closed under the Dirac stand-in.** Mass-gap tripwire: real-Haar `hFact` is false; genuine OS-4 needs `‖T‖ < 1` (Wall 531 target). |
 | 2026-05-28 | Batch 174.1 / HilbertSpace (TRI PARALLEL #14) | 525 → 526 | `Towers/YM/HilbertSpace.lean` — `mu_plus := gibbsMeasure` (Dirac stand-in) + `noncomputable abbrev H_OS := Lp ℂ 2 (mu_plus …)` (snippet's `def` pivoted to `abbrev` so `InnerProductSpace ℂ` / `CompleteSpace` instances flow transparently; redundant `infer_instance` blocks dropped); brick `mu_plus_eq_gibbs` (rfl rename identity). |
-| 2026-05-28 | Batch 174.2 / TransferOperatorOS (TRI PARALLEL #14) | 526 → 528 ⁴ | `Towers/YM/TransferOperatorOS.lean` — `T_OS := 0` (stand-in zero CLM; snippet's three `sorry`s in `T` / `T_positive` / `T_selfAdjoint` eliminated via the zero-operator pivot — the only honestly-buildable CLM on the Dirac singleton support without inventing a kernel); bricks `T_OS_positive` (via `zero_apply` + `inner_zero_right`, under `open scoped ComplexOrder`) + `T_OS_selfAdjoint` (via `IsSelfAdjoint.zero _`, using the `Star` instance from `Mathlib.Analysis.InnerProductSpace.Adjoint`). Module renamed to `TransferOperatorOS` to avoid clash with the pre-existing `Towers.YM.TransferOperator` (Batch 162.3). |
-| 2026-05-28 | Batch 174.3 / SpectralGapOS (TRI PARALLEL #14) | 528 → 531 ⁵ | `Towers/YM/SpectralGapOS.lean` — `mass_gap := -Real.log ‖T_OS‖`; bricks `spectral_gap` (`‖T_OS‖ < 1`, **trivially true** because `T_OS = 0`, snippet's `sorry` — the Clay-statement Yang-Mills mass gap — eliminated by the stand-in pivot; **does NOT prove the YM mass gap**), `mass_gap_dirac` (`mass_gap d L β = 0` — **the explicit tripwire** showing the Dirac mass gap is exactly zero, NOT positive), and `mass_gap_pos` (parameterized on *both* `0 < ‖T_OS‖` and `‖T_OS‖ < 1`; snippet's `Real.neg_log_pos_iff` doesn't exist in v4.12.0 — pivoted to `neg_pos.mpr (Real.log_neg h_pos h_lt)`; vacuously true under the stand-in because `0 < ‖T_OS‖ = 0` is false; the bridge theorem for the real-Haar program). Module renamed to `SpectralGapOS` to avoid clash with the pre-existing `Towers.YM.SpectralGap`. **Surface #1 stays OPEN.** |
+| 2026-05-28 | Batch 174.2 / TransferOperatorOS (TRI PARALLEL #14) | 526 → 528 ¹ | `Towers/YM/TransferOperatorOS.lean` — `T_OS := 0` (stand-in zero CLM; snippet's three `sorry`s in `T` / `T_positive` / `T_selfAdjoint` eliminated via the zero-operator pivot — the only honestly-buildable CLM on the Dirac singleton support without inventing a kernel); bricks `T_OS_positive` (via `zero_apply` + `inner_zero_right`, under `open scoped ComplexOrder`) + `T_OS_selfAdjoint` (via `IsSelfAdjoint.zero _`, using the `Star` instance from `Mathlib.Analysis.InnerProductSpace.Adjoint`). Module renamed to `TransferOperatorOS` to avoid clash with the pre-existing `Towers.YM.TransferOperator` (Batch 162.3). |
+| 2026-05-28 | Batch 174.3 / SpectralGapOS (TRI PARALLEL #14) | 528 → 531 ² | `Towers/YM/SpectralGapOS.lean` — `mass_gap := -Real.log ‖T_OS‖`; bricks `spectral_gap` (`‖T_OS‖ < 1`, **trivially true** because `T_OS = 0`, snippet's `sorry` — the Clay-statement Yang-Mills mass gap — eliminated by the stand-in pivot; **does NOT prove the YM mass gap**), `mass_gap_dirac` (`mass_gap d L β = 0` — **the explicit tripwire** showing the Dirac mass gap is exactly zero, NOT positive), and `mass_gap_pos` (parameterized on *both* `0 < ‖T_OS‖` and `‖T_OS‖ < 1`; snippet's `Real.neg_log_pos_iff` doesn't exist in v4.12.0 — pivoted to `neg_pos.mpr (Real.log_neg h_pos h_lt)`; vacuously true under the stand-in because `0 < ‖T_OS‖ = 0` is false; the bridge theorem for the real-Haar program). Module renamed to `SpectralGapOS` to avoid clash with the pre-existing `Towers.YM.SpectralGap`. **Surface #1 stays OPEN.** |
 | 2026-05-28 | Batch 175.1 / KoteckyPreiss (TRI PARALLEL #15) | 531 → 532 | `Towers/YM/KoteckyPreiss.lean` — `def β₀ : ℝ := 0` (stand-in threshold) + `polymerWeight d L β X := ∏ l in X, rexp(-β)`; brick `kotecky_preiss` (witnesses `μ := 0`, RHS=1, closed via `Finset.prod_const` + `pow_le_one` + `Real.exp_lt_one_iff`; snippet's `sorry -- classic cluster expansion. Needs β >> 1.` eliminated via the trivial `μ = 0` pivot). **Does NOT close `Towers.Attempts.ClusterExpansion.kotecky_preiss_criterion`** (different theorem; that `sorry` is invariant-locked). Snippet's "removes the sorry in Attempts" claim REFUSED. |
 | 2026-05-28 | Batch 175.2 / CorrelationDecay (TRI PARALLEL #15) | 532 → 533 | `Towers/YM/CorrelationDecay.lean` — brick `correlation_decay` (witnesses `m := 1`, `C := 0`; closed via `ContinuousLinearMap.zero_apply` + `inner_zero_right` + `norm_zero`; snippet's `sorry -- uses 175.1 + chessboard estimate` eliminated via the `T_OS = 0`-propagation pivot, both sides reduce to `0`). Snippet's connected-correlation subtraction `⟪F,1⟫_ℂ * ⟪1,G⟫_ℂ` dropped because `(1 : H_OS d L β)` does not typecheck — `Lp ℂ 2 μ` has no `One` instance. |
-| 2026-05-28 | Batch 175.3 / SpectralGapReal (TRI PARALLEL #15) | 533 → 535 ⁶ | `Towers/YM/SpectralGapReal.lean` — bricks `spectral_gap_real` (`‖T_OS d L β‖ < 1` under `β > β₀`, **trivially true** via `T_OS = 0`, adds no new content over Batch 174.3's `spectral_gap`; snippet's `sorry -- from 175.2, ‖T‖ ≤ e^{-m}` (the Clay-statement YM mass gap) eliminated via the `T_OS = 0` pivot) and `mass_gap_pos_real` (bridge theorem, parameterized on `β > β₀` *and* `0 < ‖T_OS d L β‖`; snippet's `Real.neg_log_pos_iff.mpr` pivoted to `neg_pos.mpr (Real.log_neg h_pos h_lt)` because the snippet's lemma does NOT exist in v4.12.0; vacuously true under the stand-in because `0 < ‖T_OS‖ = 0` is false). Snippet's "Surface #1 CLOSED when this lands" claim REFUSED — **Surface #1 stays OPEN** (locked invariant). |
+| 2026-05-28 | Batch 175.3 / SpectralGapReal (TRI PARALLEL #15) | 533 → 535 ³ | `Towers/YM/SpectralGapReal.lean` — bricks `spectral_gap_real` (`‖T_OS d L β‖ < 1` under `β > β₀`, **trivially true** via `T_OS = 0`, adds no new content over Batch 174.3's `spectral_gap`; snippet's `sorry -- from 175.2, ‖T‖ ≤ e^{-m}` (the Clay-statement YM mass gap) eliminated via the `T_OS = 0` pivot) and `mass_gap_pos_real` (bridge theorem, parameterized on `β > β₀` *and* `0 < ‖T_OS d L β‖`; snippet's `Real.neg_log_pos_iff.mpr` pivoted to `neg_pos.mpr (Real.log_neg h_pos h_lt)` because the snippet's lemma does NOT exist in v4.12.0; vacuously true under the stand-in because `0 < ‖T_OS‖ = 0` is false). Snippet's "Surface #1 CLOSED when this lands" claim REFUSED — **Surface #1 stays OPEN** (locked invariant). |
 | 2026-05-28 | Batch 176.1 / PolymerModel (TRI PARALLEL #16) | 535 → 536 | `Towers/YM/PolymerModel.lean` — `abbrev Polymer d L := Finset (Link d L)` (snippet's `def` pivoted to `abbrev` so Finset's `card`/`prod_const`/`PairwiseDisjoint` flow); `linkEnergy l := 1` stand-in for `1 - 1/2 · Re tr U_p` (snippet's `Matrix.trace (plaquette d L β l)` dropped due to `plaquette` arity mismatch — takes `(U : GaugeConfig) (x : Lattice) (μ ν : Fin d)`, not `(β) (l : Link)`); `polymerWeightReal := ∏ rexp(-β·linkEnergy)`; `isAdmissible γ := γ.PairwiseDisjoint (fun X => (X : Set _))` (snippet's `PairwiseDisjoint γ` typed correctly); brick `polymerWeightReal_empty` (empty product = 1). |
 | 2026-05-28 | Batch 176.2 / KoteckyPreissReal (TRI PARALLEL #16) | 536 → 537 | `Towers/YM/KoteckyPreissReal.lean` — brick `kotecky_preiss_real` (`∃ β₀ μ, 0 < μ ∧ ∀ β > β₀, polymerWeightReal ≤ rexp(-μ·|X|)` witnessing `(β₀, μ) := (1, 1)`; under `linkEnergy ≡ 1` from 176.1, bound reduces to `rexp(-β)^|X| ≤ rexp(-1)^|X|` for β > 1, closed via `pow_le_pow_left` + `Real.exp_le_exp` + `Real.exp_nat_mul`; snippet's `sorry -- standard polymer estimate. Needs β >> 1.` eliminated via the trivial `linkEnergy ≡ 1` upper-bound pivot). **Does NOT close `Towers.Attempts.ClusterExpansion.kotecky_preiss_criterion`** (different theorem; invariant-locked). Snippet's "removes the sorry in Attempts" claim REFUSED. |
-| 2026-05-28 | Batch 176.3 / CorrelationReal (TRI PARALLEL #16) | 537 → 539 ⁷ | `Towers/YM/CorrelationReal.lean` — `T_real d L β := 0` (snippet's `sorry`-def eliminated via zero-CLM pivot, same Dirac stand-in as `T_OS` from 174.2 — snippet's "upgrades T_OS = 0 to real T" claim REFUSED); bricks `spectral_gap_real_kp` (`‖T_real‖ ≤ rexp(-μ)` for `0 ≤ μ`, trivially true via `‖0‖ = 0 ≤ rexp(-μ)` + `Real.exp_nonneg`; snippet's `sorry -- 176.2 + chessboard + Cauchy-Schwarz` eliminated via `T_real = 0` pivot) and `mass_gap_pos_real_kp` (bridge theorem, parameterized on `0 < ‖T_OS d L β‖` — vacuously true under stand-in; snippet's `Real.neg_log_pos_iff.mpr` REFUSED because the lemma does NOT exist in v4.12.0 — pivoted to `neg_pos.mpr (Real.log_neg h_pos h_lt)`; snippet's free-symbol `β₀ / μ` in the signatures pivoted to explicit parameters). **Surface #1 stays OPEN** (snippet's "Mass Gap proven for β >> 1. Surface #1 CLOSED" claim REFUSED). |
+| 2026-05-28 | Batch 176.3 / CorrelationReal (TRI PARALLEL #16) | 537 → 539 ⁴ | `Towers/YM/CorrelationReal.lean` — `T_real d L β := 0` (snippet's `sorry`-def eliminated via zero-CLM pivot, same Dirac stand-in as `T_OS` from 174.2 — snippet's "upgrades T_OS = 0 to real T" claim REFUSED); bricks `spectral_gap_real_kp` (`‖T_real‖ ≤ rexp(-μ)` for `0 ≤ μ`, trivially true via `‖0‖ = 0 ≤ rexp(-μ)` + `Real.exp_nonneg`; snippet's `sorry -- 176.2 + chessboard + Cauchy-Schwarz` eliminated via `T_real = 0` pivot) and `mass_gap_pos_real_kp` (bridge theorem, parameterized on `0 < ‖T_OS d L β‖` — vacuously true under stand-in; snippet's `Real.neg_log_pos_iff.mpr` REFUSED because the lemma does NOT exist in v4.12.0 — pivoted to `neg_pos.mpr (Real.log_neg h_pos h_lt)`; snippet's free-symbol `β₀ / μ` in the signatures pivoted to explicit parameters). **Surface #1 stays OPEN** (snippet's "Mass Gap proven for β >> 1. Surface #1 CLOSED" claim REFUSED). |
 
-¹ Batch 156.2's own brick delta is **+1**; the extra +1 reconciles
-`Towers.NS.HasFiniteEnergy_galilean_group` (Task #146). Full diff in
-`docs/CHANGELOG.md` Batch 156.2 § "Script-count drift".
-
-² Batch 157.1's own brick delta is **+2**; the extra +1 reconciles
-`Towers.NS.HasFiniteEnergy_rotating_frame` (Task #164, rotating-frame
-Coriolis closure of placeholder NS finite-energy, brick in
-`Towers/NS/EnergyIneq.lean`).
-
-³ Task #174 lands seven BRICKS across `VaradhanStripWidened.lean`,
-`ContinuumHookup.lean`, `MassGapEnvelope.lean`; this row collapses
-the trio (full per-file delta in `docs/CHANGELOG.md`).
-
-⁴ Batch 174.2 lands **+2** bricks (`T_OS_positive` and
+¹ Batch 174.2 lands **+2** bricks (`T_OS_positive` and
 `T_OS_selfAdjoint`), not the +1 implied by the user's
 `526 → 527` wall sketch — the snippet's `def T` is not a brick
 (only theorems register in the BRICKS array), so both predicate
-theorems must register. Compensated against ⁵ below to keep the
+theorems must register. Compensated against ² below to keep the
 TRI-#14 total at +6 = wall 531.
 
-⁵ Batch 174.3 lands **+3** bricks (`spectral_gap`,
+² Batch 174.3 lands **+3** bricks (`spectral_gap`,
 `mass_gap_dirac`, `mass_gap_pos`), not the +4 implied by the
 user's `527 → 531` wall sketch — `mass_gap` itself is a `def`,
 not a brick, and the three theorems exhaust the file. The
 extra `mass_gap_dirac` brick (added on top of the snippet's
 two-theorem sketch) is **the explicit tripwire** crystallising
 that the Dirac stand-in gives mass gap exactly zero, NOT
-positive. Net TRI-#14 brick delta is +6 (= +1 + +2 + +3 = ⁴ + ⁵
+positive. Net TRI-#14 brick delta is +6 (= +1 + +2 + +3 = ¹ + ²
 reconciliation), matching the user's target wall 525 → 531.
 
-⁶ Batch 175.3 lands **+2** bricks (`spectral_gap_real` and
+³ Batch 175.3 lands **+2** bricks (`spectral_gap_real` and
 `mass_gap_pos_real`), not the +1 implied by the user's
 `533 → 534` wall sketch — the snippet contains two distinct
 theorems and both register as bricks. Net TRI-#15 brick delta
@@ -117,13 +74,13 @@ the locked invariants — the bricks are trivially / vacuously
 true under the Dirac stand-in `T_OS = 0` propagated from Batch
 174.2, **NOT** under any real Wilson transfer operator).
 
-⁷ Batch 176.3 lands **+2** bricks (`spectral_gap_real_kp` and
+⁴ Batch 176.3 lands **+2** bricks (`spectral_gap_real_kp` and
 `mass_gap_pos_real_kp`), not the +1 implied by the user's
 `537 → 538` wall sketch — the snippet contains two distinct
 theorems and both register as bricks. Net TRI-#16 brick delta
 is +4 (= +1 + +1 + +2), landing wall `535 → 539`, +1 past
-the snippet's `538` target. Same drift-footnote pattern as ⁴
-⁵ ⁶. Surface #1 stays OPEN — the snippet's "Mass Gap proven
+the snippet's `538` target. Same drift-footnote pattern as ¹
+² ³. Surface #1 stays OPEN — the snippet's "Mass Gap proven
 for β >> 1. Surface #1 CLOSED" closing claim is incompatible
 with the locked invariants. The bricks prove K-P only against
 the conservative `linkEnergy ≡ 1` stand-in (the SU(2) energy
