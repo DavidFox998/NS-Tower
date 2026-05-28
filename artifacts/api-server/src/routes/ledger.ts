@@ -2454,5 +2454,40 @@ if (monitorIntervalSeconds != null) {
   );
 }
 
+// Task #176: daily summary email (or webhook) of checkpoint re-roll
+// attempts. Runs on its own setInterval so a quiet dashboard doesn't
+// hide an unauthorized referee racking up successful re-rolls. Rides
+// the same `createKernelAlertSink` plumbing as the integrity monitor,
+// so MORNINGSTAR_ALERT_WEBHOOK_URL / MORNINGSTAR_ALERT_EMAIL_TO
+// already-configured for tamper alerts also receive the digest.
+import {
+  resolveRerollDigestIntervalSeconds,
+  startRerollDigestScheduler,
+} from "../lib/rerollDigest.js";
+
+const rerollDigestIntervalSeconds = resolveRerollDigestIntervalSeconds(
+  process.env["MORNINGSTAR_REROLL_DIGEST_INTERVAL_SECONDS"],
+);
+if (rerollDigestIntervalSeconds != null) {
+  const windowHours = Math.max(1, Math.round(rerollDigestIntervalSeconds / 3600));
+  startRerollDigestScheduler({
+    intervalMs: rerollDigestIntervalSeconds * 1000,
+    windowHours,
+    sink: createKernelAlertSink({
+      repoRoot: REPO_ROOT,
+      logger: defaultLogger,
+    }),
+    logger: defaultLogger,
+  });
+  defaultLogger.info(
+    { intervalSeconds: rerollDigestIntervalSeconds, windowHours },
+    "reroll digest: scheduled (daily summary of checkpoint re-rolls)",
+  );
+} else {
+  defaultLogger.info(
+    "reroll digest: disabled (MORNINGSTAR_REROLL_DIGEST_INTERVAL_SECONDS=off)",
+  );
+}
+
 export { defaultChecker };
 export default defaultChecker.router;

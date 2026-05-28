@@ -321,6 +321,20 @@ def _alert_subject(payload: "dict[str, Any]") -> str:
         return f"[MorningStar] Ledger monitor RECOVERED: {workflow}"
     if failure_mode == "recovered":
         return f"[MorningStar] Ledger integrity RECOVERED: {workflow}"
+    if failure_mode == "reroll_digest":
+        # Task #176: daily summary email of checkpoint re-roll attempts.
+        # Distinct subject so on-call can split routine digests from
+        # tamper / watchdog alerts without re-deriving from
+        # `failure_mode`.
+        window_hours = payload.get("window_hours")
+        suffix = (
+            f" (last {window_hours}h)"
+            if isinstance(window_hours, (int, float)) and window_hours > 0
+            else ""
+        )
+        return (
+            f"[MorningStar] Checkpoint re-roll digest{suffix}: {workflow}"
+        )
     return f"[MorningStar] Ledger integrity alert: {workflow}"
 
 
@@ -390,6 +404,27 @@ def _send_email(payload: "dict[str, Any]", message: str) -> None:
             f"tamper may not fire until the api-server is restarted. "
             f"Investigate the api-server process and its periodic "
             f"integrity tick; do NOT restore hits.txt.\n"
+        )
+    elif failure_mode == "reroll_digest":
+        # Task #176: routine daily summary of checkpoint re-roll
+        # attempts. Body carries the pre-formatted digest text built by
+        # the api-server (referee → ok/fail counts, plus a per-row list
+        # of any failures). NOT a tamper signal; the recovery pointer
+        # is intentionally omitted so on-call doesn't think the ledger
+        # was touched.
+        digest = payload.get("digest_text")
+        body = (
+            f"{message}\n\n"
+            f"workflow: {payload.get('workflow')}\n"
+            f"timestamp: {payload.get('timestamp')}\n"
+            f"window_hours: {payload.get('window_hours')}\n"
+            f"total_attempts: {payload.get('total_attempts')}\n"
+            f"ok_count: {payload.get('ok_count')}\n"
+            f"fail_count: {payload.get('fail_count')}\n\n"
+            f"{digest if isinstance(digest, str) else ''}\n"
+            f"\nThis is a routine digest, not a tamper alert. No "
+            f"action required unless an unexpected referee or a "
+            f"high fail-count appears above.\n"
         )
     else:
         body = (
