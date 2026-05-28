@@ -1,18 +1,13 @@
-import { test, expect, type Route, type Request } from "@playwright/test";
+import { test, expect } from "@playwright/test";
+import { existsSync } from "node:fs";
 import {
-  mkdtempSync,
-  writeFileSync,
-  rmSync,
-  unlinkSync,
-  existsSync,
-} from "node:fs";
-import { tmpdir } from "node:os";
-import path from "node:path";
-import { createHash } from "node:crypto";
-import http from "node:http";
-import type { AddressInfo } from "node:net";
-import express from "express";
-import { createLedgerChecker } from "../../../api-server/src/routes/ledger.js";
+  bootForgedSidecarFixture,
+  cleanupForgedSidecarTmpDir,
+  createForgedSidecarTmpDir,
+  installForgedSidecarForwarders,
+  writeForgedSidecar,
+  type FixtureServer,
+} from "./helpers/forged-sidecar-fixture.js";
 
 /**
  * Task #138: end-to-end coverage for the sidecar tamper banner's
@@ -28,24 +23,11 @@ import { createLedgerChecker } from "../../../api-server/src/routes/ledger.js";
  * fresh tamper attempt with DIFFERENT bytes lands — in which case
  * the stale ack is dropped and the banner re-fires un-acked.
  *
- * Only `routes/ledger.monitor.test.ts` covered this server-side; the
- * dashboard flow (set token → click → poll re-render → restart →
- * poll re-render → different payload → restart → re-render) had no
- * end-to-end coverage. This file closes that gap.
- *
- * Fixture-driven strategy (matches `ledger-sidecar-forged.spec.ts`,
- * task #125): we boot an in-process express server backed by a REAL
- * `createLedgerChecker` from the api-server package, pointed at a
- * tmp dir whose contents are pre-arranged so the boot-time sidecar
- * read classifies the payload as `forged`. We expose:
- *
- *   - GET  /api/ledger/integrity         → real router from checker
- *   - POST /api/ledger/sidecar-forged-ack → tiny wrapper around the
- *       checker's `acknowledgeForgedSidecar()` with a bearer-token
- *       check that mirrors `lean.ts:checkRebuildAuth` for a single
- *       shared token. We do NOT import `lean.ts` because it pulls in
- *       env vars (LEAN_REBUILD_TOKEN, lockout map, …) we don't want
- *       to mutate from a parallel-safe test fixture.
+ * Task #186: the in-process express fixture used to live inline in
+ * this file. It now lives in `helpers/forged-sidecar-fixture.ts`
+ * and is shared with the named-referee + history-panel specs so
+ * production endpoint contract changes only have to be reflected
+ * in one place.
  *
  * "Restart" is modeled by closing the express server, tearing down
  * the checker, and constructing a fresh `createLedgerChecker` over
@@ -63,13 +45,11 @@ import { createLedgerChecker } from "../../../api-server/src/routes/ledger.js";
  * 30s default per-test timeout under parallel-worker CPU contention.
  * Replaced with `page.clock.fastForward("31s")` so the dashboard's
  * 30s integrity `refetchInterval` fires inside the SAME page session
- * — the `installForwarders` route reads `getActive()` on every
- * request, so the refetch lands on the rebooted fixture without any
- * reload, and the assertions hold against the same observable state.
+ * — the helper's forwarder reads `getActive()` on every request, so
+ * the refetch lands on the rebooted fixture without any reload, and
+ * the assertions hold against the same observable state.
  */
 
-const LEDGER_INTEGRITY_URL = "**/api/ledger/integrity*";
-const LEDGER_ACK_URL = "**/api/ledger/sidecar-forged-ack";
 const FIXTURE_TOKEN = "fixture-referee-token";
 const REBUILD_TOKEN_STORAGE_KEY = "lean-rebuild-token";
 // 31s — just past the 30s `refetchInterval` on
@@ -77,185 +57,24 @@ const REBUILD_TOKEN_STORAGE_KEY = "lean-rebuild-token";
 // one /integrity refetch through the page.route forwarder.
 const INTEGRITY_REFETCH_TICK_MS = 31_000;
 
-function sha256(buf: Buffer | string): string {
-  return createHash("sha256").update(buf).digest("hex");
-}
-
-type FixtureServer = {
-  baseUrl: string;
-  close: () => Promise<void>;
-};
-
-/**
- * Build an express app that mounts the real `createLedgerChecker`
- * router AND a minimal POST /api/ledger/sidecar-forged-ack wrapper
- * that calls the checker's `acknowledgeForgedSidecar()`. The token
- * check is the same Authorization: Bearer <token> shape the real
- * lean.ts route uses, so the dashboard's outbound headers don't need
- * a special case for the test.
- */
-async function bootFixture(paths: {
-  hitsPath: string;
-  checkpointPath: string;
-  lastOkPath: string;
-  secretPath: string;
-}): Promise<FixtureServer> {
-  const checker = createLedgerChecker({
-    hitsPath: paths.hitsPath,
-    checkpointPath: paths.checkpointPath,
-    lastOkPath: paths.lastOkPath,
-    secretPath: paths.secretPath,
-  });
-
-  const app = express();
-  app.use(express.json());
-  app.use("/api", checker.router);
-  app.post("/api/ledger/sidecar-forged-ack", (req, res) => {
-    const auth = req.headers["authorization"] ?? "";
-    const match = /^Bearer\s+(.+)$/i.exec(
-      Array.isArray(auth) ? (auth[0] ?? "") : auth,
-    );
-    const provided = match ? match[1]?.trim() : "";
-    if (!provided || provided !== FIXTURE_TOKEN) {
-      res
-        .status(401)
-        .json({ ok: false, error: "Unauthorized: bad referee token." });
-      return;
-    }
-    const result = checker.acknowledgeForgedSidecar();
-    if (!result.ok) {
-      res.status(409).json({
-        ok: false,
-        error: "No forged-sidecar incident to acknowledge.",
-      });
-      return;
-    }
-    res.json({
-      ok: true,
-      acknowledgedAt: result.acknowledgedAt,
-      alreadyAcknowledged: result.alreadyAcknowledged,
-      payloadSha: result.payloadSha,
-    });
-  });
-
-  const srv = http.createServer(app);
-  await new Promise<void>((resolve) => srv.listen(0, "127.0.0.1", resolve));
-  const port = (srv.address() as AddressInfo).port;
-
-  return {
-    baseUrl: `http://127.0.0.1:${port}`,
-    close: async () => {
-      await new Promise<void>((resolve, reject) =>
-        srv.close((err) => (err ? reject(err) : resolve())),
-      );
-    },
-  };
-}
-
-/**
- * Forward both /api/ledger/integrity (GET) and
- * /api/ledger/sidecar-forged-ack (POST) requests from the dashboard
- * to whichever fixture server is currently active. The forwarder
- * reads `getActive()` on every request, so flipping the fixture
- * pointer mid-test (to simulate a server restart) takes effect on
- * the next dashboard poll without re-installing routes.
- */
-async function installForwarders(
-  page: import("@playwright/test").Page,
-  getActive: () => FixtureServer,
-): Promise<void> {
-  const forward = async (route: Route, request: Request, suffix: string) => {
-    const upstream = new URL(request.url());
-    const forwarded = `${getActive().baseUrl}${suffix}${upstream.search}`;
-    const postData = request.postData();
-    const res = await fetch(forwarded, {
-      method: request.method(),
-      headers: request.headers(),
-      body: postData ?? undefined,
-    });
-    const body = Buffer.from(await res.arrayBuffer());
-    const headers: Record<string, string> = {};
-    res.headers.forEach((v, k) => {
-      const lk = k.toLowerCase();
-      if (
-        lk === "content-encoding" ||
-        lk === "content-length" ||
-        lk === "transfer-encoding"
-      ) {
-        return;
-      }
-      headers[k] = v;
-    });
-    await route.fulfill({ status: res.status, headers, body });
-  };
-  await page.route(LEDGER_INTEGRITY_URL, (route, request) =>
-    forward(route, request, "/api/ledger/integrity"),
-  );
-  await page.route(LEDGER_ACK_URL, (route, request) =>
-    forward(route, request, "/api/ledger/sidecar-forged-ack"),
-  );
-}
-
-/**
- * Build the bytes of a forged hits.txt.lastok payload. `marker`
- * lets the caller vary the bytes so a second "tamper attempt" lands
- * a DIFFERENT sha256 (the ack file is bound to the prior payload's
- * sha and must be discarded when the bytes change). No HMAC field
- * → the real router's sidecar verify will classify this as `forged`.
- *
- * Note (task #138): the first call to /api/ledger/integrity after
- * boot writes a valid HMAC'd sidecar back to disk, so a restart
- * test has to *re-forge* (re-write the same bytes) right before
- * tearing down the old fixture. Otherwise boot 2 would see a valid
- * sidecar and clear the acked banner.
- */
-function forgedSidecarBytes(marker: string): Buffer {
-  // Frozen timestamp baked into the marker keeps the bytes (and
-  // therefore the sha) deterministic across the re-forge calls
-  // that bracket a simulated restart.
-  return Buffer.from(
-    JSON.stringify({
-      lastOkAt: "2099-01-01T00:00:00.000Z",
-      lastCheckedAt: "2099-01-01T00:00:00.000Z",
-      marker,
-    }) + "\n",
-  );
-}
-
-function writeForgedSidecar(lastOkPath: string, marker: string): void {
-  writeFileSync(lastOkPath, forgedSidecarBytes(marker));
-}
+// Single anonymous fixture token — no referee-name attribution.
+// `null` value means "accept this token but don't pass a name to
+// `acknowledgeForgedSidecar`", matching the original task-#138 shape.
+const namedTokens = new Map<string, string | null>([[FIXTURE_TOKEN, null]]);
 
 test.describe("dashboard: sidecar tamper banner Acknowledge button (task #138)", () => {
   test("clicking Acknowledge persists across restart, and a fresh tamper attempt re-fires un-acked", async ({
     page,
   }) => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), "ledger-ack-e2e-"));
-    const hitsPath = path.join(tmpDir, "hits.txt");
-    const checkpointPath = path.join(tmpDir, "hits.txt.checkpoint");
-    const lastOkPath = path.join(tmpDir, "hits.txt.lastok");
-    const secretPath = path.join(tmpDir, "hits.txt.lastok.key");
-
-    // Healthy sealed prefix + matching checkpoint so the integrity
-    // check itself is `ok` — the failure surface under test is the
-    // sidecar HMAC, not the prefix mismatch.
-    const sealed = "line1\nline2\nline3\n";
-    const buf = Buffer.from(sealed, "utf-8");
-    writeFileSync(hitsPath, buf);
-    writeFileSync(checkpointPath, `${buf.length} ${sha256(buf)}\n`);
-    // Pre-seed the HMAC secret so the router does NOT auto-generate
-    // one — the forged sidecar must be evaluated against a known
-    // secret it carries no valid mac for.
-    writeFileSync(secretPath, "ab".repeat(32) + "\n");
+    const { tmpDir, paths } = createForgedSidecarTmpDir("ledger-ack-e2e-");
+    const { lastOkPath } = paths;
 
     // Initial forged payload — boot 1.
     writeForgedSidecar(lastOkPath, "payload-v1");
 
-    let active = await bootFixture({
-      hitsPath,
-      checkpointPath,
-      lastOkPath,
-      secretPath,
+    let active: FixtureServer = await bootForgedSidecarFixture({
+      paths,
+      namedTokens,
     });
 
     try {
@@ -265,7 +84,7 @@ test.describe("dashboard: sidecar tamper banner Acknowledge button (task #138)",
       // `Date.now()` so any baked-in age math in the rendered card
       // stays sensible.
       await page.clock.install({ time: Date.now() });
-      await installForwarders(page, () => active);
+      await installForgedSidecarForwarders(page, () => active);
 
       // Seed the referee token in localStorage so the dashboard
       // sends Authorization: Bearer <token> on the ack POST and so
@@ -325,12 +144,7 @@ test.describe("dashboard: sidecar tamper banner Acknowledge button (task #138)",
       // scenario. Same bytes → same sha → ack file still applies.
       await active.close();
       writeForgedSidecar(lastOkPath, "payload-v1");
-      active = await bootFixture({
-        hitsPath,
-        checkpointPath,
-        lastOkPath,
-        secretPath,
-      });
+      active = await bootForgedSidecarFixture({ paths, namedTokens });
 
       // Trigger the dashboard's 30s integrity refetch — the
       // forwarder reads `getActive()` per request, so the refetch
@@ -350,12 +164,7 @@ test.describe("dashboard: sidecar tamper banner Acknowledge button (task #138)",
       // → stale ack discarded → banner re-fires un-acked ---
       await active.close();
       writeForgedSidecar(lastOkPath, "payload-v2-different-bytes");
-      active = await bootFixture({
-        hitsPath,
-        checkpointPath,
-        lastOkPath,
-        secretPath,
-      });
+      active = await bootForgedSidecarFixture({ paths, namedTokens });
 
       // Same trick: advance the page clock past the integrity
       // refetchInterval so the dashboard re-polls the (now-fresh)
@@ -372,22 +181,7 @@ test.describe("dashboard: sidecar tamper banner Acknowledge button (task #138)",
       await expect(ackButton).toHaveText(/^Acknowledge$/);
     } finally {
       await active.close();
-      try {
-        unlinkSync(lastOkPath);
-      } catch {
-        /* ignore */
-      }
-      try {
-        unlinkSync(secretPath);
-      } catch {
-        /* ignore */
-      }
-      try {
-        unlinkSync(`${lastOkPath}.forged-ack`);
-      } catch {
-        /* ignore */
-      }
-      rmSync(tmpDir, { recursive: true, force: true });
+      cleanupForgedSidecarTmpDir(tmpDir, paths);
     }
   });
 });

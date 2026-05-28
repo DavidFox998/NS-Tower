@@ -831,7 +831,7 @@ function listForgedAckHistoryRotations(
   return out;
 }
 
-function readForgedAckHistory(
+export function readForgedAckHistory(
   historyPath: string,
   limit: number,
   logger?: { warn: (...args: unknown[]) => void },
