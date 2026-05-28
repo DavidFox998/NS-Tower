@@ -539,6 +539,140 @@ describe("GET /api/ledger/integrity", () => {
     try { unlinkSync(`${lastOkPath}.forged-ack.log.jsonl`); } catch { /* ignore */ }
   });
 
+  it("paging into a rotated forged-ack archive returns archived entries + rotations metadata (task #187)", async () => {
+    // Task #187: cover the new dismissals paging end-to-end at the
+    // checker layer. Force a rotation by setting
+    // MORNINGSTAR_FORGED_ACK_HISTORY_MAX_BYTES low enough that two
+    // appends tip the live file past the cap, then assert the
+    // archived `.1` is reachable via `listForgedAckHistory(undefined, 1)`
+    // and that `rotations[0].index === 1` so the dashboard pager
+    // can light up the right tab without a second round-trip.
+    const sealed = "line1\nline2\n";
+    const { size, sha } = writeHits(sealed);
+    writeCheckpoint(size, sha);
+
+    const lastOkPath = path.join(tmpDir, "hits.txt.fackpage.lastok");
+    const secretPath = `${lastOkPath}.key`;
+    const historyPath = `${lastOkPath}.forged-ack.log.jsonl`;
+    const rot1 = `${historyPath}.1`;
+    for (const p of [
+      lastOkPath,
+      secretPath,
+      `${lastOkPath}.forged-ack`,
+      historyPath,
+      rot1,
+      `${historyPath}.2`,
+    ]) {
+      try { unlinkSync(p); } catch { /* ignore */ }
+    }
+    const secretHex = "ef".repeat(32);
+    writeFileSync(secretPath, secretHex + "\n", { mode: 0o600 });
+
+    const ENV_BYTES_KEY = "MORNINGSTAR_FORGED_ACK_HISTORY_MAX_BYTES";
+    const ENV_ROTS_KEY = "MORNINGSTAR_FORGED_ACK_HISTORY_MAX_ROTATIONS";
+    const prevBytes = process.env[ENV_BYTES_KEY];
+    const prevRots = process.env[ENV_ROTS_KEY];
+    // One JSONL entry is ~140 bytes. 200 fits exactly one; the
+    // second append tips it over and the rotator renames the live
+    // file to `.1`.
+    process.env[ENV_BYTES_KEY] = "200";
+    process.env[ENV_ROTS_KEY] = "2";
+
+    try {
+      const { createLedgerChecker } = await import("./ledger.js");
+      const ackOnce = (marker: string, ref: string) => {
+        writeFileSync(
+          lastOkPath,
+          JSON.stringify({
+            lastOkAt: new Date().toISOString(),
+            lastCheckedAt: new Date().toISOString(),
+            boundCheckpointSize: size,
+            boundCheckpointSha: sha,
+            marker,
+          }) + "\n",
+        );
+        const checker = createLedgerChecker({
+          hitsPath,
+          checkpointPath,
+          lastOkPath,
+          secretPath,
+        });
+        const r = checker.acknowledgeForgedSidecar(ref);
+        expect(r.ok).toBe(true);
+        if (r.ok) expect(r.alreadyAcknowledged).toBe(false);
+      };
+
+      // Two distinct forged incidents → two history rows; the
+      // second append crosses the byte cap and rotates the live
+      // file to `.1`.
+      ackOnce("page-v1", "alice");
+      ackOnce("page-v2", "bob");
+
+      expect(existsSync(rot1)).toBe(true);
+      // After rotation the live file does not exist (or is empty)
+      // until the next ack repopulates it.
+      const liveExists =
+        existsSync(historyPath) &&
+        statSync(historyPath).size > 0;
+      expect(liveExists).toBe(false);
+
+      // Build a fresh checker to read; it inherits the on-disk
+      // rotated state.
+      writeFileSync(
+        lastOkPath,
+        JSON.stringify({
+          lastOkAt: new Date().toISOString(),
+          lastCheckedAt: new Date().toISOString(),
+          boundCheckpointSize: size,
+          boundCheckpointSha: sha,
+          marker: "page-v3",
+        }) + "\n",
+      );
+      const reader = createLedgerChecker({
+        hitsPath,
+        checkpointPath,
+        lastOkPath,
+        secretPath,
+      });
+
+      // Default (live) read: rotations metadata surfaces the `.1`
+      // archive so the dashboard can render the pager.
+      const live = reader.listForgedAckHistory();
+      expect(live.rotation).toBe(0);
+      expect(live.rotations.length).toBeGreaterThanOrEqual(1);
+      expect(live.rotations[0]?.index).toBe(1);
+      expect(live.rotations[0]?.path).toBe(rot1);
+
+      // Paged read: rotation=1 returns the archived entries (both
+      // alice and bob, newest-first) and echoes rotation=1.
+      const archived = reader.listForgedAckHistory(undefined, 1);
+      expect(archived.rotation).toBe(1);
+      expect(archived.logExists).toBe(true);
+      expect(archived.rotations.length).toBeGreaterThanOrEqual(1);
+      expect(archived.rotations[0]?.index).toBe(1);
+      const ackedBys = archived.entries.map((e) => e.ackedBy);
+      expect(ackedBys).toContain("alice");
+      expect(ackedBys).toContain("bob");
+      // Newest-first ordering: bob's ack landed after alice's.
+      expect(ackedBys[0]).toBe("bob");
+    } finally {
+      if (prevBytes === undefined) delete process.env[ENV_BYTES_KEY];
+      else process.env[ENV_BYTES_KEY] = prevBytes;
+      if (prevRots === undefined) delete process.env[ENV_ROTS_KEY];
+      else process.env[ENV_ROTS_KEY] = prevRots;
+      for (const p of [
+        lastOkPath,
+        secretPath,
+        `${lastOkPath}.forged-ack`,
+        historyPath,
+        rot1,
+        `${historyPath}.2`,
+      ]) {
+        try { unlinkSync(p); } catch { /* ignore */ }
+      }
+    }
+  });
+
   it("rejects a forged sidecar with a fake future lastOkAt (HMAC mismatch ⇒ discarded as null)", async () => {
     // Healthy ledger so the integrity check itself succeeds. We're
     // testing that a hand-edited sidecar — written by an attacker who
