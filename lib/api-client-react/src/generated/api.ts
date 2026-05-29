@@ -26,6 +26,7 @@ import type {
   CheckpointRerollHistory,
   CheckpointRerollResult,
   GetLedgerAlertsParams,
+  GetLedgerCheckpointRerollDigestParams,
   GetMorningstarHitsParams,
   GetSidecarForgedAckHistoryParams,
   HealthStatus,
@@ -41,6 +42,7 @@ import type {
   LedgerAlertsResponse,
   LedgerIntegrityStatus,
   MorningstarHits,
+  RerollDigest,
   SidecarForgedAckHistory,
   SidecarForgedAckResult,
   SidecarSecretRotateResult,
@@ -1694,6 +1696,98 @@ export function useGetLedgerCheckpointRerollHistory<TData = Awaited<ReturnType<t
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetLedgerCheckpointRerollHistoryQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetLedgerCheckpointRerollDigestUrl = (params?: GetLedgerCheckpointRerollDigestParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/ledger/checkpoint/reroll/digest?${stringifiedParams}` : `/api/ledger/checkpoint/reroll/digest`
+}
+
+/**
+ * Task #199. Recomputes the checkpoint re-roll digest (per-referee
+ok/fail rollup, failing rows, and the rendered text body) over the
+requested window. This is the same summary the daily digest
+email/webhook sends; surfacing it here lets operators browse recent
+trends without digging through their inbox. No auth required —
+read-only audit view, same posture as
+`/ledger/checkpoint/reroll/history`.
+
+ * @summary On-demand checkpoint re-roll digest for a time window
+ */
+export const getLedgerCheckpointRerollDigest = async (params?: GetLedgerCheckpointRerollDigestParams, options?: RequestInit): Promise<RerollDigest> => {
+
+  return customFetch<RerollDigest>(getGetLedgerCheckpointRerollDigestUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLedgerCheckpointRerollDigestQueryKey = (params?: GetLedgerCheckpointRerollDigestParams,) => {
+    return [
+    `/api/ledger/checkpoint/reroll/digest`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetLedgerCheckpointRerollDigestQueryOptions = <TData = Awaited<ReturnType<typeof getLedgerCheckpointRerollDigest>>, TError = ErrorType<unknown>>(params?: GetLedgerCheckpointRerollDigestParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLedgerCheckpointRerollDigest>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLedgerCheckpointRerollDigestQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLedgerCheckpointRerollDigest>>> = ({ signal }) => getLedgerCheckpointRerollDigest(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLedgerCheckpointRerollDigest>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetLedgerCheckpointRerollDigestQueryResult = NonNullable<Awaited<ReturnType<typeof getLedgerCheckpointRerollDigest>>>
+export type GetLedgerCheckpointRerollDigestQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary On-demand checkpoint re-roll digest for a time window
+ */
+
+export function useGetLedgerCheckpointRerollDigest<TData = Awaited<ReturnType<typeof getLedgerCheckpointRerollDigest>>, TError = ErrorType<unknown>>(
+ params?: GetLedgerCheckpointRerollDigestParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLedgerCheckpointRerollDigest>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetLedgerCheckpointRerollDigestQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

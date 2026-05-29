@@ -330,6 +330,70 @@ export interface CheckpointRerollHistory {
 }
 
 /**
+ * One failing checkpoint re-roll attempt inside a digest window.
+ */
+export interface RerollDigestRow {
+  /** ISO-8601 timestamp of when the re-roll attempt finished. */
+  timestamp: string;
+  durationMs: number;
+  exitCode: number;
+  ok: boolean;
+  /** @nullable */
+  error?: string | null;
+  /** @nullable */
+  refereeName?: string | null;
+  /** @nullable */
+  ip?: string | null;
+}
+
+/**
+ * Per-referee ok/fail rollup for a digest window.
+ */
+export interface RerollDigestPerReferee {
+  /** Referee identity (or `(unnamed)` when attribution was absent). */
+  refereeName: string;
+  okCount: number;
+  failCount: number;
+}
+
+/**
+ * The requested (and applied) window key.
+ */
+export type RerollDigestWindow = typeof RerollDigestWindow[keyof typeof RerollDigestWindow];
+
+
+export const RerollDigestWindow = {
+  '24h': '24h',
+  '7d': '7d',
+  '30d': '30d',
+} as const;
+
+/**
+ * On-demand rollup of checkpoint re-roll attempts over a window
+(task #199). Recomputed from the persisted re-roll history each
+time it is requested — the same body the daily digest email/webhook
+sends, surfaced for the dashboard.
+
+ */
+export interface RerollDigest {
+  /** The requested (and applied) window key. */
+  window: RerollDigestWindow;
+  /** The window length in hours. */
+  windowHours: number;
+  windowStart: string;
+  windowEnd: string;
+  totalAttempts: number;
+  okCount: number;
+  failCount: number;
+  /** Per-referee rollup, most failures first. */
+  perReferee: RerollDigestPerReferee[];
+  /** Every failing re-roll row in the window. */
+  failures: RerollDigestRow[];
+  /** The rendered digest body (same text the email/webhook sends). */
+  text: string;
+}
+
+/**
  * One operator-driven dismissal of a forged-sidecar banner,
 as parsed from the rotating history log.
 
@@ -1275,6 +1339,22 @@ uniform "page back into archive" control.
  */
 rotation?: number;
 };
+
+export type GetLedgerCheckpointRerollDigestParams = {
+/**
+ * Time window to summarize. Defaults to `24h`.
+ */
+window?: GetLedgerCheckpointRerollDigestWindow;
+};
+
+export type GetLedgerCheckpointRerollDigestWindow = typeof GetLedgerCheckpointRerollDigestWindow[keyof typeof GetLedgerCheckpointRerollDigestWindow];
+
+
+export const GetLedgerCheckpointRerollDigestWindow = {
+  '24h': '24h',
+  '7d': '7d',
+  '30d': '30d',
+} as const;
 
 export type GetMorningstarHitsParams = {
 /**

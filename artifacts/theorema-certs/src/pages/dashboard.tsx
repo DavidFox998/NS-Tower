@@ -13,6 +13,9 @@ import {
   useRotateSidecarSecret,
   useRerollLedgerCheckpoint,
   useGetLedgerCheckpointRerollHistory,
+  useGetLedgerCheckpointRerollDigest,
+  getGetLedgerCheckpointRerollDigestQueryKey,
+  GetLedgerCheckpointRerollDigestWindow,
   useGetSidecarForgedAckHistory,
   getGetSidecarForgedAckHistoryQueryKey,
   getGetMorningstarHitsQueryKey,
@@ -477,6 +480,27 @@ export default function DashboardPage() {
       retry: false,
     },
   });
+  // Task #199: on-demand re-roll digest panel. Operators pick a window
+  // (24h / 7d / 30d) and we recompute the same per-referee ok/fail rollup
+  // the daily email/webhook sends, so trends can be browsed without
+  // digging through an inbox.
+  const [rerollDigestWindow, setRerollDigestWindow] =
+    useState<GetLedgerCheckpointRerollDigestWindow>(
+      GetLedgerCheckpointRerollDigestWindow["24h"],
+    );
+  const rerollDigestParams = useMemo(
+    () => ({ window: rerollDigestWindow }),
+    [rerollDigestWindow],
+  );
+  const { data: rerollDigest, isError: isRerollDigestError } =
+    useGetLedgerCheckpointRerollDigest(rerollDigestParams, {
+      query: {
+        queryKey: getGetLedgerCheckpointRerollDigestQueryKey(rerollDigestParams),
+        refetchInterval: 30000,
+        refetchIntervalInBackground: false,
+        retry: false,
+      },
+    });
   const [rerollCheckpointError, setRerollCheckpointError] = useState<
     string | null
   >(null);
@@ -3111,6 +3135,159 @@ export default function DashboardPage() {
                     </li>
                   ))}
                 </ul>
+              </div>
+            );
+          })()}
+
+          {(() => {
+            // Task #199: re-roll digest panel. The daily digest only
+            // goes out as email/webhook; this surfaces the same
+            // per-referee ok/fail rollup (recomputed on demand for the
+            // chosen window) so operators can scan trends in the UI.
+            const windows: GetLedgerCheckpointRerollDigestWindow[] = [
+              GetLedgerCheckpointRerollDigestWindow["24h"],
+              GetLedgerCheckpointRerollDigestWindow["7d"],
+              GetLedgerCheckpointRerollDigestWindow["30d"],
+            ];
+            const perReferee = rerollDigest?.perReferee ?? [];
+            const failures = rerollDigest?.failures ?? [];
+            return (
+              <div
+                className="border border-border bg-muted/20"
+                data-testid="panel-checkpoint-reroll-digest"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 border-b border-border bg-muted/30">
+                  <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                    Re-roll digest
+                  </span>
+                  <div className="flex items-center gap-1">
+                    {windows.map((w) => {
+                      const isActive = rerollDigestWindow === w;
+                      return (
+                        <button
+                          key={w}
+                          type="button"
+                          onClick={() => setRerollDigestWindow(w)}
+                          className={`font-mono text-[11px] px-1.5 py-0.5 border ${
+                            isActive
+                              ? "border-foreground bg-muted/60 text-foreground font-bold"
+                              : "border-border text-muted-foreground hover:text-foreground"
+                          }`}
+                          data-testid={`button-reroll-digest-window-${w}`}
+                        >
+                          {w}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                {isRerollDigestError ? (
+                  <p
+                    className="px-3 py-2 font-mono text-[11px] text-red-700 dark:text-red-400 italic"
+                    data-testid="text-reroll-digest-error"
+                  >
+                    Failed to load digest. Retrying…
+                  </p>
+                ) : !rerollDigest ? (
+                  <p
+                    className="px-3 py-2 font-mono text-[11px] text-muted-foreground italic"
+                    data-testid="text-reroll-digest-loading"
+                  >
+                    Loading digest…
+                  </p>
+                ) : (
+                  <>
+                    <div
+                      className="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 py-1.5 border-b border-border bg-muted/10 font-mono text-[11px]"
+                      data-testid="text-reroll-digest-summary"
+                    >
+                      <span className="text-muted-foreground">
+                        {rerollDigest.totalAttempts} attempts
+                      </span>
+                      <span className="text-green-700 dark:text-green-400">
+                        {rerollDigest.okCount} ok
+                      </span>
+                      <span className="text-red-700 dark:text-red-400">
+                        {rerollDigest.failCount} fail
+                      </span>
+                      <span className="text-muted-foreground">
+                        over last {rerollDigest.windowHours}h
+                      </span>
+                    </div>
+                    {perReferee.length === 0 ? (
+                      <p
+                        className="px-3 py-2 font-mono text-[11px] text-muted-foreground italic"
+                        data-testid="text-reroll-digest-empty"
+                      >
+                        No checkpoint re-roll attempts in this window.
+                      </p>
+                    ) : (
+                      <ul
+                        className="divide-y divide-border"
+                        data-testid="list-reroll-digest-per-referee"
+                      >
+                        {perReferee.map((p, i) => (
+                          <li
+                            key={`${p.refereeName}-${i}`}
+                            className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5 font-mono text-[11px]"
+                            data-testid={`row-reroll-digest-referee-${i}`}
+                          >
+                            <span className="md:w-44 truncate text-foreground">
+                              {p.refereeName}
+                            </span>
+                            <span className="text-green-700 dark:text-green-400 md:w-16">
+                              {p.okCount} ok
+                            </span>
+                            <span className="text-red-700 dark:text-red-400 md:w-16">
+                              {p.failCount} fail
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {failures.length > 0 ? (
+                      <div
+                        className="border-t border-border"
+                        data-testid="list-reroll-digest-failures"
+                      >
+                        <div className="px-3 py-1 bg-red-50 dark:bg-red-950/30 font-mono text-[11px] uppercase tracking-wider text-red-700 dark:text-red-400">
+                          {failures.length} failure
+                          {failures.length === 1 ? "" : "s"}
+                        </div>
+                        <ul className="divide-y divide-border">
+                          {failures.map((f, i) => (
+                            <li
+                              key={`${f.timestamp}-${i}`}
+                              className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5 font-mono text-[11px]"
+                              data-testid={`row-reroll-digest-failure-${i}`}
+                            >
+                              <span className="text-muted-foreground md:w-44">
+                                {formatTimestamp(f.timestamp)}
+                              </span>
+                              <span
+                                className={
+                                  f.refereeName
+                                    ? "text-foreground md:w-40 truncate"
+                                    : "text-muted-foreground italic md:w-40 truncate"
+                                }
+                              >
+                                {f.refereeName ?? "anonymous"}
+                              </span>
+                              {f.error ? (
+                                <span
+                                  className="text-red-700 dark:text-red-400 flex-1 min-w-0 truncate"
+                                  title={f.error}
+                                >
+                                  {f.error}
+                                </span>
+                              ) : null}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </>
+                )}
               </div>
             );
           })()}

@@ -263,6 +263,7 @@ import {
   readAckMap as readAckMapShared,
   writeAckMap as writeAckMapShared,
 } from "../lib/alertAckStore.js";
+import { buildRerollDigest, fetchRerollRowsSince } from "../lib/rerollDigest.js";
 import { defaultChecker as defaultLedgerChecker } from "./ledger.js";
 
 /**
@@ -917,6 +918,39 @@ router.get("/ledger/checkpoint/reroll/history", async (req, res) => {
   } catch (err) {
     req.log.error({ err }, "Failed to read checkpoint reroll history");
     res.status(500).json({ error: "Failed to read checkpoint reroll history" });
+  }
+});
+
+// Task #199: surface the daily re-roll digest on the dashboard. Digests
+// aren't persisted (the scheduler only emails/webhooks them), so we
+// recompute on demand from the persisted re-roll history using the exact
+// same `buildRerollDigest` the scheduler uses — operators get the same
+// per-referee ok/fail rollup + failing rows + rendered text without
+// digging through their inbox.
+const REROLL_DIGEST_WINDOW_HOURS: Record<string, number> = {
+  "24h": 24,
+  "7d": 24 * 7,
+  "30d": 24 * 30,
+};
+const REROLL_DIGEST_DEFAULT_WINDOW = "24h";
+
+router.get("/ledger/checkpoint/reroll/digest", async (req, res) => {
+  const rawWindow = req.query["window"];
+  const windowKey =
+    typeof rawWindow === "string" &&
+    Object.hasOwn(REROLL_DIGEST_WINDOW_HOURS, rawWindow)
+      ? rawWindow
+      : REROLL_DIGEST_DEFAULT_WINDOW;
+  const windowHours = REROLL_DIGEST_WINDOW_HOURS[windowKey];
+  try {
+    const rows = await fetchRerollRowsSince(windowHours);
+    const digest = buildRerollDigest(rows, windowHours);
+    res.json({ window: windowKey, ...digest });
+  } catch (err) {
+    req.log.error({ err }, "Failed to build checkpoint reroll digest");
+    res
+      .status(500)
+      .json({ error: "Failed to build checkpoint reroll digest" });
   }
 });
 

@@ -516,6 +516,49 @@ export const GetLedgerCheckpointRerollHistoryResponse = zod.object({
 
 
 /**
+ * Task #199. Recomputes the checkpoint re-roll digest (per-referee
+ok/fail rollup, failing rows, and the rendered text body) over the
+requested window. This is the same summary the daily digest
+email/webhook sends; surfacing it here lets operators browse recent
+trends without digging through their inbox. No auth required —
+read-only audit view, same posture as
+`/ledger/checkpoint/reroll/history`.
+
+ * @summary On-demand checkpoint re-roll digest for a time window
+ */
+export const getLedgerCheckpointRerollDigestQueryWindowDefault = `24h`;
+
+export const GetLedgerCheckpointRerollDigestQueryParams = zod.object({
+  "window": zod.enum(['24h', '7d', '30d']).default(getLedgerCheckpointRerollDigestQueryWindowDefault).describe('Time window to summarize. Defaults to `24h`.')
+})
+
+export const GetLedgerCheckpointRerollDigestResponse = zod.object({
+  "window": zod.enum(['24h', '7d', '30d']).describe('The requested (and applied) window key.'),
+  "windowHours": zod.number().describe('The window length in hours.'),
+  "windowStart": zod.coerce.date(),
+  "windowEnd": zod.coerce.date(),
+  "totalAttempts": zod.number(),
+  "okCount": zod.number(),
+  "failCount": zod.number(),
+  "perReferee": zod.array(zod.object({
+  "refereeName": zod.string().describe('Referee identity (or `(unnamed)` when attribution was absent).'),
+  "okCount": zod.number(),
+  "failCount": zod.number()
+}).describe('Per-referee ok\/fail rollup for a digest window.')).describe('Per-referee rollup, most failures first.'),
+  "failures": zod.array(zod.object({
+  "timestamp": zod.coerce.date().describe('ISO-8601 timestamp of when the re-roll attempt finished.'),
+  "durationMs": zod.number(),
+  "exitCode": zod.number(),
+  "ok": zod.boolean(),
+  "error": zod.string().nullish(),
+  "refereeName": zod.string().nullish(),
+  "ip": zod.string().nullish()
+}).describe('One failing checkpoint re-roll attempt inside a digest window.')).describe('Every failing re-roll row in the window.'),
+  "text": zod.string().describe('The rendered digest body (same text the email\/webhook sends).')
+}).describe('On-demand rollup of checkpoint re-roll attempts over a window\n(task #199). Recomputed from the persisted re-roll history each\ntime it is requested — the same body the daily digest email\/webhook\nsends, surfaced for the dashboard.\n')
+
+
+/**
  * Returns the parsed contents of `data/hits.txt`: the header comment
 lines, the five frozen Genesis lines (including the
 `--- GENESIS SEAL ---` marker), the SHA-256 of the immutable
