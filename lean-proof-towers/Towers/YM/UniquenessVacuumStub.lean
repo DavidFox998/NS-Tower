@@ -17,7 +17,7 @@ def vacuum_candidate : Int → Bool := fun v => v = 0
 
 theorem vacuum_uniqueness_vacuous :
   ∀ v : Int, vacuum_candidate v = true → v = 0 := by
-  intro v h; exact h
+  intro v h; exact of_decide_eq_true h
 
 theorem vacuum_exists_zero :
   vacuum_candidate 0 = true := by
