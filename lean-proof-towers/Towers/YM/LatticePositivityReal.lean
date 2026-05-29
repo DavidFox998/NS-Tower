@@ -63,8 +63,14 @@ variable {n : ℕ}
     operator `wilsonAction U • 𝟙`. This is `−log T` of the Step-3
     transfer operator `T = exp(−S_W[U]) · 𝟙` at the scalar / Perron
     eigenvalue level (see `neg_log_boltzmannWeight_eq_wilsonAction`).
-    Supersedes the Wall 572 `H = 1` identity stand-in. -/
-def H {d L : ℕ} [NeZero L] (U : GaugeConfig d L)
+    Supersedes the Wall 572 `H = 1` identity stand-in.
+
+    `noncomputable`: `wilsonAction U • ψ` scales a real `PiLp 2` vector,
+    so the def depends on `Real.instRCLike` and has no executable code.
+    This is codegen-only (axiom-neutral, proof-preserving); required so
+    the module emits a real `.olean` for downstream `lake env lean`
+    verification of `SpectrumBound` / `MassGap574`. -/
+noncomputable def H {d L : ℕ} [NeZero L] (U : GaugeConfig d L)
     (ψ : PiLp 2 (fun _ : Fin n => ℝ)) : PiLp 2 (fun _ : Fin n => ℝ) :=
   wilsonAction U • ψ
 

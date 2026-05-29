@@ -49,6 +49,9 @@ INVARIANT-LOCKED:
     declaration must never enter the wall. Script-reported wall unchanged.
 -/
 import Towers.YM.SpectrumBound
+import Towers.YM.WilsonPositivity
+
+open TheoremaAureum.Towers.YM.LatticeGauge
 
 namespace TheoremaAureum.YM_MassGap
 
@@ -63,5 +66,33 @@ theorem YM_mass_gap {d L n : ℕ} [NeZero L] [NeZero n]
     (U : GaugeConfig d L) (hpos : 0 < wilsonAction U) :
     ∃ m > 0, spectrum_bound (E := PiLp 2 (fun _ : Fin n => ℝ)) (H U) m := by
   sorry -- invariant-locked: real Wilson transfer Hamiltonian unbuilt (Wall 574)
+
+/-- **Brick (`YM_mass_gap_nontrivial`) — Task #255 follow-up: discharge
+    `hpos`.** Same SCALAR-shadow statement as `YM_mass_gap`, but the
+    deferred-positivity hypothesis `hpos : 0 < wilsonAction U` is now
+    REPLACED by the geometric, provable condition "the gauge field has
+    at least one non-identity plaquette". The chain is:
+
+      `(∃ x μ ν, wilsonPlaquette U x μ ν ≠ 1)`
+        ──`wilsonAction_pos_of_nontrivial`──▶  `0 < wilsonAction U`
+        ──`spectrum_bound_H_iff … |>.mpr le_rfl`──▶
+            `spectrum_bound (H U) (wilsonAction U)`,
+
+    witnessed by `m := wilsonAction U`. This DISCHARGES the conditional
+    scalar-shadow gap completely — no `sorry`, classical trio only.
+
+    INVARIANT-LOCKED — this is NOT a Yang–Mills mass gap. `H U =
+    wilsonAction U • 𝟙` is the scalar / Perron-sector shadow, NOT the
+    real Wilson transfer operator on `L²(∏ SU(3), Haar)`. Wall 574
+    (`YM_mass_gap` above) is UNTOUCHED and keeps its `sorry`. Makes NO
+    μ>0 / Surface-#1-CLOSED claim — Surface #1 stays OPEN, YM Status:
+    Open. -/
+theorem YM_mass_gap_nontrivial {d L n : ℕ} [NeZero L] [NeZero n]
+    (U : GaugeConfig d L)
+    (h : ∃ x μ ν, wilsonPlaquette U x μ ν ≠ 1) :
+    ∃ m > 0, spectrum_bound (E := PiLp 2 (fun _ : Fin n => ℝ)) (H U) m := by
+  have hpos : 0 < wilsonAction U := wilsonAction_pos_of_nontrivial U h
+  exact ⟨wilsonAction U, hpos,
+    (spectrum_bound_H_iff (n := n) U (wilsonAction U)).mpr le_rfl⟩
 
 end TheoremaAureum.YM_MassGap

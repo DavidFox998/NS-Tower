@@ -99,6 +99,43 @@ the Wall-510 / Wall-539 / Wall-542 trims).
   mathlib cache. `lake exe cache get` succeeded on a direct foreground
   run (the backgrounded fetch had been SIGKILL'd mid cache-exe compile).
 
+## Task #255 follow-up — discharge `hpos` in MassGap574 for non-trivial `U` (COMPLETE — 2026-05-29)
+
+- NEW theorem `YM_mass_gap_nontrivial` appended to
+  `Towers/YM/MassGap574.lean` (imports `Towers.YM.WilsonPositivity`,
+  opens `…LatticeGauge`). Same SCALAR-shadow statement as `YM_mass_gap`
+  (`∃ m>0, spectrum_bound (E := PiLp 2 (fun _:Fin n=>ℝ)) (H U) m`) but the
+  deferred-positivity hypothesis `hpos : 0 < wilsonAction U` is REPLACED by
+  the geometric, provable condition `(h : ∃ x μ ν, wilsonPlaquette U x μ ν ≠ 1)`.
+  Proof chain: `wilsonAction_pos_of_nontrivial U h` (Task #255) ⟹
+  `0 < wilsonAction U` ⟹ `(spectrum_bound_H_iff U (wilsonAction U)).mpr le_rfl`
+  with witness `m := wilsonAction U`. **No `sorry`; axioms = classical trio**
+  `[propext, Classical.choice, Quot.sound]` (verified live — see below).
+- **Original `YM_mass_gap` (with `hpos` + `sorry`) KEPT UNTOUCHED** — confirmed
+  live: `MassGap574.lean:65 warning: declaration uses 'sorry'`.
+- INVARIANT-LOCKED: this is NOT a Yang–Mills mass gap. `H U = wilsonAction U • 𝟙`
+  is the scalar / Perron-sector shadow, NOT the real Wilson transfer operator.
+  Wall 574 stays OPEN, Surface #1 stays OPEN, YM Status: Open. NO μ>0 claim.
+  NOT in `scripts/check-towers.sh` BRICKS, NOT a `lakefile.lean` root (the file
+  still carries `YM_mass_gap`'s `sorry`) → script-reported wall unchanged at 539.
+- **Required codegen fix (axiom-neutral):** `def H` in
+  `Towers/YM/LatticePositivityReal.lean:67` is now `noncomputable def H`.
+  `H U ψ = wilsonAction U • ψ` scales a real `PiLp 2` vector → depends on
+  `Real.instRCLike`, no executable code, so olean emission (`lean`'s codegen
+  pass) FAILED with "consider marking it as 'noncomputable'". This blocked
+  producing `LatticePositivityReal.olean` / `SpectrumBound.olean` (they had in
+  fact never been emittable — the prior `lake env lean` checks only ran the
+  `#print` before codegen aborted). Marking `H` `noncomputable` is codegen-only:
+  no axiom / proof / statement change. With it, the full dep chain now emits
+  real oleans and `MassGap574` elaborates end-to-end.
+- **Verified live** (temp workflow: `restore-lake-git.sh` ×2 +
+  `fetch-mathlib-oleans.sh` `cache get` → 4845 oleans; `lake build` of the
+  Towers roots; `lean -o` emit of `LatticePositivityReal.olean` +
+  `SpectrumBound.olean`; `lake env lean Towers/YM/MassGap574.lean`):
+  `YM_mass_gap_nontrivial depends on axioms: [propext, Classical.choice,
+  Quot.sound]`, `MassGap574.lean:65 … uses 'sorry'` (the retained `YM_mass_gap`),
+  exit 0. Temp script + workflow removed afterward.
+
 ## Task #220 — feed the lattice→continuum map into the mass-gap envelope (2026-05-29)
 
 Routed the headline envelope brick through Task #195's non-trivial
