@@ -17,7 +17,7 @@ def spectrum_lower_bound : Int := 0
 
 theorem spectral_gap_vacuous :
   ∀ n : Int, spectrum_lower_bound ≤ hamiltonian_zero n := by
-  intro n; decide
+  intro n; show (0:Int) ≤ 0; decide
 
 theorem spectrum_gap_const : spectrum_lower_bound = 0 := by rfl
 end TheoremaAureum.Towers.YM
