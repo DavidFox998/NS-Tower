@@ -7,7 +7,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { createHash } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 import express from "express";
@@ -27,26 +27,27 @@ import {
  * were only covered by typecheck. A React-side regression — conditional
  * ordering, missing import, copy drift — would not have been caught.
  *
- * Mixed strategy: the two `sidecar_forged` cases (initial forged
- * banner + rotate-clears-banner) are fixture-driven — they spin up a
- * fresh in-process express server backed by a real `createLedgerRouter`
+ * Fixture-driven strategy: all three cases (initial forged banner,
+ * rotate-clears-banner, and stale-checkpoint-binding) spin up a fresh
+ * in-process express server backed by a real `createLedgerRouter`
  * from the api-server package, pointed at a tmp dir containing real
- * `hits.txt`, `hits.txt.checkpoint`, `hits.txt.lastok.key` and a forged
- * `hits.txt.lastok`. Playwright forwards the dashboard's
- * `/api/ledger/integrity` requests to that fixture-backed server via
- * `page.route` and fulfils the dashboard with the REAL bytes the real
- * router computed, exercising the same code path as the "rejects a
- * forged sidecar…" test in
+ * `hits.txt`, `hits.txt.checkpoint`, `hits.txt.lastok.key` and a
+ * forged / stale `hits.txt.lastok`. Playwright forwards the
+ * dashboard's `/api/ledger/integrity` requests to that fixture-backed
+ * server via `page.route` and fulfils the dashboard with the REAL
+ * bytes the real router computed, exercising the same code path as
+ * the integration tests in
  * `artifacts/api-server/src/routes/ledger.integration.test.ts`. This
- * works because `forgedIncident` is sticky on the API's response shape.
+ * works because both `forgedIncident` and (since Task #183) the
+ * `stale_checkpoint_binding` signal are sticky on the API's response
+ * shape.
  *
- * The third case (`stale_checkpoint_binding`) uses a SYNTHETIC
- * `page.route` mock instead — see the comment block above that test
- * for the full root-cause analysis (Task #165). Short version: the
- * API's `buildStatusInner` unconditionally flips
- * `lastOkSidecarStatus = "ok"` on every `/integrity` call, so a
- * fixture-driven test could never deterministically observe the
- * banner.
+ * Task #205 restored the third case (`stale_checkpoint_binding`) to a
+ * fixture-driven shape — see the comment block above that test for
+ * the history. Task #165 had to fall back to a synthetic `page.route`
+ * mock there because the API used to overwrite the boot-time stale
+ * status with `"ok"` on every call; Task #183 made it sticky and
+ * real, so the fixture path now works deterministically.
  *
  * We forward instead of swapping the dashboard's baseURL because the
  * dashboard is served by the global proxy on port 80 and the real
@@ -454,110 +455,109 @@ test.describe("dashboard: ledger sidecar tamper / stale-binding banners", () => 
   });
 
   /**
-   * Task #165: the original fixture-driven version of this test was
-   * structurally flaky — it boots a real `createLedgerRouter` over a
-   * stale-bound sidecar, but the server's `buildStatusInner()` (in
-   * `artifacts/api-server/src/routes/ledger.ts` ~line 1356)
-   * unconditionally flips `lastOkSidecarStatus = "ok"` on every
-   * `/integrity` call and rewrites the sidecar with a fresh HMAC.
-   * The boot-time `stale_checkpoint_binding` status is therefore
-   * never surfaced on the wire (the server-side coverage in
-   * `ledger.integration.test.ts:658` only asserts `lastOkAt === null`,
-   * which is what does survive). The fixture-driven approach cannot
-   * deterministically exercise the dashboard's amber banner; switching
-   * this one case to a synthetic `page.route` mock — same pattern as
-   * `ledger-monitor-suppressed.spec.ts` — keeps the dashboard-side
-   * coverage intact without depending on server behaviour the API
-   * doesn't promise. The two sibling tests above (forged + rotate)
-   * stay fixture-driven because `forgedIncident` IS sticky and they
-   * exercise a real cross-process tamper path.
+   * Task #205: restored to a fixture-driven shape. Task #165 had to
+   * fall back to a synthetic `page.route` mock here because the
+   * api-server's `buildStatusInner()` overwrote the boot-time
+   * `stale_checkpoint_binding` status with `"ok"` on every
+   * `/integrity` call, so a fixture could never deterministically
+   * observe the amber banner. Task #183 made that signal sticky and
+   * real (see `ledger.ts` ~lines 1334/1600/1761 and the server-side
+   * coverage in `ledger.integration.test.ts` "discards lastOkAt when
+   * the bound checkpoint no longer matches…"). This test now boots a
+   * real `createLedgerRouter` over a valid-MAC sidecar bound to a
+   * bogus checkpoint and asserts the dashboard's amber banner, so it
+   * exercises the actual production code path instead of stubbing the
+   * API response.
+   *
+   * Fixture recipe (mirrors the integration test's stale-binding
+   * case): write a healthy `hits.txt` + matching checkpoint, pre-seed
+   * the HMAC secret, then seal a sidecar whose MAC verifies but whose
+   * `boundCheckpoint*` fields point at a checkpoint that is NOT on
+   * disk (size 999 / all-zero sha). Finally break the live ledger so
+   * the first `/integrity` check returns `mismatch` — a successful
+   * `ok` verify would re-seal the sidecar against the current
+   * checkpoint and clear the sticky flag (`ledger.ts` ~line 1761),
+   * which is exactly the heal-on-verify behaviour we must avoid to
+   * observe the banner.
    */
-  test("renders the amber 'stale checkpoint binding' line when the integrity endpoint reports lastOkSidecarStatus=stale_checkpoint_binding", async ({
+  test("renders the amber 'stale checkpoint binding' panel when the real api-server boots over a valid-MAC sidecar bound to a bogus checkpoint", async ({
     page,
   }) => {
-    const nowIso = new Date().toISOString();
-    const integrityBody = {
-      status: "ok" as const,
-      failureMode: null,
-      reason: null,
-      checkpointSize: 17,
-      checkpointSha:
-        "0000000000000000000000000000000000000000000000000000000000000000",
-      liveSize: 17,
-      livePrefixSha:
-        "0000000000000000000000000000000000000000000000000000000000000000",
-      growthBytes: 0,
-      checkedAt: nowIso,
-      ledgerLastModified: nowIso,
-      ledgerPath: "data/hits.txt",
-      checkpointPath: "data/hits.txt.checkpoint",
-      // lastOkAt is null in the stale-binding case — the binding was
-      // verified by HMAC but bound to a checkpoint that no longer
-      // matches, so the persisted ok timestamp was discarded.
-      lastOkAt: null,
-      lastOkAgeSeconds: null,
-      lastCheckedAt: nowIso,
-      lastCheckedAgeSeconds: 5,
-      staleThresholdSeconds: 1800,
-      stale: true,
-      checkedStaleThresholdSeconds: 600,
-      checkedStale: false,
-      checkpointLastModified: nowIso,
-      checkpointAgeSeconds: 100,
-      checkpointCoverageRatio: 1,
-      checkpointStaleThresholdSeconds: 2592000,
-      checkpointStale: false,
-      lastOkSidecarStatus: "stale_checkpoint_binding" as const,
-      sidecarSecretStrictMode: false,
-      lastOkSidecarStatusAcknowledgedAt: null,
-      lastOkSidecarStatusAcknowledgedBy: null,
-      monitor: {
-        enabled: true,
-        intervalSeconds: 300,
-        lastTickAt: nowIso,
-        lastAlertedFailureMode: null,
-        lastAcknowledgedAlertId: null,
-        watchdogState: "ok",
-        watchdogLastFiredAt: null,
+    const fixture = await startFixtureLedgerServer(
+      ({ hitsPath, checkpointPath, lastOkPath, secretPath }) => {
+        // Healthy sealed prefix + matching checkpoint so the boot-time
+        // sidecar read compares the sidecar's bound checkpoint against
+        // a real on-disk one.
+        const sealed = "line1\nline2\nline3\n";
+        const buf = Buffer.from(sealed, "utf-8");
+        writeFileSync(hitsPath, buf);
+        writeFileSync(checkpointPath, `${buf.length} ${sha256(buf)}\n`);
+
+        // Pre-seed a known HMAC secret so the router does NOT
+        // auto-generate one on boot, and so our `sealSidecar` MAC
+        // verifies against the same key the router loads.
+        const secretHex = "cd".repeat(32);
+        writeFileSync(secretPath, secretHex + "\n");
+
+        // Seal a sidecar whose MAC is VALID but whose bound checkpoint
+        // (size 999 / all-zero sha) does not match the on-disk
+        // checkpoint. The router must classify this as
+        // `stale_checkpoint_binding` on boot, discard the stale
+        // lastOkAt (→ null), and surface the sticky status on
+        // `/integrity`.
+        const stalePast = new Date(Date.now() - 30_000).toISOString();
+        writeFileSync(
+          lastOkPath,
+          sealSidecar(secretHex, {
+            lastOkAt: stalePast,
+            lastCheckedAt: stalePast,
+            boundCheckpointSize: 999,
+            boundCheckpointSha: "0".repeat(64),
+          }),
+        );
+
+        // Break the live ledger so the first /integrity check returns
+        // `mismatch` — otherwise a successful `ok` verify would
+        // re-seal the sidecar against the current checkpoint and clear
+        // the sticky stale-binding flag before we can observe it.
+        writeFileSync(hitsPath, "X");
       },
-    };
-
-    await page.route(LEDGER_INTEGRITY_URL, async (route: Route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(integrityBody),
-      });
-    });
-    await page.goto("/");
-
-    const staleLine = page.locator(
-      '[data-testid="text-ledger-sidecar-stale-binding"]',
     );
-    await expect(staleLine).toBeVisible();
-    await expect(staleLine).toContainText("Stale checkpoint binding");
-    // Task #204: the banner is now a full panel (with an Acknowledge
-    // affordance) rather than a one-line hint, so the descriptive copy
-    // distinguishing this benign case from the forged-HMAC case lives
-    // in the surrounding panel body.
-    const stalePanel = page.locator(
-      '[data-testid="panel-ledger-sidecar-stale-binding"]',
-    );
-    await expect(stalePanel).toBeVisible();
-    await expect(stalePanel).toContainText("HMAC verification");
-    await expect(stalePanel).toContainText("bound to a different checkpoint");
-    await expect(stalePanel).toContainText("discarded");
-    // Un-acknowledged at boot: the acknowledged badge must not render.
-    await expect(stalePanel).toHaveAttribute("data-acknowledged", "false");
-    await expect(
-      page.locator(
-        '[data-testid="badge-ledger-sidecar-stale-binding-acknowledged"]',
-      ),
-    ).toHaveCount(0);
 
-    // The red forged panel must NOT render in the stale-binding case.
-    await expect(
-      page.locator('[data-testid="panel-ledger-sidecar-forged"]'),
-    ).toHaveCount(0);
+    try {
+      await forwardIntegrityToFixture(page, fixture.baseUrl);
+      await page.goto("/");
+
+      const staleLine = page.locator(
+        '[data-testid="text-ledger-sidecar-stale-binding"]',
+      );
+      await expect(staleLine).toBeVisible();
+      await expect(staleLine).toContainText("Stale checkpoint binding");
+      // Task #204: the banner is now a full panel (with an Acknowledge
+      // affordance) rather than a one-line hint, so the descriptive copy
+      // distinguishing this benign case from the forged-HMAC case lives
+      // in the surrounding panel body.
+      const stalePanel = page.locator(
+        '[data-testid="panel-ledger-sidecar-stale-binding"]',
+      );
+      await expect(stalePanel).toBeVisible();
+      await expect(stalePanel).toContainText("HMAC verification");
+      await expect(stalePanel).toContainText("bound to a different checkpoint");
+      await expect(stalePanel).toContainText("discarded");
+      // Un-acknowledged at boot: the acknowledged badge must not render.
+      await expect(stalePanel).toHaveAttribute("data-acknowledged", "false");
+      await expect(
+        page.locator(
+          '[data-testid="badge-ledger-sidecar-stale-binding-acknowledged"]',
+        ),
+      ).toHaveCount(0);
+
+      // The red forged panel must NOT render in the stale-binding case.
+      await expect(
+        page.locator('[data-testid="panel-ledger-sidecar-forged"]'),
+      ).toHaveCount(0);
+    } finally {
+      await fixture.close();
+    }
   });
 });

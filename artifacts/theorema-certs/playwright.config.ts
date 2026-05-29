@@ -44,11 +44,14 @@ const MANAGED_API_PORT = Number(
 /**
  * Task #165 reclaimed `ledger-sidecar-forged.spec.ts` from this list
  * by rewriting its one flaky case (the "stale checkpoint binding"
- * test) as a synthetic `page.route` mock — the fixture-driven
- * version could never pass deterministically because the API's
- * `buildStatusInner()` unconditionally overwrites
- * `lastOkSidecarStatus = "ok"` on every /integrity call (see the
- * comment block above the test for the full root-cause analysis).
+ * test) as a synthetic `page.route` mock — at the time the
+ * fixture-driven version could never pass deterministically because
+ * the API's `buildStatusInner()` overwrote `lastOkSidecarStatus =
+ * "ok"` on every /integrity call. Task #183 made that signal sticky
+ * and real, and Task #205 then restored the case to a fixture-driven
+ * shape (it boots a real `createLedgerRouter` over a valid-MAC
+ * sidecar bound to a bogus checkpoint — see the comment block above
+ * the test). All three cases in that spec are now fixture-driven.
  * Task #182 reclaimed `ledger-monitor-suppressed.spec.ts` by fixing
  * the underlying fixture bug: the spec's mocked
  * `/api/lean/ledger-alerts` payload was missing
