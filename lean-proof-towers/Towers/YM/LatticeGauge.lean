@@ -49,13 +49,19 @@ or a `Fintype`/`Nonempty` instance lookup.
 ================================================================
 -/
 
-import Mathlib.LinearAlgebra.UnitaryGroup
-import Mathlib.Data.Finset.Lattice
+-- (Zero mathlib imports until Wall 570 — pure combinatorics.)
 
 namespace TheoremaAureum.Towers.YM.LatticeGauge
 
-/-- The gauge group: `SU(2)`. -/
-abbrev G : Type := Matrix.specialUnitaryGroup (Fin 2) ℂ
+/- Surface #1: YM measure vacuous. G/Group/Haar deferred to Wall 570+.
+   Lattice is pure combinatorics. -/
+
+-- `G` (the SU(2) gauge group) and `GaugeConfig` are deferred to
+-- Wall 570+ together with the Group/Haar structure: they require
+-- `Mathlib.LinearAlgebra.UnitaryGroup`, excluded here to keep this
+-- file mathlib-free. `ℕ` is a mathlib/notation symbol unavailable
+-- in bare Lean core, so the core spelling `Nat` is used below —
+-- definitionally identical.
 
 /-- Sites of a `d`-dimensional periodic lattice of side length `L`.
 
@@ -64,18 +70,19 @@ abbrev G : Type := Matrix.specialUnitaryGroup (Fin 2) ℂ
     `Fin L`'s native modular `+` gives the periodic-boundary
     structure for free (when `[NeZero L]` is in scope, used in
     Batch 168.2). -/
-def Lattice (d L : ℕ) : Type := Fin d → Fin L
+def Lattice (d L : Nat) : Type := Fin d → Fin L
 
 /-- An oriented link: a site plus a direction. -/
-def Link (d L : ℕ) : Type := Lattice d L × Fin d
+def Link (d L : Nat) : Type := Lattice d L × Fin d
 
-/-- A gauge configuration: a `G`-valued function on links. -/
-def GaugeConfig (d L : ℕ) : Type := Link d L → G
+/- A gauge configuration: a `G`-valued function on links.
+   Deferred to Wall 570+ together with `G`/Group/Haar:
+   `def GaugeConfig (d L : Nat) : Type := Link d L → G` -/
 
 /-- **Brick (`Lattice_def`).** Definitional unfolding of the
     `Lattice d L` carrier. Useful as a `rfl` rewrite target for
     any downstream code that needs `Fin d → Fin L` directly. -/
-theorem Lattice_def (d L : ℕ) :
+theorem Lattice_def (d L : Nat) :
     Lattice d L = (Fin d → Fin L) := rfl
 
 end TheoremaAureum.Towers.YM.LatticeGauge
