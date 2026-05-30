@@ -15,11 +15,50 @@ history. Roadmap → `docs/ROADMAP.md`.
   identification), `Towers/NS/Stokes.lean` (0 — every decl classical-trio,
   zero `sorryAx`, verified live). HONEST scope: these NAME/BOUND operators
   only; NOT bricks, not lakefile roots; NS stays `Status: Open`, Surface #2
-  stays OPEN. **Next: the NS energy inequality (Phase 3,
-  `Towers/NS/Energy.lean`)** — must import both Leray + Stokes, max 2 sorries.
+  stays OPEN.
   (Milestone tags recorded here as prose, matching this repo's SHA/prose
   versioning convention — see note in "Operational gotchas" on git-tag
   creation being restricted for the main agent.)
+
+- **NS Tower 540 Phase 3 COMPLETE** (milestone `NS-540-phase3-energy` @
+  checkpoint `ae85a633`): `Towers/NS/Energy.lean` — the Phase-3 kinetic energy
+  functional `energy u t = ‖u t‖²` on `Hdiv_free (s+2)`, with `energy_def`.
+  Trio-clean, no `sorryAx`. NOT a brick, not in BRICKS, not a lakefile root;
+  NS stays `Status: Open`, Surface #2 OPEN.
+
+- **NS Tower 540 Phase 4A/4B COMPLETE — Galerkin scheme + Aubin–Lions
+  combinator (NOT bricks, not in BRICKS, not lakefile roots; both fully
+  `sorry`-free / classical-trio, `#print axioms` = trio on every decl,
+  verified live):**
+  - `Towers/NS/GalerkinApprox.lean` (Phase 4A, imports Energy) — the genuine
+    **finite-dimensional Galerkin projection** `galerkinProj K n : Hˢ⁺² →L Kₙ`
+    (mathlib `orthogonalProjection` onto the finite-dim `Kₙ`; the
+    `HasOrthogonalProjection` instance comes from `FiniteDimensional.complete`,
+    supplied as a *local* `haveI` so it never pollutes global instance
+    resolution — making the projection genuinely finite-dimensional), plus the
+    Galerkin sequence `galerkin_seq K u n t = ↑(Pₙ (u t))` and three a-priori
+    bounds: `galerkinProj_norm_le` (`‖Pₙ‖ ≤ 1`), `galerkin_seq_norm_le`
+    (`‖uₙ(t)‖ ≤ ‖u(t)‖`, via `Submodule.norm_coe` + `le_opNorm` —
+    `Submodule.norm_coe` is essential: the coe-norm `‖↑x‖ = ‖x‖` is NOT
+    definitional on the deep `Hdiv_free` Lp-over-`withDensity` stack, so `rfl`
+    blows the heartbeat budget), and the headline
+    `galerkin_seq_sq_le_energy` (`‖uₙ(t)‖² ≤ energy u t`).
+  - `Towers/NS/Compactness.lean` (Phase 4B, imports GalerkinApprox) — the
+    compactness layer: `embedToLower` (the bounded, **NON-compact** Sobolev
+    inclusion `Hˢ⁺² ↪ Hˢ`), `TendstoLocL2` (**modeled** lower-order
+    convergence — an `Hˢ`-norm surrogate for `L²_loc`, NOT literal `L²_loc`),
+    and `AubinLionsCriterion` — the genuine Rellich–Kondrachov compactness
+    theorem stated as a **NAMED `Prop` HYPOTHESIS, NOT proved and NOT
+    `sorry`-ed** (the *compact* embedding it needs is absent from mathlib
+    v4.12.0). `galerkin_strong_convergence` is an HONEST combinator: it routes
+    the Phase-4A energy bound through the assumed criterion to yield an
+    `L²_loc`-surrogate-convergent subsequence; it proves nothing about NS by
+    itself. `galerkin_seq_energy_bounded` re-exports the Phase-4A bound.
+  - HONEST scope: these build the approximation scheme + its a-priori bound and
+    NAME the compactness input; they prove **NO** NS
+    existence/uniqueness/regularity result and **NO** convergence of the full
+    sequence. NS tower stays `Status: Open`; Surface #2 stays OPEN; YM
+    untouched.
 
 - **Wall:** 550 BRICKS (`${#BRICKS[@]}` in `scripts/check-towers.sh`). The
   source of truth for the count is the script, not this file.

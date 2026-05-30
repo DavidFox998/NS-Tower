@@ -208,9 +208,34 @@ Status legend:
     genuine operator, no longer provisional. NO self-adjointness /
     sectoriality / analytic-semigroup claim (absent from mathlib
     v4.12.0). Stokes does NOT import Leray.
-  - HONEST scope: these build spaces and name/bound operators; they prove
-    NO NS existence/uniqueness/regularity result. NS stays `Status:
-    Open`; Surface #2 stays OPEN.
+  - **Phase 3 — Status: Complete** (milestone `NS-540-phase3-energy` @
+    checkpoint `ae85a633`). `Towers/NS/Energy.lean` — the kinetic energy
+    functional `energy u t = ‖u t‖²` on `Hdiv_free (s+2)`, with `energy_def`.
+    Trio-clean, no `sorryAx`.
+  - **Phase 4A — Status: Complete.** `Towers/NS/GalerkinApprox.lean` (imports
+    Energy) — the **finite-dimensional Galerkin projection** `galerkinProj K n
+    : Hˢ⁺² →L Kₙ` (mathlib `orthogonalProjection` onto the finite-dim `Kₙ`;
+    `HasOrthogonalProjection` from `FiniteDimensional.complete`, supplied as a
+    *local* `haveI` so it never pollutes global instance resolution), the
+    Galerkin sequence `galerkin_seq`, and the a-priori bounds
+    `galerkinProj_norm_le` (`‖Pₙ‖ ≤ 1`), `galerkin_seq_norm_le`
+    (`‖uₙ(t)‖ ≤ ‖u(t)‖`), and the headline `galerkin_seq_sq_le_energy`
+    (`‖uₙ(t)‖² ≤ energy u t`). Fully `sorry`-free, classical trio on every
+    decl (verified live).
+  - **Phase 4B — Status: Complete.** `Towers/NS/Compactness.lean` (imports
+    GalerkinApprox) — `embedToLower` (the bounded, **NON-compact** inclusion
+    `Hˢ⁺² ↪ Hˢ`), `TendstoLocL2` (**modeled** lower-order convergence — an
+    `Hˢ`-norm surrogate for `L²_loc`, NOT literal `L²_loc`), and
+    `AubinLionsCriterion` — the genuine Rellich–Kondrachov compactness theorem
+    stated as a **NAMED `Prop` HYPOTHESIS, NOT proved and NOT `sorry`-ed**
+    (the *compact* embedding it needs is absent from mathlib v4.12.0).
+    `galerkin_strong_convergence` is an HONEST combinator routing the Phase-4A
+    energy bound through the assumed criterion; it proves nothing about NS by
+    itself. Fully `sorry`-free, classical trio (verified live).
+  - HONEST scope: these build spaces, name/bound operators, build the
+    approximation scheme + its a-priori bound, and NAME the compactness input;
+    they prove NO NS existence/uniqueness/regularity result and NO convergence
+    of the full sequence. NS stays `Status: Open`; Surface #2 stays OPEN.
 
 ## 4. 280-curve cohort (M9 Weil-transfer discharge) — and BSD
 
