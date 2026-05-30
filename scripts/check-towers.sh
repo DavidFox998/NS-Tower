@@ -3402,6 +3402,31 @@ BRICKS=(
   "Towers.YM.Wall263_CoxeterSpectral|TheoremaAureum.Towers.YM.Wall263.phi_lt_two"
   "Towers.YM.Wall263_CoxeterSpectral|TheoremaAureum.Towers.YM.Wall263.one_lt_phi"
   "Towers.YM.Wall263_CoxeterSpectral|TheoremaAureum.Towers.YM.Wall263.defect_bound_H4"
+  # Wall262a_RatioModel: the HONEST version of "Theoria's" richer R-series writeup
+  # (namespace Wall262a). A STANDALONE LEAF (imports only Mathlib; nothing imports
+  # it; OUT of the YM dependency graph). Machine-checks only a concrete finite
+  # numeric MODEL: the four invented H4 ratio weights 1,2,3/2,2; the coherent
+  # 4-term R a = 1 - (a/2 + a^2/3 + a^3/16 + a^4/60); the HONEST drop-the-tail
+  # reduction R a <= 1 - a/2; exp(-0.88) >= 257/1000 (via exp 0.88 <= exp 1 <
+  # 2.7182818286, then invert); and the headline R(exp(-0.88)) <= 1743/2000 (margin
+  # huge, true R ~ 0.73). PLUS an honest arithmetic record of the prime structure:
+  # 2!,3!,4!,5! all 5-smooth; 7! = 2^4*3^2*5*7 (prime 7 enters only beyond the
+  # truncation); 1743 = 3*7*83, 2000 = 2^4*5^3. The H4 Coxeter matrix / 120-cell /
+  # h=30 / exponents / phi-as-highest-root-norm are DOCUMENTARY only and Theoria's
+  # "largest eigenvalue of 2I-M_H4 = phi" is FALSE (it is 2cos(pi/30); see Wall263).
+  # all sorry-free, #print axioms = classical trio (verified live, raw lean v4.12.0
+  # Towers/YM/Wall262a_RatioModel.lean, EXIT=0). HONEST: a standalone numeric MODEL
+  # with invented weights; does NOT discharge Wall262 hR; uses NO real Coxeter/H4
+  # datum; proves NO YM result; discharges no open surface. YM stays Status: Open.
+  "Towers.YM.Wall262a_RatioModel|TheoremaAureum.Towers.YM.Wall262a.Hweight_values"
+  "Towers.YM.Wall262a_RatioModel|TheoremaAureum.Towers.YM.Wall262a.Hweight_nonneg"
+  "Towers.YM.Wall262a_RatioModel|TheoremaAureum.Towers.YM.Wall262a.term_nonneg"
+  "Towers.YM.Wall262a_RatioModel|TheoremaAureum.Towers.YM.Wall262a.R_le_one_sub_half"
+  "Towers.YM.Wall262a_RatioModel|TheoremaAureum.Towers.YM.Wall262a.exp_neg88_lower"
+  "Towers.YM.Wall262a_RatioModel|TheoremaAureum.Towers.YM.Wall262a.R_le"
+  "Towers.YM.Wall262a_RatioModel|TheoremaAureum.Towers.YM.Wall262a.factorial_smooth"
+  "Towers.YM.Wall262a_RatioModel|TheoremaAureum.Towers.YM.Wall262a.seven_enters_at_seven"
+  "Towers.YM.Wall262a_RatioModel|TheoremaAureum.Towers.YM.Wall262a.threshold_factorization"
 )
 
 VERIFIER_DIR="$(mktemp -d)"

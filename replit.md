@@ -62,6 +62,36 @@ history. Roadmap → `docs/ROADMAP.md`.
 
 - **Wall:** BRICKS array in `scripts/check-towers.sh` (`${#BRICKS[@]}`) is the
   source of truth for the count, not this file.
+- **Wall262a_RatioModel — HONEST standalone numeric MODEL of "Theoria's" richer
+  R-series (bricks, in BRICKS):** `Towers/YM/Wall262a_RatioModel.lean` (namespace
+  `Wall262a`). The HONEST version of Theoria's fuller `R(a) = 1 − ∑ Hₙaⁿ⁻¹/n!`
+  writeup: it keeps Theoria's H4/120-cell/`2,3,5` narrative as DOCUMENTATION but
+  machine-checks only a concrete finite numeric MODEL. **A STANDALONE LEAF —
+  imports only `Mathlib`, nothing imports it, OUT of the YM dependency graph.**
+  **GENUINE/UNCONDITIONAL:** `Hweight` (the four INVENTED H4 ratio weights
+  `1,2,3/2,2` at `n=2..5`, `0` beyond), `term`, the coherent 4-term
+  `R a = 1 − (a/2 + a²/3 + a³/16 + a⁴/60)`; `Hweight_values`, `Hweight_nonneg`,
+  `term_nonneg`; `R_le_one_sub_half` (`0≤a ⟹ R a ≤ 1−a/2`, the HONEST
+  drop-the-nonneg-tail reduction); `exp_neg88_lower` (`257/1000 ≤ exp(−0.88)`, via
+  `exp 0.88 ≤ exp 1 < 2.7182818286` then invert; `257/1000` is the exact
+  break-even of `1−a/2 = 1743/2000`); `R_le` (the headline `R(exp(−0.88)) ≤
+  1743/2000`, margin huge — true `R ≈ 0.73`). Honest prime-structure record:
+  `factorial_smooth` (`2!,3!,4!,5!` all 5-smooth `= 2,2·3,2³·3,2³·3·5`),
+  `seven_enters_at_seven` (`7! = 2⁴·3²·5·7` — the entropy prime `7` enters only
+  BEYOND the truncation, so the 5-smoothness is a truncation artifact),
+  `threshold_factorization` (`1743 = 3·7·83`, `2000 = 2⁴·5³`). 9 public theorems;
+  all `sorry`-free, `#print axioms` = classical trio (the three ℕ-arithmetic ones
+  only `propext`; verified live, raw `lean` v4.12.0, EXIT=0). **DOCUMENTARY ONLY +
+  Theoria errors FLAGGED:** the H4 Coxeter matrix `M_H4`, the 120-cell, `h=30`,
+  exponents `1,11,19,29`, `φ` as highest-root norm are NOT in mathlib v4.12.0
+  (`CoxeterGroup.H4.spectral_radius`/`.subgraph_count`/`.highest_root_norm` do NOT
+  exist); Theoria's "largest eigenvalue of `2I−M_H4` = `φ`" is FALSE (it is
+  `2cos(π/30)≈1.989`; `φ` is NOT an eigenvalue — see `Wall263`); Theoria's
+  alternating-sign / `R≤0.6665` arithmetic is incoherent (coherent value ≈0.73).
+  HONEST: a standalone numeric MODEL with INVENTED weights; does **NOT** discharge
+  `Wall262`'s open `hR` (the real `R := μ_ℤ⁴/φ` is research-level, not a 4-term
+  sum); uses NO real Coxeter/H4 datum; proves NO YM result; discharges no open
+  surface. YM stays `Status: Open`.
 - **Wall263_CoxeterSpectral — HONEST REFUTATION of "largest eigenvalue of
   2I−M_H4 = φ", axiom-free (bricks, in BRICKS):**
   `Towers/YM/Wall263_CoxeterSpectral.lean` (namespace `Wall263`). The honest
