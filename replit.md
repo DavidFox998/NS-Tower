@@ -167,12 +167,23 @@ history. Roadmap → `docs/ROADMAP.md`.
   components). `divFreeSubmodule s : Submodule ℂ (Hsv s)` has **PROVED**
   `0/+/•` closure (via `Lp.coeFn_*` + `inner_{zero,add,smul}_right`), and
   `Hdiv_free s` carries the real `NormedAddCommGroup` / `InnerProductSpace ℂ` /
-  `CompleteSpace` instances mathlib gives. Compiles clean under `lake env lean`
-  (only the 2 intended `sorry` warnings). Ships `sorryAx` BY DESIGN: exactly
-  **two documented Clay-adjacent `sorry`s** — `divFreeSubmodule_isClosed` (the
-  div-free set is `L²`-closed) and `embed` (the `Hˢ ↪ Hˢ'` Sobolev embedding
-  for `s' ≤ s`). Makes **no** NS existence/uniqueness/regularity claim; NS
-  tower stays `Status: Open`, Surface #2 stays OPEN.
+  `CompleteSpace` instances mathlib gives. **NOW `sorry`-free** (the 2 former
+  Clay-adjacent `sorry`s are closed): `divFreeSubmodule_isClosed` (the div-free
+  set is `L²`-closed) is PROVED by sequential closedness — `L²` convergence ⇒
+  convergence in measure (`tendstoInMeasure_of_tendsto_Lp`) ⇒ a.e.-convergent
+  subsequence (`TendstoInMeasure.exists_seq_tendsto_ae`; neither needs `μ_s`
+  finite, so it works for the infinite weighted measure) ⇒ the linear constraint
+  passes to the pointwise limit; and `embed` (the `Hˢ ↪ Hˢ'` Sobolev inclusion
+  for `s' ≤ s`) is PROVED via weight monotonicity (`weight_mono` ⇒ `mu_mono :
+  μ_{s'} ≤ μ_s`) + `Memℒp.mono_measure`, a bounded inclusion of operator norm
+  `≤ 1` (`eLpNorm_mono_measure`), div-freeness transferred a.e. (`μ_{s'} ≪
+  μ_s`). `#print axioms` on `divFreeSubmodule_isClosed` / `embed` = classical
+  trio `[propext, Classical.choice, Quot.sound]` (no `sorryAx`, verified live);
+  compiles exit 0 under `lake env lean` with no warnings. HONEST scope: `embed`
+  is the bounded INCLUSION, **not** a compact (Rellich–Kondrachov) embedding.
+  Still NOT a brick / not in BRICKS / not a lakefile root; makes **no** NS
+  existence/uniqueness/regularity claim; NS tower stays `Status: Open`, Surface
+  #2 stays OPEN.
 
 ## Locked invariants (every batch must hold these)
 
