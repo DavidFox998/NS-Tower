@@ -60,8 +60,28 @@ history. Roadmap → `docs/ROADMAP.md`.
     inputs; they prove NO NS existence/uniqueness/regularity result. NS stays
     `Status: Open`; Surface #1/#2 stay OPEN; YM untouched.
 
-- **Wall:** 567 BRICKS (`${#BRICKS[@]}` in `scripts/check-towers.sh`). The
+- **Wall:** 570 BRICKS (`${#BRICKS[@]}` in `scripts/check-towers.sh`). The
   source of truth for the count is the script, not this file.
+- **Wall252_KP — MODELED Kotecký–Preiss smallness bound (bricks, in BRICKS):**
+  `Towers/YM/Wall252_KP.lean` lands `kp_sum_lt_half` — for `0 ≤ β < 48/e`,
+  `KP_sum β g < 1/2`, where `KP_sum β g := zModes·kEff·C_S4·exp(−β·E_g)·e·β /
+  11520` and `E_g := su2PlaquetteEnergy g`. An HONEST ARITHMETIC COMBINATOR that
+  USES all four requested inputs: `zModes_eq` (→ `(zModes:ℝ)=15`), `kEff_le`
+  (→ `≤16/5`), `c_S4_lt` (→ `C_S4<5/2`) give `kpModeWeight < 120`
+  (`kpModeWeight_lt`); `su2_plaquetteEnergy_nonneg` (→ `E_g≥0`) gives the
+  activity `exp(−β·E_g) ≤ 1`. 3 public theorems registered (`kpModeWeight_lt`,
+  `kpModeWeight_nonneg`, `kp_sum_lt_half`); all `sorry`-free, `#print axioms`
+  = classical trio (verified live, raw `lean`, EXIT=0). DEVIATION from the
+  literal `KP_sum β` ask: the def takes `(β, g)` and the theorem assumes `0 ≤ β`
+  — both are needed to use `su2_plaquetteEnergy_nonneg` genuinely (the activity
+  `exp(−β·E_g) ≤ 1` step requires a real plaquette and `β ≥ 0`). HONEST:
+  `KP_sum` is a MODELED SINGLE-TERM MAJORANT SURROGATE, NOT the genuine
+  infinite Kotecký–Preiss polymer sum (`∑_{γ∋x} |activity(γ)| e^{a(|γ|)}` over
+  ALL lattice polymers with a weight `a:Polymer→ℝ`). The constants are bare
+  numerics (see S4Numerics); `48/e` and `11520` are tuned so the bound is tight
+  at the boundary. Makes NO mass-gap / μ>0 / Surface-#1 / RH / BSD claim, does
+  NOT establish KP convergence, and does NOT discharge the disclaimed
+  `kotecky_preiss_criterion` `sorry`; YM stays `Status: Open`.
 - **SU(2) Wilson-positivity companion (brick, in BRICKS):**
   `Towers/YM/WilsonPositivitySU2.lean` lands the verbatim N = 2 instances of the
   SU(3) positivity bricks — `traceRe_le_two` (`Re tr A ≤ 2`),

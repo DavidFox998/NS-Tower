@@ -3030,6 +3030,22 @@ BRICKS=(
   "Towers.YM.Wall251b_H4|TheoremaAureum.Towers.YM.Wall251b.su2_traceRe_eq_two_iff"
   "Towers.YM.Wall251b_H4|TheoremaAureum.Towers.YM.Wall251b.su2_plaquetteEnergy_nonneg"
   "Towers.YM.Wall251b_H4|TheoremaAureum.Towers.YM.Wall251b.su2_plaquetteEnergy_pos_iff"
+  # Wall252_KP: a MODELED Kotecký–Preiss-style smallness bound assembled as a
+  # pure arithmetic combinator. `kp_sum_lt_half` proves `0 ≤ β < 48/e →
+  # KP_sum β g < 1/2`, where KP_sum := zModes·kEff·C_S4·exp(−β·E_g)·e·β/11520.
+  # USES all four named inputs: zModes_eq, kEff_le, c_S4_lt (→ kpModeWeight <
+  # 120) and su2_plaquetteEnergy_nonneg (→ activity exp(−β·E_g) ≤ 1). All 3
+  # public theorems `sorry`-free; `#print axioms` = classical trio (verified by
+  # hand: lean Towers/YM/Wall252_KP.lean + #print axioms, EXIT=0). HONEST:
+  # KP_sum is a MODELED single-term majorant SURROGATE, NOT the genuine
+  # infinite Kotecký–Preiss polymer sum (∑ over all lattice polymers with a
+  # weight a:Polymer→ℝ). This bound does NOT establish KP convergence, does
+  # NOT discharge the `kotecky_preiss_criterion` sorry, and makes NO mass-gap /
+  # μ>0 / Surface-#1 / RH / BSD claim. The prefactor constants are bare
+  # numerics (see S4Numerics); 48/e and 11520 are tuned so the bound is tight.
+  "Towers.YM.Wall252_KP|TheoremaAureum.Towers.YM.Wall252.kpModeWeight_lt"
+  "Towers.YM.Wall252_KP|TheoremaAureum.Towers.YM.Wall252.kpModeWeight_nonneg"
+  "Towers.YM.Wall252_KP|TheoremaAureum.Towers.YM.Wall252.kp_sum_lt_half"
 )
 
 VERIFIER_DIR="$(mktemp -d)"
