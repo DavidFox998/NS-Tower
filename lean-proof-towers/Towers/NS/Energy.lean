@@ -111,20 +111,29 @@ theorem energy_nonincreasing {ν : ℝ} (hν : 0 ≤ ν) (u : ℝ → Hdiv_free 
   have := dissipation_nonneg hν u t
   linarith
 
-/-- **NAMED SORRY (Phase-3 order #4) — integration by parts.** The Stokes
-operator is symmetric for the Sobolev pairing: `⟪A u, ι v⟫ = ⟪ι u, A v⟫`,
-where `ι = embed` is the inclusion `Hˢ⁺²_div ↪ Hˢ_div`. This is the
+/-- **NAMED INTEGRATION-BY-PARTS STATEMENT (Phase-3 order #4) — axiom-free.**
+The Stokes operator is symmetric for the Sobolev pairing: `⟪A u, ι v⟫ = ⟪ι u,
+A v⟫`, where `ι = embed` is the inclusion `Hˢ⁺²_div ↪ Hˢ_div`. This is the
 divergence-theorem / integration-by-parts identity that drives the energy
-balance. Per order #4 it is NAMED and NOT proved (the pairing requires the
-divergence theorem, absent from mathlib v4.12.0). This is the ONLY `sorry`
-in the file; it reports `sorryAx` and is NOT a brick. -/
-theorem integration_by_parts (u v : Hdiv_free (s + 2)) :
-    (@inner ℂ (Hdiv_free s) _ (stokes_op s u) (@embed (s + 2) s (by linarith) v))
-      = (@inner ℂ (Hdiv_free s) _ (@embed (s + 2) s (by linarith) u) (stokes_op s v)) := by
+balance.
+
+Per the Shawlock Rule #1 axiom lock we record it as a `Prop` (the *statement*),
+NOT as a `theorem … := by sorry`. In Lean 4 `sorry` IS the axiom `sorryAx`
+(they are literally the same term), so any `by sorry` proof necessarily makes
+`#print axioms` report `sorryAx` — there is no `sorry` that avoids the axiom.
+Naming the proposition creates no proof obligation, so it carries NO `sorryAx`
+and NO new axioms: `#print axioms integration_by_parts` is the classical trio
+only. It is honestly NOT proved (the divergence-theorem pairing is absent from
+mathlib v4.12.0) and NOT asserted true — it is the named analytic input behind
+the `hbal` hypothesis of `energy_inequality`. NOT a brick.
+
   -- SORRY: Integration by parts for Hdiv_free. Follows from Fourier
-  -- characterization + decay. (Divergence-theorem pairing absent from
-  -- mathlib v4.12.0.)
-  sorry
+  -- characterization + decay. (Stated, not discharged: a `by sorry` proof
+  -- would inject the `sorryAx` axiom, which the honesty lock forbids.) -/
+def integration_by_parts : Prop :=
+  ∀ (u v : Hdiv_free (s + 2)),
+    (@inner ℂ (Hdiv_free s) _ (stokes_op s u) (@embed (s + 2) s (by linarith) v))
+      = (@inner ℂ (Hdiv_free s) _ (@embed (s + 2) s (by linarith) u) (stokes_op s v))
 
 end Energy
 end NS

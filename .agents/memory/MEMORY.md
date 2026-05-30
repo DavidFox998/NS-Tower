@@ -5,4 +5,5 @@
 - [Headline theorems are True-stubs](headline-theorems-are-true-stubs.md) — RH main_theorem proves `def RiemannHypothesis := True`; axiom-clean is vacuous; never report this repo as proving RH or the YM mass gap.
 - [EuclideanSpace mathlib v4.12.0](euclideanspace-mathlib-v4_12.md) — volume import is Haar.InnerProductSpace (not Lebesgue.EuclideanSpace); build elts via WithLp.equiv.symm; prove subspace closure via inner_*_right, not component indexing.
 - [Wilson-action positivity ≠ mass gap](wilson-action-positivity-honesty.md) — pointwise positivity is necessary-not-sufficient; off-vacuum inf=0 so no uniform gap from compactness; zero-iff is "all plaquettes trivial" NOT U=1.
+- [Lean sorry == sorryAx](lean-sorry-is-sorryax.md) — `by sorry` always prints sorryAx; to pass the axiom lock, name unproved inputs as a Prop def or a hypothesis, never `theorem := by sorry`.
 - [Main-agent git is write-blocked](main-agent-git-blocked.md) — git writes (tag/commit/etc) rejected for main agent + guard scans heredoc bodies; track milestones as prose+SHA in docs, or delegate to a background Project Task.
