@@ -50,6 +50,14 @@ export default defineConfig({
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
       "@assets": path.resolve(import.meta.dirname, "..", "..", "attached_assets"),
+      // Verified Lean foundation sources, imported `?raw` for the
+      // Foundations page downloads (auto-synced with the proof at build time).
+      "@lean": path.resolve(
+        import.meta.dirname,
+        "..",
+        "..",
+        "lean-proof-towers",
+      ),
     },
     dedupe: ["react", "react-dom"],
   },
