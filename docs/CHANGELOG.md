@@ -6,6 +6,25 @@ this file is the version history.
 
 ---
 
+## NS Tower 540 FROZEN at the Clay boundary (2026-05-30)
+
+Milestone `NS-540-phase6-clay-boundary` @ checkpoint
+`c5f29fb4390e5dda83ffdbfcae5dea2333cf5c12` (supersedes
+`NS-540-phase6-regularity`). NS Tower 540 is FROZEN at 251 — the weak→strong
+chain is built up to the Clay surface and stopped there. **Freeze rule: no
+further commits to `Towers/NS/` without an explicit unfreeze order.** Live audit:
+`Towers/NS/Regularity.lean` compiles EXIT=0; `#print axioms global_smooth_exists`
+and `#print axioms weak_implies_strong` both = `[propext, Classical.choice,
+Quot.sound]`. NS named surfaces (Props, no `sorryAx`): `global_smooth_exists`
+(Surface #1, the open Clay content), `galerkin_subsequence_converges`,
+`limit_satisfies_weak_form`, `energy_inequality_passes_to_limit`,
+`AubinLionsCriterion`, `integration_by_parts` (6). PLUS one pre-existing real
+`sorry` `leray_proj_ker_eq_grad` in `Leray.lean` (reports `sorryAx`, ISOLATED —
+not a brick, not used by the weak→strong chain). 7 total ≤ 9. Surface #1 and
+Surface #2 (modeled `weak_solution_exists`) stay OPEN; NS stays `Status: Open`.
+Disabling the `towers-build` auto-run + permanently locking the mathlib v4.12.0
+pin is tracked as background Project Task #294.
+
 ## NS Tower 540 (Phases 1–6) + YM Transfer/polymer scaffolding — detailed history (2026-05-30)
 
 Full detail for the items summarized compactly in `replit.md`. None of these
@@ -72,7 +91,9 @@ explicitly marked a disclaimed OPEN `sorry`.
   only — genuine joint space–time smoothness needs the Sobolev `⋂ₛ Hˢ ↪ C^∞`
   embedding across all indices, absent here). Per the Phase-6 order, because the
   single sorry IS the surface, **NS Tower 540 is frozen at 251** (milestone
-  `NS-540-phase6-regularity`): the regularity surface is reached and left OPEN.
+  `NS-540-phase6-regularity`, SUPERSEDED by `NS-540-phase6-clay-boundary` — see
+  the "FROZEN at the Clay boundary" entry at the top of this file): the
+  regularity surface is reached and left OPEN.
 
 ### YM Transfer / polymer / positivity / measure scaffolding (NOT bricks)
 

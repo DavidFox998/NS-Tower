@@ -8,7 +8,9 @@ history. Roadmap → `docs/ROADMAP.md`.
 ## Current status — 2026-05-30
 
 - **NS Tower 540 — honest weak→strong chain, Phases 1–6 COMPLETE** (NONE are
-  bricks / in BRICKS / lakefile roots; all classical-trio, no `sorryAx`,
+  bricks / in BRICKS / lakefile roots; all classical-trio, no `sorryAx` EXCEPT
+  the one isolated documented `sorry` `leray_proj_ker_eq_grad` in `Leray.lean`
+  (reports `sorryAx`, not a brick, not in the weak→strong chain),
   verified live; full per-phase detail → `docs/CHANGELOG.md` +
   `docs/ROADMAP.md`). Fourier-side model on `Hdiv_free (s+2)`, `ν = 1`:
   - **P1** `FunctionSpaces.lean` (Hˢ as weighted `L²`; `divFreeSubmodule`
@@ -32,8 +34,27 @@ history. Roadmap → `docs/ROADMAP.md`.
     `ContDiffOn ℝ ⊤` of tested profiles `t ↦ ⟪u t, φ⟫` only). `#print axioms` on
     both `weak_implies_strong` and `global_smooth_exists` = classical trio.
     Because the single sorry IS the surface, **NS Tower 540 is FROZEN at 251**
-    (milestone `NS-540-phase6-regularity`): the regularity surface is reached,
-    left OPEN.
+    (milestone `NS-540-phase6-clay-boundary` @ checkpoint
+    `c5f29fb4390e5dda83ffdbfcae5dea2333cf5c12`; supersedes
+    `NS-540-phase6-regularity`): the regularity surface is reached, left OPEN.
+  - **NS COMPLETE TO THE CLAY BOUNDARY — FROZEN (Status still Open).** The
+    weak→strong tower is built up to the Clay surface and stopped there:
+    - **Surface #1 — global regularity: OPEN.** `global_smooth_exists : Prop`
+      is the single NAMED Clay surface (an unproved hypothesis, NOT `by sorry`,
+      so NO `sorryAx`); `#print axioms` = classical trio. This is the entire
+      mathematical content behind `weak_implies_strong`.
+    - **Surface #2 — weak existence: OPEN (modeled).** `weak_solution_exists`
+      is an HONEST COMBINATOR routing THREE NAMED Props over the MODELED
+      `WeakNS` surrogate (linear weak form; nonlinear `(u·∇)u` DROPPED) — it is
+      NOT a literal Leray–Hopf existence theorem and proves NO NS existence.
+    - Audited live: `Regularity.lean` compiles EXIT=0; `#print axioms` on both
+      `global_smooth_exists` and `weak_implies_strong` = `[propext,
+      Classical.choice, Quot.sound]`. NS named surfaces (no `sorryAx`):
+      `global_smooth_exists`, `galerkin_subsequence_converges`,
+      `limit_satisfies_weak_form`, `energy_inequality_passes_to_limit`,
+      `AubinLionsCriterion`, `integration_by_parts` (6). PLUS one pre-existing
+      real `sorry` `leray_proj_ker_eq_grad` (`Leray.lean`, reports `sorryAx`,
+      ISOLATED — not a brick, not used by the weak→strong chain). 7 total ≤ 9.
   - HONEST scope: these build spaces, name/bound operators, and assemble the
     Galerkin weak-existence + conditional-regularity combinators from NAMED
     inputs; they prove NO NS existence/uniqueness/regularity result. NS stays
@@ -98,6 +119,15 @@ history. Roadmap → `docs/ROADMAP.md`.
   (`T_OS = 0` / `T_real = 0`), NOT under any real Wilson transfer operator.
 - `kotecky_preiss_criterion` remains a `sorry` in
   `Towers/Attempts/ClusterExpansion.lean` (invariant-locked).
+- **NS FREEZE.** `Towers/NS/*` is FROZEN at the Clay boundary (milestone
+  `NS-540-phase6-clay-boundary`). NO further commits to `Towers/NS/` without an
+  explicit unfreeze order from the user. Surface #1 (`global_smooth_exists`) and
+  Surface #2 (modeled `weak_solution_exists`) stay OPEN; "NS solved" /
+  "regularity proven" / "weak solutions exist (literally)" claims are REFUSED.
+- **Infra (in progress).** Disabling the `towers-build` auto-run and permanently
+  locking the mathlib `v4.12.0` pin is tracked as a background Project Task
+  (#294); until it lands, every boot/merge can still wipe the pin and require
+  the manual recovery in "Operational gotchas".
 
 ## Operational gotchas
 

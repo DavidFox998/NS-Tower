@@ -249,8 +249,13 @@ Status legend:
     live). The combinator routes the three unproved NAMED inputs into the
     conclusion; it proves NOTHING about NS by itself. Last combinator BEFORE
     Surface #1 (`global_smooth_exists`); does NOT touch it.
-  - **Phase 6 — Status: Complete; NS FROZEN at 251** (milestone
-    `NS-540-phase6-regularity`). `Towers/NS/Regularity.lean` (imports
+  - **Phase 6 — Status: Complete; NS FROZEN at 251 at the Clay boundary**
+    (milestone `NS-540-phase6-clay-boundary` @ checkpoint
+    `c5f29fb4390e5dda83ffdbfcae5dea2333cf5c12`; supersedes
+    `NS-540-phase6-regularity`). **FREEZE RULE: no further commits to
+    `Towers/NS/` without an explicit unfreeze order.** Surface #1
+    (`global_smooth_exists`) and Surface #2 (modeled `weak_solution_exists`)
+    stay OPEN. `Towers/NS/Regularity.lean` (imports
     WeakSolution) — the weak⇒strong (conditional) regularity step as an HONEST
     combinator. `weak_implies_strong (h : global_smooth_exists) (w : WeakSolution
     s) : ∃ T > 0, IsSmoothOn w.u T` is PROVED from the SINGLE NAMED `Prop`
