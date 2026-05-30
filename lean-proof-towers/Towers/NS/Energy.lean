@@ -121,6 +121,9 @@ in the file; it reports `sorryAx` and is NOT a brick. -/
 theorem integration_by_parts (u v : Hdiv_free (s + 2)) :
     (@inner ℂ (Hdiv_free s) _ (stokes_op s u) (@embed (s + 2) s (by linarith) v))
       = (@inner ℂ (Hdiv_free s) _ (@embed (s + 2) s (by linarith) u) (stokes_op s v)) := by
+  -- SORRY: Integration by parts for Hdiv_free. Follows from Fourier
+  -- characterization + decay. (Divergence-theorem pairing absent from
+  -- mathlib v4.12.0.)
   sorry
 
 end Energy
