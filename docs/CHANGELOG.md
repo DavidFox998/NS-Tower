@@ -6,6 +6,43 @@ this file is the version history.
 
 ---
 
+## Wall gated on a real clean build (Task #240) (2026-05-30)
+
+**`scripts/check-towers.sh` can no longer report a healthy wall while the proof
+tower fails to build.** Previously the reported wall was simply `${#BRICKS[@]}`
+(the count of registered entries), and the per-brick `#print axioms` step ran
+via `lake env lean` against whatever oleans were on disk — so a brick whose
+source no longer compiled could still be "verified" against a stale olean
+(exactly the drift Task #208 surfaced: ~8 registered bricks did not compile
+under a clean `lake build Towers`). NO wall-count change when everything is
+green; no BRICKS added/removed; axiom policy (classical trio) unchanged.
+
+What changed in `scripts/check-towers.sh`:
+
+- **Clean-build step.** Before building, the script now removes ONLY this
+  package's own build artifacts (`.lake/build/lib/Towers`,
+  `.lake/build/ir/Towers`), forcing every brick module to recompile from
+  source. The expensive vendored mathlib cache
+  (`.lake/packages/mathlib/.lake/build/`) is left untouched, so this never
+  triggers a mathlib re-fetch and is cheap to recover (a Towers-only recompile).
+- **`lake build Towers` made tolerant.** A whole-library failure no longer
+  aborts the script (it would otherwise deny us a per-file report). It is now a
+  fast parallel warm-up; the authoritative gate is the per-brick loop.
+- **Phase A — per-module compile gate.** Each UNIQUE brick module is compiled
+  individually with `lake build <module>` from the cleaned tree. A module that
+  fails disqualifies every brick that lives in it, with the failing `lake build`
+  output echoed indented in the report.
+- **Phase B — per-brick axiom check**, run only for bricks whose module built.
+- **Wall = bricks that actually pass BOTH phases.** The loops collect every
+  failure instead of aborting on the first, print a per-file report, and the
+  script exits non-zero whenever `PASSED < TOTAL`. The reported `WALL: P / T`
+  line now reflects only bricks that genuinely build from clean oleans and pass
+  `#print axioms`.
+
+This makes the wall impossible to overstate: a broken/`sorry`-laden/stale brick
+now fails the gate loudly with the exact offending file, rather than slipping
+through on a stale olean.
+
 ## YM surface-file repair — 3/4 fixed, LocalityOS3 stays deferred (2026-05-30)
 
 **Repair of the four invariant-locked YM surface files flagged by the Task #208

@@ -115,23 +115,46 @@ lake update
 echo ">> fetch-mathlib-oleans.sh (ensure mathlib oleans; never fall back to source)" >&2
 "$REPO_ROOT/scripts/fetch-mathlib-oleans.sh"
 
-echo ">> lake build Towers" >&2
-lake build Towers
+# Force a from-source recompile of the Towers layer so the wall is gated on a
+# genuine clean build, never on stale oleans (Task #240 / lesson of Task #208).
+# We delete ONLY this package's own build artifacts under `.lake/build/`; the
+# expensive vendored mathlib cache under `.lake/packages/mathlib/.lake/build/`
+# is left completely untouched, so this is cheap to recover (a Towers-only
+# recompile) and never triggers a mathlib re-fetch.
+echo ">> clean stale Towers oleans (force from-source recompile; mathlib cache untouched)" >&2
+rm -rf "$TOWERS_DIR/.lake/build/lib/Towers" "$TOWERS_DIR/.lake/build/ir/Towers"
+
+# Best-effort whole-library build (parallel, fast). Deliberately tolerant: a
+# failure here is EXPECTED when a registered brick is broken, and aborting now
+# would deny us the per-file report. The authoritative gate is the per-brick
+# build+axiom loop at the bottom of this script, which pinpoints exactly which
+# brick(s) failed to compile from clean oleans.
+echo ">> lake build Towers (from clean; tolerant — per-brick loop below is the gate)" >&2
+if ! lake build Towers; then
+  echo "warn: \`lake build Towers\` reported errors; the per-brick report below" >&2
+  echo "      pinpoints which registered brick(s) do not compile from clean oleans." >&2
+fi
 
 # ------------------------------------------------------------------
-# Per-brick axiom-footprint check.
+# Per-brick build + axiom-footprint check.
 #
 # Each entry is "<lean import path>|<fully qualified theorem name>".
 # The lean import path is the dot-separated module name that mathlib's
 # Lean elaborator expects in `import <...>` (e.g. `Towers.RH.ZeroDensity`).
 # The theorem name is what `#print axioms` will receive.
 #
-# Acceptable axiom footprint per brick:
-#   (a) truly no axioms ("does not depend on any axioms"), OR
-#   (b) a subset of mathlib's classical core
-#       {propext, Classical.choice, Quot.sound}.
-# Any other axiom name — `sorryAx`, a user-declared `axiom`, etc. —
-# is rejected and the script exits non-zero on the first failure.
+# A brick is counted toward the wall ONLY if BOTH hold:
+#   (1) its module compiles from clean oleans (`lake build <module>`), AND
+#   (2) its theorem's axiom footprint is acceptable:
+#         (a) truly no axioms ("does not depend on any axioms"), OR
+#         (b) a subset of mathlib's classical core
+#             {propext, Classical.choice, Quot.sound}.
+# Any other axiom name — `sorryAx`, a user-declared `axiom`, etc. — is
+# rejected. Unlike earlier revisions, the loop does NOT abort on the first
+# failure: it checks every brick, prints a per-file report, reports the wall
+# as the number of bricks that actually pass, and exits non-zero if any failed.
+# This is what makes the wall impossible to report as healthy while the tower
+# does not build (Task #240).
 # ------------------------------------------------------------------
 BRICKS=(
   "Towers.RH.ZeroDensity|TheoremaAureum.Towers.RH.N_monotone_in_sigma"
@@ -2944,7 +2967,22 @@ BRICKS=(
 
 VERIFIER_DIR="$(mktemp -d)"
 AXIOM_LOG="$(mktemp)"
-trap 'rm -f "$AXIOM_LOG"; rm -rf "$VERIFIER_DIR"' EXIT
+BUILD_LOG="$(mktemp)"
+trap 'rm -f "$AXIOM_LOG" "$BUILD_LOG"; rm -rf "$VERIFIER_DIR"' EXIT
+
+# Build a single brick module from (cleaned) source. Returns 0 iff the module
+# compiles. On failure the lake build output is echoed, indented, so the final
+# report shows exactly why the brick did not build from clean oleans.
+build_module() {
+  local module="$1"
+  echo ">> build-from-clean: $module" >&2
+  if lake build "$module" >"$BUILD_LOG" 2>&1; then
+    return 0
+  fi
+  echo "error: \`lake build $module\` failed (does not compile from clean oleans):" >&2
+  sed 's/^/    /' "$BUILD_LOG" >&2
+  return 1
+}
 
 check_brick() {
   local module="$1"
@@ -2989,10 +3027,75 @@ EOF
   fi
 }
 
+# ------------------------------------------------------------------
+# Gate the wall on a real clean build (Task #240).
+#
+# Phase A — compile each UNIQUE brick module from the cleaned source tree
+# (mathlib cache intact). A module that fails here disqualifies every brick
+# that lives in it: the wall must never count a brick whose file does not
+# build from clean oleans.
+#
+# Phase B — for each brick whose module built, run the `#print axioms` check.
+#
+# The loops do NOT abort on the first failure (this script runs under
+# `set -e`, so each fallible call is guarded). Instead every failure is
+# collected and reported per file, the wall is reported as the number of
+# bricks that pass BOTH phases, and the script exits non-zero if that number
+# is below the registered total.
+# ------------------------------------------------------------------
+
+declare -A MODULE_BUILT       # module -> "1" (built) / "0" (failed)
+UNIQUE_MODULES=()
+for entry in "${BRICKS[@]}"; do
+  module="${entry%%|*}"
+  if [ -z "${MODULE_BUILT[$module]+set}" ]; then
+    UNIQUE_MODULES+=("$module")
+    MODULE_BUILT[$module]="pending"
+  fi
+done
+
+echo ">> Phase A: compile ${#UNIQUE_MODULES[@]} unique brick module(s) from clean oleans" >&2
+for module in "${UNIQUE_MODULES[@]}"; do
+  if build_module "$module"; then
+    MODULE_BUILT[$module]="1"
+  else
+    MODULE_BUILT[$module]="0"
+  fi
+done
+
+echo ">> Phase B: axiom-footprint check for ${#BRICKS[@]} registered brick(s)" >&2
+PASSED=0
+FAILURES=()
 for entry in "${BRICKS[@]}"; do
   module="${entry%%|*}"
   thm="${entry#*|}"
-  check_brick "$module" "$thm"
+  if [ "${MODULE_BUILT[$module]}" != "1" ]; then
+    echo "skip: $thm — its module $module did not build from clean oleans." >&2
+    FAILURES+=("$thm  [module $module did not compile from clean oleans]")
+    continue
+  fi
+  if check_brick "$module" "$thm"; then
+    PASSED=$((PASSED + 1))
+  else
+    FAILURES+=("$thm  [axiom-footprint check failed]")
+  fi
 done
 
-echo "ok: Towers library built; all ${#BRICKS[@]} brick(s) passed the axiom-footprint check." >&2
+TOTAL=${#BRICKS[@]}
+echo "============================================================" >&2
+echo "WALL: $PASSED / $TOTAL bricks verified (built from clean oleans + classical-trio axiom footprint)." >&2
+
+if [ "${#FAILURES[@]}" -ne 0 ]; then
+  echo "" >&2
+  echo "error: ${#FAILURES[@]} registered brick(s) did NOT verify:" >&2
+  for f in "${FAILURES[@]}"; do
+    echo "  - $f" >&2
+  done
+  echo "" >&2
+  echo "The reported wall ($PASSED) counts ONLY bricks that actually build from" >&2
+  echo "clean oleans AND pass \`#print axioms\`. Refusing to report a healthy wall" >&2
+  echo "while the tower does not build (Task #240)." >&2
+  exit 1
+fi
+
+echo "ok: Towers library built from clean oleans; all $TOTAL brick(s) passed the axiom-footprint check." >&2
