@@ -60,8 +60,35 @@ history. Roadmap → `docs/ROADMAP.md`.
     inputs; they prove NO NS existence/uniqueness/regularity result. NS stays
     `Status: Open`; Surface #1/#2 stay OPEN; YM untouched.
 
-- **Wall:** 570 BRICKS (`${#BRICKS[@]}` in `scripts/check-towers.sh`). The
+- **Wall:** 575 BRICKS (`${#BRICKS[@]}` in `scripts/check-towers.sh`). The
   source of truth for the count is the script, not this file.
+- **Wall253_KP_Cluster — HONEST CONDITIONAL Kotecký–Preiss cluster expansion
+  (bricks, in BRICKS):** `Towers/YM/Wall253_KP_Cluster.lean` extends Wall252's
+  single-plaquette `kp_sum_lt_half` base case toward a full polymer sum in two
+  honestly-scoped layers. **(1) Base case:** `kp_sum_nonneg` (`0 ≤ KP_sum β g`
+  for `β ≥ 0`) and `kp_sum_lt_one` (`KP_sum β g < 1`, from `kp_sum_lt_half`'s
+  `< 1/2`). **(2) Cluster expansion (GENUINE multi-term sum over all polymer
+  sizes `n`):** `kp_cluster_summable` (`Summable (fun n => (KP_sum β g)^n)`) +
+  `kp_cluster_sum_lt_two` (`∑' n, (KP_sum β g)^n < 2`), via mathlib's
+  `summable_geometric_of_lt_one` / `tsum_geometric_of_lt_one`. **(3) Full
+  polymer-index criterion:** `kp_cluster_criterion` derives
+  `Summable (fun π => |activity π|)` over an arbitrary (possibly infinite)
+  polymer index from the NAMED OPEN surface `hKP : Summable (fun π =>
+  |activity π|·e^{a π})` by the comparison test (`e^{a π} ≥ 1`). 5 public
+  theorems registered; all `sorry`-free, `#print axioms` = classical trio
+  (verified live, raw `lean`, EXIT=0). HONEST: the geometric layer is a
+  SIZE-series MAJORANT with polymer multiplicity (entropy `≈ 7^n`, cf.
+  `EntropyBound.polymer_const = 7`) DROPPED — beating it geometrically needs
+  per-polymer activity `< 1/7`, NOT the `< 1/2` that `kp_sum_lt_half` supplies,
+  so the entropy-weighted polymer sum is NOT shown to converge here.
+  `kp_cluster_criterion` is CONDITIONAL on the OPEN surface `hKP` (the genuine
+  KP tree-graph / Ursell weighted-summability core, absent from mathlib
+  v4.12.0; a HYPOTHESIS, NOT `by sorry`, so NO `sorryAx`) — it is the same
+  comparison-test shape as the invariant-locked `kotecky_preiss_criterion` and
+  does NOT touch or discharge that `sorry`. This file proves `hKP` NOWHERE,
+  establishes NO unconditional KP convergence, and makes NO mass-gap / μ>0 /
+  Surface-#1 / RH / BSD claim. YM stays `Status: Open` (cluster expansion + OS
+  positivity remain to be done).
 - **Wall252_KP — MODELED Kotecký–Preiss smallness bound (bricks, in BRICKS):**
   `Towers/YM/Wall252_KP.lean` lands `kp_sum_lt_half` — for `0 ≤ β < 48/e`,
   `KP_sum β g < 1/2`, where `KP_sum β g := zModes·kEff·C_S4·exp(−β·E_g)·e·β /

@@ -3046,6 +3046,32 @@ BRICKS=(
   "Towers.YM.Wall252_KP|TheoremaAureum.Towers.YM.Wall252.kpModeWeight_lt"
   "Towers.YM.Wall252_KP|TheoremaAureum.Towers.YM.Wall252.kpModeWeight_nonneg"
   "Towers.YM.Wall252_KP|TheoremaAureum.Towers.YM.Wall252.kp_sum_lt_half"
+  # Wall253_KP_Cluster: HONEST CONDITIONAL Kotecký–Preiss cluster-expansion
+  # combinator built on Wall252's `kp_sum_lt_half` base case, in two layers.
+  # (1) BASE CASE: `kp_sum_nonneg`, `kp_sum_lt_one` give 0 ≤ KP_sum β g < 1 for
+  # 0 ≤ β < 48/e (from kp_sum_lt_half's < 1/2). (2) CLUSTER EXPANSION: a GENUINE
+  # multi-term geometric series over ALL polymer sizes n — `kp_cluster_summable`
+  # (Summable (fun n => (KP_sum β g)^n)) + `kp_cluster_sum_lt_two` (total < 2),
+  # via mathlib summable_geometric_of_lt_one / tsum_geometric_of_lt_one. (3) FULL
+  # POLYMER-INDEX criterion: `kp_cluster_criterion` derives Summable (∑_π
+  # |activity π|) over an arbitrary (infinite) polymer index from the NAMED OPEN
+  # surface hKP : Summable (|activity π|·e^{a π}) by the comparison test. All 5
+  # public theorems `sorry`-free; `#print axioms` = classical trio (verified by
+  # hand: lean Towers/YM/Wall253_KP_Cluster.lean + #print axioms, EXIT=0).
+  # HONEST: the geometric layer is a SIZE-series MAJORANT with polymer
+  # multiplicity (entropy ≈ 7^n) DROPPED — beating it needs activity < 1/7, NOT
+  # the < 1/2 kp_sum_lt_half supplies, so the entropy-weighted sum is NOT shown
+  # to converge. `kp_cluster_criterion` is CONDITIONAL on the OPEN surface hKP
+  # (the genuine KP tree-graph/Ursell core, absent from mathlib v4.12.0), a
+  # HYPOTHESIS not `by sorry`. This file proves hKP nowhere, establishes NO
+  # unconditional KP convergence, does NOT touch/discharge the invariant-locked
+  # `kotecky_preiss_criterion` sorry, and makes NO mass-gap / μ>0 / Surface-#1 /
+  # RH / BSD claim. YM stays Status: Open.
+  "Towers.YM.Wall253_KP_Cluster|TheoremaAureum.Towers.YM.Wall253.kp_sum_nonneg"
+  "Towers.YM.Wall253_KP_Cluster|TheoremaAureum.Towers.YM.Wall253.kp_sum_lt_one"
+  "Towers.YM.Wall253_KP_Cluster|TheoremaAureum.Towers.YM.Wall253.kp_cluster_summable"
+  "Towers.YM.Wall253_KP_Cluster|TheoremaAureum.Towers.YM.Wall253.kp_cluster_sum_lt_two"
+  "Towers.YM.Wall253_KP_Cluster|TheoremaAureum.Towers.YM.Wall253.kp_cluster_criterion"
 )
 
 VERIFIER_DIR="$(mktemp -d)"
