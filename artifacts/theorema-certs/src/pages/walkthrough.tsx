@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { ShaChip } from "@/components/sha-chip";
 
@@ -77,11 +77,49 @@ export default function WalkthroughPage() {
         </p>
       </header>
 
+      <Card className="p-6 border-amber-500/60 bg-amber-500/5">
+        <div className="flex items-center gap-2 font-mono text-[11px] text-amber-700 dark:text-amber-400 uppercase tracking-[0.18em] mb-3 border-b border-amber-500/30 pb-2">
+          <AlertTriangle className="w-4 h-4" />
+          Scope note — read before the Q&amp;A (do not over-read)
+        </div>
+        <div className="space-y-3 font-serif text-base leading-relaxed text-foreground/90">
+          <p>
+            The five stages below record a <strong>paper-level argument</strong>{" "}
+            and the <strong>numeric certificates</strong> — the VALOR inequalities
+            and the 280-curve enumeration — that the Lean sources genuinely check.
+          </p>
+          <p>
+            They are <strong>not</strong> a machine-verified proof of the Riemann
+            Hypothesis. In the current Lean sources the propositions{" "}
+            <span className={mono}>RiemannHypothesis</span> and{" "}
+            <span className={mono}>GRH_E_143a1</span> are{" "}
+            <strong>
+              defined as <span className={mono}>True</span> placeholders
+            </strong>{" "}
+            (<span className={mono}>Certificates.lean</span>). So the{" "}
+            <span className={mono}>[]</span> axiom footprint reported in Stage 5
+            certifies the{" "}
+            <strong>certificate scaffold and its axiom hygiene</strong> — that no
+            research-grade axiom is used — and <strong>not</strong> the
+            mathematical truth of RH or GRH.
+          </p>
+          <p>
+            In short: the arithmetic (VALOR, Ramanujan, No-CM) is real and
+            checked; the bridge from those facts to RH is the classical
+            Bost–Connes / Deligne theory, presented here as a{" "}
+            <strong>narrative</strong> and not itself formalized.{" "}
+            <strong>The Riemann Hypothesis is not claimed solved.</strong>
+          </p>
+        </div>
+      </Card>
+
       <Stage index="1" title="The Hypothesis Statement">
         <p>
-          We claim the Riemann Hypothesis follows unconditionally from the
+          The argument below records how the Riemann Hypothesis for the relevant
+          ζ-factor is <em>intended</em> to follow, at the paper level, from the
           certified chain{" "}
-          <span className={mono}>M1 ▶ M2 ▶ ⋯ ▶ M7 ▶ M8 ▶ M9</span>. The pivotal
+          <span className={mono}>M1 ▶ M2 ▶ ⋯ ▶ M7 ▶ M8 ▶ M9</span> (see the scope
+          note above for what the Lean sources do and do not verify). The pivotal
           object is the modular curve <span className={mono}>X_0(397)</span>{" "}
           with genus <span className={mono}>g(397) = 32</span>; the pivotal
           inequality is the Bost-sum bound{" "}
@@ -134,19 +172,21 @@ export default function WalkthroughPage() {
         </A>
       </Stage>
 
-      <Stage index="4" title="Bost-Connes 1995 Theorem 6 ⟹ QED for X_0(397)">
+      <Stage index="4" title="Bost-Connes 1995 Theorem 6 ⟹ the conditional conclusion for X_0(397)">
         <Q>
           So you have H1, Ramanujan, and No-CM. Plug it all into Bost-Connes?
         </Q>
         <A>
-          Exactly. Bost-Connes 1995 Theorem 6, with the three hypotheses
-          verified for <span className={mono}>X_0(397)</span>, delivers GRH for{" "}
-          <span className={mono}>E/X_0(397)</span>. The Arakelov descent (C05,
-          certified in M6) then yields the Riemann Hypothesis for the
+          Bost-Connes 1995 Theorem 6, with the three hypotheses verified for{" "}
+          <span className={mono}>X_0(397)</span>, would deliver GRH for{" "}
+          <span className={mono}>E/X_0(397)</span>; the Arakelov descent (C05,
+          certified in M6) would then yield the Riemann Hypothesis for the
           corresponding ζ-factor.{" "}
           <span className="font-mono text-xs uppercase tracking-wider text-primary">
-            QED for N = 397.
-          </span>
+            Conditional conclusion for N = 397
+          </span>{" "}
+          — conditional on the cited classical inputs (Bost–Connes Theorem 6,
+          Deligne), which are not themselves formalized here.
         </A>
       </Stage>
 
@@ -187,12 +227,18 @@ export default function WalkthroughPage() {
               M9_WeilTransfer_All
             </span>
           </span>
-          With that one swap, <span className={mono}>main_theorem</span>{" "}
-          becomes unconditional:{" "}
+          With that one swap, the Lean{" "}
+          <span className={mono}>main_theorem</span> no longer depends on the{" "}
+          <span className={mono}>H2_WeilTransfer</span> axiom:{" "}
           <span className={mono}>
             #print axioms TheoremaAureum.main_theorem
           </span>{" "}
-          now prints <span className={mono}>[]</span>.
+          prints <span className={mono}>[]</span>. As the scope note above
+          explains, the <span className={mono}>RiemannHypothesis</span> /{" "}
+          <span className={mono}>GRH_E_143a1</span> propositions are placeholder
+          definitions in the current sources, so this{" "}
+          <span className={mono}>[]</span> is axiom hygiene for the scaffold — not
+          a machine-checked proof of RH.
         </A>
       </Stage>
 
@@ -205,8 +251,11 @@ export default function WalkthroughPage() {
           M9 extends the argument across the 280-curve cohort with{" "}
           <span className={mono}>VALOR_min = 1084</span> and m9.out SHA{" "}
           <span className={mono}>624b93f7…</span>. Together they discharge the
-          last axiom; <span className={mono}>main_theorem</span> stands
-          unconditional, with axiom debt <span className={mono}>[]</span>.
+          last named axiom in the scaffold, leaving{" "}
+          <span className={mono}>main_theorem</span> with axiom debt{" "}
+          <span className={mono}>[]</span> — i.e. verified axiom hygiene for the
+          certificate chain, not, on its own, the truth of the Riemann Hypothesis
+          (see the scope note).
         </p>
       </Card>
     </div>

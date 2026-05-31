@@ -1319,6 +1319,39 @@ export default function DashboardPage() {
         <p className="text-sm font-mono text-muted-foreground">OVERVIEW OF DAG CHAIN VERIFICATION</p>
       </header>
 
+      <Card className="p-5 border-amber-500/50 bg-amber-500/5">
+        <div className="flex items-center gap-2 font-mono text-[11px] text-amber-700 dark:text-amber-400 uppercase tracking-[0.18em] mb-2 border-b border-amber-500/30 pb-2">
+          <AlertTriangle className="w-4 h-4" />
+          What this ledger is — and is not
+        </div>
+        <div className="space-y-2 font-serif text-sm leading-relaxed text-foreground/85">
+          <p>
+            This is a <strong>formal-verification ledger</strong> for an{" "}
+            <strong>in-progress</strong> Lean&nbsp;4 formalization: it tracks build
+            status, axiom footprints, and the certificate chain. An{" "}
+            <span className="font-mono">axiom debt = [ ]</span> means the listed
+            declarations compile against Lean&rsquo;s standard classical
+            foundations only — a statement about <em>logical hygiene</em>, not a
+            claim that a theorem&rsquo;s informal target has been settled.
+          </p>
+          <p>
+            <strong>No Millennium Prize problem is claimed solved here.</strong>{" "}
+            The Yang–Mills mass gap and Navier–Stokes regularity remain{" "}
+            <span className="font-mono">Open</span>; the Riemann and GRH
+            propositions in the current Lean sources are{" "}
+            <strong>placeholder definitions</strong>. See the{" "}
+            <Link href="/walkthrough" className="text-primary hover:underline">
+              Walkthrough
+            </Link>{" "}
+            and{" "}
+            <Link href="/foundations" className="text-primary hover:underline">
+              Foundations
+            </Link>{" "}
+            pages for the exact scope of each before drawing conclusions.
+          </p>
+        </div>
+      </Card>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 flex flex-col justify-between border-border bg-card">
           <span className="text-xs font-mono text-muted-foreground uppercase">DAG Status</span>
@@ -1363,6 +1396,12 @@ export default function DashboardPage() {
             </p>
             <p className="text-xs font-mono text-muted-foreground mt-1">
               H2_WeilTransfer is now a theorem (M9). #print axioms TheoremaAureum → [].
+            </p>
+            <p className="text-xs font-serif text-amber-700 dark:text-amber-400 mt-2 max-w-prose leading-relaxed">
+              Scope: [] is the axiom footprint of the formal scaffold as written.
+              The RiemannHypothesis / GRH propositions it targets are placeholder
+              definitions in the current sources, so this certifies axiom hygiene —
+              not a machine-checked proof of RH. See the walkthrough.
             </p>
           </div>
           <Link href="/walkthrough" data-testid="link-walkthrough-banner">
