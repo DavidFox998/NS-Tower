@@ -1,3 +1,24 @@
+/- VACUOUS-SURFACE AUDIT (2026-05-31) — the following named `*_Surface` Props
+   in this file are VACUOUS under the stand-in defs (`spectral_radius_def := 1`,
+   `Decay_constant_real := 1`, `Plaquette_action_def := 0`,
+   `Polymer_activity_def := 0`, `Wilson_measure_gaussian_part := 1`,
+   `mayer_K_constant := 1`, `Character_expansion_plaquette := 0`). They encode
+   NO genuine content:
+
+   Vacuously FALSE (reduce to `1 < 1`; can NEVER be discharged — any conditional
+   theorem over them holds only ex falso):
+     · `Strict_contraction_CE_real_Surface`
+     · `Strict_contraction_real_strict_Surface`
+     · `Spectral_radius_lt_one_strict_real_Surface`
+   Vacuously TRUE (provable with no hypothesis):
+     · `Single_plaquette_bound_Surface`        (1 ≤ exp 0 = 1)
+     · `Polymer_decoupling_estimate_Surface`   (0 ≤ 0·0)
+     · `Inductive_activity_bound_Surface`      (0 ≤ 1^n)
+     · `Polymer_activity_bound_real_Surface`   (0 ≤ 1^n)
+     · `Single_plaquette_bound_SU3_Surface`    (0 ≤ exp _)
+
+   Genuine non-trivial open surfaces are indexed in
+   `Towers/CanonicalSurfaces.lean`. These remain NOT bricks; kept for history. -/
 /-
 ================================================================
 Towers / Attempts / ClusterExpansion  (Batch 19.1f / 19.1g,

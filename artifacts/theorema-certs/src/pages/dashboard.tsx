@@ -1388,7 +1388,7 @@ export default function DashboardPage() {
           className="font-mono text-sm font-bold text-foreground"
           data-testid="text-surface-status-line"
         >
-          YM: OPEN (conditional) · HODGE: OPEN via AnalyticObstruction · NS: OPEN · SORRY: 0
+          YM: OPEN (conditional) · HODGE: OPEN via AnalyticObstruction · NS: OPEN · SORRY: 0 · VACUOUS: 11 (2 deprecated / 9 flagged) · GENUINE OPEN SURFACES: 6
         </p>
         <p className="text-xs font-serif text-muted-foreground mt-2 leading-relaxed max-w-prose">
           Every live <span className="font-mono">sorry</span> proof-term across{" "}
@@ -1399,7 +1399,13 @@ export default function DashboardPage() {
           trio. This is <em>logical hygiene</em> — it does <strong>not</strong> close any
           surface. Yang–Mills (conditional reduction only), Navier–Stokes, and Hodge (via the
           named-open <span className="font-mono">AnalyticObstruction</span>) all remain{" "}
-          <span className="font-mono">Open</span>.
+          <span className="font-mono">Open</span>. A vacuity audit (2026-05-31) further found{" "}
+          <strong>11 named surfaces were vacuous</strong> under the stand-in defs —
+          tautologously true (e.g.{" "}<span className="font-mono">δ₀ ≤ δ₀</span>) or
+          unsatisfiable (e.g.{" "}<span className="font-mono">1 &lt; 1</span>) — encoding nothing;
+          they are now deprecated or flagged. Only <strong>6 surfaces carry genuine content</strong>{" "}
+          (YM 4, NS 2; see <span className="font-mono">Towers/CanonicalSurfaces.lean</span>). No{" "}
+          <em>iff</em> with global regularity is claimed — four of the six are Yang–Mills, only two are NS.
         </p>
       </Card>
 

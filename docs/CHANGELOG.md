@@ -6,6 +6,70 @@ this file is the version history.
 
 ---
 
+## Vacuous surface purge + honest cross-tower registry (2026-05-31)
+
+Follow-up to the SORRY purge below. The SORRY purge converted every live
+`sorry` into a named open `Prop` hypothesis — but a `Prop` hypothesis is only
+*honest* if its statement is non-trivial. An audit of the resulting
+`*_Surface` Props found that **11 of them are VACUOUS** under the repo's
+stand-in defs, so they encode no mathematical content:
+
+- **Stand-in defs that collapse them.** `spectral_radius_def := 1`,
+  `Decay_constant_real := 1`, `Plaquette_action_def := 0`,
+  `Polymer_activity_def := 0`, `Wilson_measure_gaussian_part := 1`,
+  `mayer_K_constant := 1`, `Character_expansion_plaquette := 0`.
+- **Vacuously FALSE (`1 < 1`; can never be discharged — any conditional
+  theorem over them holds only ex falso):**
+  `ClusterExpansion.{Strict_contraction_CE_real, Strict_contraction_real_strict,
+  Spectral_radius_lt_one_strict_real}`, `T_g.Perron_Frobenius_for_transfer`.
+- **Vacuously TRUE (`δ₀ ≤ δ₀` / `0 ≤ 1` / `1 ≤ 1` / `0 ≤ exp _`):**
+  `UniformGap.gap_uniform_in_Lambda_v2`,
+  `Perron.Perron_Frobenius_for_transfer_unconditional`,
+  `ClusterExpansion.{Single_plaquette_bound, Polymer_decoupling_estimate,
+  Inductive_activity_bound, Polymer_activity_bound_real,
+  Single_plaquette_bound_SU3}`.
+
+**Resolution (honesty only — discharges NO surface, proves NO result):**
+
+- The 2 fully-vacuous files moved to `Towers/Deprecated/`
+  (`UniformGap_Placeholder.lean`, `Perron_Placeholder.lean`) with honest
+  DEPRECATED headers; the two `lakefile.lean` roots renamed accordingly
+  (`Towers.Attempts.{Perron,UniformGap}` →
+  `Towers.Deprecated.{Perron_Placeholder,UniformGap_Placeholder}`).
+- The 9 intermixed vacuous surfaces flagged in place with a VACUOUS-AUDIT
+  header comment in `Attempts/ClusterExpansion.lean` and `Attempts/T_g.lean`
+  (comment-only; no proof-term change).
+- New doc-only `Towers/CanonicalSurfaces.lean` (no imports, no defs, NOT a
+  lakefile root) indexes the **6 GENUINE non-trivial open surfaces**:
+  real-object — NS `Leray.leray_proj_ker_eq_grad`, NS
+  `Enstrophy.enstrophy_bound_global` (CAVEAT: simplified `‖u t 0‖` seminorm,
+  not full H¹), YM `Transfer.kotecky_preiss_criterion` (real `T_L`), YM
+  `Transfer.trivial_polymer_set_null` (real `haarN`); shadow-object
+  (necessary-not-sufficient, SCALAR operator) — YM `Clay.MassGap_YM4_Clay`
+  (`continuumOp = (1−scale)•1`), YM `MassGap574.YM_mass_gap`
+  (`H = wilsonAction U • 𝟙`). Plus 4 abstract placeholder-bundle hypotheses
+  (`OSHilbert`×3 over `D.reflectionPositive` / `D.timeZeroAlgebra_acts` /
+  `D.physHilbert_isHilbert`, and `T_g.Transfer_compact`).
+- **Refused** the originally-requested `NSGlobalRegularityHypothesis` and the
+  "NS global regularity ⟺ all 5 surfaces discharge" framing: it is false (FOUR
+  of the six genuine surfaces are Yang–Mills, only TWO are Navier–Stokes; no
+  `iff` holds), and the proposed Lean did not compile (no `Surface` type / no
+  `SurfaceDischarged`, `import` of defs not modules, mismatched arities). The
+  registry therefore makes **NO `iff` claim** and groups surfaces by their REAL
+  tower.
+- Registry placed OUTSIDE `Towers/NS/` so the **NS freeze** is untouched (it
+  only NAMES surfaces; it does not import or modify NS).
+- Dashboard "Open-surface status" badge updated honestly (no `iff`):
+  `… SORRY: 0 · VACUOUS: 11 (2 deprecated / 9 flagged) · GENUINE OPEN
+  SURFACES: 6`.
+
+SORRY: 0; axiom footprint stays the classical trio; YM/NS/Hodge all stay OPEN.
+Lean changes are file-move + comment/doc-only, so no `lake` rebuild was run
+(the `v4.12.0`-pin re-resolution is destructive); the dashboard typechecks
+clean.
+
+---
+
 ## SORRY purge — every live `sorry` proof-term → named open `Prop` (2026-05-31)
 
 Under an EXPLICIT one-pass user override of the NS freeze + YM invariant-locks,

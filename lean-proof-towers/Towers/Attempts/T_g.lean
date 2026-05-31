@@ -1,3 +1,12 @@
+/- VACUOUS-SURFACE AUDIT (2026-05-31):
+   · `Perron_Frobenius_for_transfer_Surface D g` = `spectral_radius_def D g < 1`
+     = `1 < 1` (stand-in `spectral_radius_def := 1`) — vacuously FALSE; can never
+     be discharged, so any conditional theorem over it holds only ex falso.
+   · `Transfer_compact_Surface D` = `D.physHilbert_isHilbert` — an ABSTRACT `Prop`
+     field of the placeholder `OSPreHilbert` bundle: non-vacuous as a hypothesis,
+     but necessary-not-sufficient (no concrete measure behind it).
+   Genuine non-trivial open surfaces are indexed in
+   `Towers/CanonicalSurfaces.lean`. NOT a brick; kept for history. -/
 /-
 ================================================================
 Towers / Attempts / T_g  (Batch 19.1c — Track 3)

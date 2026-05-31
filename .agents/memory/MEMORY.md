@@ -6,6 +6,7 @@
 - [EuclideanSpace mathlib v4.12.0](euclideanspace-mathlib-v4_12.md) — volume import is Haar.InnerProductSpace (not Lebesgue.EuclideanSpace); build elts via WithLp.equiv.symm; prove subspace closure via inner_*_right, not component indexing.
 - [Wilson-action positivity ≠ mass gap](wilson-action-positivity-honesty.md) — pointwise positivity is necessary-not-sufficient; off-vacuum inf=0 so no uniform gap from compactness; zero-iff is "all plaquettes trivial" NOT U=1.
 - [Lean sorry == sorryAx](lean-sorry-is-sorryax.md) — `by sorry` always prints sorryAx; to pass the axiom lock, name unproved inputs as a Prop def or a hypothesis, never `theorem := by sorry`.
+- [Named-Prop surface vacuity](named-prop-surface-vacuity.md) — a `sorry`→named-`Prop` hypothesis is honest only if non-trivial; stand-in consts collapse many YM surfaces to `1<1`/`0≤1` (vacuous). Unfold before trusting.
 - [Main-agent git is write-blocked](main-agent-git-blocked.md) — git writes (tag/commit/etc) rejected for main agent + guard scans heredoc bodies; track milestones as prose+SHA in docs, or delegate to a background Project Task.
 - [Direct-lean verify bypass](direct-lean-verify-bypass.md) — when mathlib pin is broken & lake/recovery are blocked, compile towers bricks with a hand-built LEAN_PATH over existing oleans (no lake, oleans safe).
 - [YM polymer-activity smallness](ym-polymer-activity-smallness.md) — `∀γ, activity β γ ≤ (1/8)^|γ|` with no β-threshold is FALSE (β=0 ⟹ activity=1); no pointwise energy floor (inf_{w≠1}=0); smallness is measure-level only.

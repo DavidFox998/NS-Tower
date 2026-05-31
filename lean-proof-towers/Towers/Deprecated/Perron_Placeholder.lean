@@ -1,3 +1,10 @@
+-- DEPRECATED: Vacuous tautology  ∀ g > 0, ∃ lam, 0 < lam < 1  (pick lam = 1/2).
+-- Provable with NO hypothesis; encodes nothing about any real transfer operator.
+-- The genuine non-trivial open surfaces are indexed in
+-- `Towers/CanonicalSurfaces.lean`. Kept for history only; NOT a brick.
+-- Moved from `Towers/Attempts/Perron.lean` on 2026-05-31.
+-- NOTE: post-purge this file is `sorry`-free (named `Prop` hypothesis); the
+-- "sorry-bearing" prose below is HISTORICAL and no longer accurate.
 /-
 ================================================================
 Towers / Attempts / Perron  (Batch 18 Track 1 — sorry-bearing stub)

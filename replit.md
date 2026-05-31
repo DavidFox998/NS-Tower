@@ -7,6 +7,25 @@ history. Roadmap → `docs/ROADMAP.md`.
 
 ## Current status — 2026-05-31
 
+- **VACUOUS SURFACE PURGE + HONEST REGISTRY (2026-05-31).** Audit found 11 of
+  the post-purge named `*_Surface` Props were VACUOUS under the stand-in defs
+  (`spectral_radius_def := 1` / `Decay_constant_real := 1` ⟹ `1 < 1`
+  unsatisfiable; `Plaquette_action_def := 0` / `Polymer_activity_def := 0` etc.
+  ⟹ `0 ≤ 1` trivially true) — they encode nothing. The 2 fully-vacuous files
+  moved to `Towers/Deprecated/` (`UniformGap_Placeholder`, `Perron_Placeholder`;
+  lakefile roots renamed); the other 9 are flagged in-place with a VACUOUS-AUDIT
+  header in `Attempts/{ClusterExpansion,T_g}.lean`. The 6 GENUINE non-trivial
+  open surfaces are indexed in the doc-only `Towers/CanonicalSurfaces.lean`:
+  real-object — NS `Leray.leray_proj_ker_eq_grad`, NS
+  `Enstrophy.enstrophy_bound_global` (simplified `‖u t 0‖` seminorm), YM
+  `Transfer.kotecky_preiss_criterion` (real `T_L`), YM
+  `Transfer.trivial_polymer_set_null` (real `haarN`); shadow-object
+  (necessary-not-sufficient, SCALAR operator) — YM `Clay.MassGap_YM4_Clay`, YM
+  `MassGap574.YM_mass_gap`. Plus 4 abstract placeholder-bundle hypotheses
+  (`OSHilbert`×3, `T_g.Transfer_compact`). NO `iff` / `NSGlobalRegularity` claim
+  — FOUR of the six are YM, only TWO are NS. Registry placed OUTSIDE `Towers/NS/`
+  to respect the NS freeze (it only NAMES surfaces; no import/modification of
+  NS). SORRY: 0; classical trio; every surface stays OPEN.
 - **SORRY PURGE (2026-05-31).** Every live `sorry` proof-term in `Towers/`
   converted to a named open `Prop` hypothesis (Option B); BSD `axiom`s →
   hypotheses. Pattern: `theorem foo (a) : Goal := by sorry` ⟹
