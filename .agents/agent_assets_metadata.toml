@@ -138,3 +138,33 @@ id = "EEINGJzE-tmwRNSISipEI"
 uri = "file://.local/downloads/WilsonPositivity.zip"
 type = "unspecified"
 title = "WilsonPositivity.lean (zipped)"
+
+[[outputs]]
+id = "RD51di58ThEGc9xxLwNHJ"
+uri = "file://docs/Wall256_Equation.svg"
+type = "image"
+title = "Wall256 — Derivation chain (clean)"
+
+[[outputs]]
+id = "ZEXgPZHIrffssuDyIVmtf"
+uri = "file://docs/Wall256_Derivation.svg"
+type = "image"
+title = "Wall256 — Derivation chain (annotated + axiom footer)"
+
+[[outputs]]
+id = "DzCcL0yQanafVL4yCq8iK"
+uri = "file://docs/Wall256_Tower.svg"
+type = "image"
+title = "Wall256 — Conditional reduction tower (H1/H2/H3 → conclusion)"
+
+[[outputs]]
+id = "l4dp4rJuW6nLz3xup2DzH"
+uri = "file://docs/Wall256_Status.png"
+type = "image"
+title = "Wall256 — Status card (commit / sorry / axioms / YM_STATUS)"
+
+[[outputs]]
+id = "4QL6wosDOhTZDRXKlNL_0"
+uri = "file://docs/Wall256_Lattice.png"
+type = "image"
+title = "Wall256 — SU(3) lattice slice (single-plaquette w1 = H1)"
