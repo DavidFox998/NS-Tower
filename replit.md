@@ -251,12 +251,13 @@ history. Roadmap → `docs/ROADMAP.md`.
   `Mathlib.Data.Nat.Choose.Basic`). NOT a brick / NOT in BRICKS / NOT a lakefile
   root / touches NO YM or NS surface. **HODGE_STATUS: OPEN.**
   - **Machine-checked (classical trio, 0 sorry):**
-    - **Combinatorics (`choose_5_2`=10, `choose_5_4`=5, `hankelRankX5_eq`=15,
+    - **Combinatorics (`choose_5_2`=10, `choose_5_4`=5, `rank_H_X5`=15,
       `rank_gt_test`: 10<15).** The `15` is the **Hankel rank** (Paper-2 input
-      datum), a DIFFERENT quantity from the Zoe invariant. `Z_le_two`: the Zoe
-      bound `1 ≤ Z ≤ p` with `p = 2` caps **Z = 2, NOT 15** — never conflate.
+      datum), a DIFFERENT quantity from the Zoe invariant. `Z_X5_bound`: the Zoe
+      bound `1 ≤ Z ≤ p` with `p = 2` caps **Z ≤ 2, NOT 15** — never conflate.
     - **`𝔗` is ENTIRE (R = ∞)** (`summable_pow_div_factorial_sq`,
-      `summable_abs_zoeTerm`): for any `Z, b = q^s ≥ 0` and ANY Frobenius pairing
+      `summable_abs_zoeTerm`, headline `radius_infinite`): for any `Z, b = q^s ≥ 0`
+      and ANY Frobenius pairing
       obeying the geometric Weil bound `|⟨ω,Frobⁿω⟩| ≤ C·Bⁿ`, the term sequence
       is absolutely summable — the `(n!)²` denominator overwhelms any geometric
       growth. This **REFUTES the earlier "radius 0 / pole at s=1" claim**: `𝔗`
@@ -268,7 +269,8 @@ history. Roadmap → `docs/ROADMAP.md`.
       rank. Refutes the *step*, not the Hodge conjecture.
   - **`hodge_obstruction_conditional` (CONDITIONAL, SORRY: 0, axiom-free).** The
     "divergence ⇒ transcendence ⇒ Hodge" step appears ONLY as a combinator over
-    a SINGLE named-open `Prop` hypothesis (`hDivToTrans`), closed by `exact`
+    a SINGLE named-open `Prop` (`AnalyticObstruction := (Diverges ω →
+    Transcendental ω)`), closed by `exact h h_div`
     (Wall256/Wall300 pattern), never `by sorry`. It is **VACUOUS for the actual
     object**: T3 shows `𝔗` is entire, so the divergence antecedent is never met
     — it proves transcendence of NO actual class. `Cls`/`Transcendental`/

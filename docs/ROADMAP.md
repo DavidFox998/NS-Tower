@@ -337,8 +337,9 @@ hypothesis (no Hodge instance proved or disproved; CMI).**
   `BRICKS`, not a lakefile root; touches no YM/NS surface; axiom footprint =
   classical core `{propext, Classical.choice, Quot.sound}`, 0 `sorry`/`sorryAx`.
 - Machine-checked: the combinatorics (`C(5,2)=10`, `C(5,2)+C(5,4)=15`,
-  `15 > 10`) and the Zoe bound `1 ≤ Z ≤ p = 2` ⟹ **Z = 2** (the `15` is the
-  Hankel rank, a *different* quantity — never "Z = 15"); and that `𝔗` is
+  `15 > 10`) and the carried-hypothesis Zoe bound `1 ≤ Z ≤ p = 2` ⟹ **Z ≤ 2**
+  (`Z_X5_bound`; the `15` is the Hankel rank `rank_H_X5`, a *different* quantity
+  — never "Z = 15"); and the headline `radius_infinite` that `𝔗` is
   **entire (R = ∞)** under the geometric Weil bound `|⟨ω,Frobⁿω⟩| ≤ C·Bⁿ`
   (the `(n!)²` dominates), which **refutes the prior "radius 0 / pole at s=1"
   framing**: `𝔗` as defined supplies no divergence / no obstruction.

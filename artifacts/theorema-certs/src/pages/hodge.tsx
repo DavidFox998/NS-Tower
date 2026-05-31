@@ -126,6 +126,13 @@ export default function HodgePage() {
           <ShieldCheck className="w-4 h-4" />
           Machine-checked — sorry-free · axioms = {TRIO}
         </div>
+        <div
+          className="mb-4 px-3 py-2 border border-green-500/40 bg-green-500/10 font-mono text-[11px] text-green-800 dark:text-green-300 leading-relaxed"
+          data-testid="badge-hodge-summary"
+        >
+          Z ≤ p = 2 · rank = 15 &gt; 10 · 𝔗 entire / R = ∞ ·
+          AnalyticObstruction OPEN · HODGE_STATUS: OPEN
+        </div>
         <div className="space-y-4">
           {MACHINE_CHECKED.map((f) => (
             <div
@@ -201,14 +208,15 @@ export default function HodgePage() {
           </em>{" "}
           In the Lean leaf this appears <strong>only</strong> as a conditional
           combinator, <span className={mono}>hodge_obstruction_conditional</span>,
-          over a single named-open hypothesis{" "}
+          over a single named-open <span className={mono}>Prop</span>{" "}
           <span className={mono}>
-            hDivToTrans : Diverges ω → Transcendental ω
+            AnalyticObstruction := (Diverges ω → Transcendental ω)
           </span>
           . The goal is closed from that hypothesis (<span className={mono}>
-            exact hDivToTrans h
-          </span>) with <strong>zero sorry</strong> — the same pattern as the YM
-          and NS scaffolds.
+            exact h h_div
+          </span>) with <strong>zero sorry</strong> — the same named-open-Prop
+          pattern as the YM (Wall256) and NS (Wall300) scaffolds. The Prop is
+          never discharged.
         </p>
         <p>
           Crucially this combinator is <strong>vacuous for the real object</strong>

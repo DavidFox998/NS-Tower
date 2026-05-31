@@ -19,14 +19,15 @@ a brick / NOT in BRICKS / NOT a lakefile root; touches NO YM/NS surface.
 conditional/arithmetic ones, 0 `sorry`/`sorryAx`.
 
 - **The reduction in one line.** Hodge-for-X₅ is reduced to ONE named-open
-  analytic hypothesis (`hDivToTrans : Diverges ω → Transcendental ω`); every
-  arithmetic fact around it is machine-checked. This documents exactly where the
-  arithmetic stops and the analytic hypothesis begins.
-- **Z ≠ 15 (honesty boundary).** `Z_le_two` transcribes Paper 3's `1 ≤ Z ≤ p`
-  with `p = 2` ⟹ **Z = 2**. The `15` (`hankelRankX5_eq`, `rank_gt_test`: 10<15)
+  analytic `Prop` (`AnalyticObstruction := (Diverges ω → Transcendental ω)`);
+  every arithmetic fact around it is machine-checked. This documents exactly
+  where the arithmetic stops and the analytic hypothesis begins.
+- **Z ≠ 15 (honesty boundary).** `Z_X5_bound` transcribes Paper 3's `1 ≤ Z ≤ p`
+  with `p = 2` ⟹ **Z ≤ 2**. The `15` (`rank_H_X5`, `rank_gt_test`: 10<15)
   is the Paper-2 **Hankel rank** — a different quantity, never conflated.
 - **`𝔗` is ENTIRE (R = ∞).** `summable_pow_div_factorial_sq` +
-  `summable_abs_zoeTerm`: for any `Z, b = q^s ≥ 0` and ANY Frobenius pairing with
+  `summable_abs_zoeTerm` (headline `radius_infinite`): for any `Z, b = q^s ≥ 0`
+  and ANY Frobenius pairing with
   the geometric Weil bound `|⟨ω,Frobⁿω⟩| ≤ C·Bⁿ`, the term sequence is absolutely
   summable — `(n!)²` dominates any geometric growth (comparison to
   `Real.summable_pow_div_factorial`). This **REFUTES the prior "radius 0 / pole

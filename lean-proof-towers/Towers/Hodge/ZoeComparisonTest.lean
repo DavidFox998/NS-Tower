@@ -74,8 +74,9 @@ theorem choose_5_4 : Nat.choose 5 4 = 5 := by decide
 HANKEL RANK, NOT the Zoe invariant.) -/
 def hankelRankX5 : ℕ := Nat.choose 5 2 + Nat.choose 5 4
 
-/-- `rank(H) = 15`. -/
-theorem hankelRankX5_eq : hankelRankX5 = 15 := by decide
+/-- **T2 — `rank(H) = 15`** (Paper 2 citation). The Hankel rank reported for the
+200 classes; an INPUT DATUM, and NOT the Zoe invariant. -/
+theorem rank_H_X5 : hankelRankX5 = 15 := by decide
 
 /-- The excess: the Hankel rank `15` strictly exceeds the recurrence-test order
 `C(5,2) = 10`. This is exactly Paper 2's "Algorithm A₂ returns False" — a failure
@@ -87,7 +88,7 @@ theorem rank_gt_test : Nat.choose 5 2 < hankelRankX5 := by decide
 taken as the (proved-in-the-paper) input `hZle`; this lemma only threads it. In
 particular `Z ≠ 15`: the `15` of Paper 2 is the Hankel rank, a different
 quantity. -/
-theorem Z_le_two {Z : ℕ} (hZle : Z ≤ pX5) : Z ≤ 2 := by
+theorem Z_X5_bound {Z : ℕ} (hZle : Z ≤ pX5) : Z ≤ 2 := by
   simpa [pX5] using hZle
 
 /-! ## T3 — the Zoe Comparison series is ENTIRE (R = ∞) -/
@@ -143,22 +144,50 @@ theorem summable_abs_zoeTerm
     _ = C * ((Z * Bnd * b) ^ n / (n.factorial : ℝ) ^ 2) := by
         rw [mul_pow, mul_pow]; ring
 
+/-- **T3 headline — the radius of convergence of `𝔗(ω, s)` is INFINITE.**
+For a fixed Zoe ratio `Z ≥ 0` and any Frobenius pairing obeying the geometric
+Weil bound `|⟨ω, Frobⁿ ω⟩| ≤ C·Bⁿ`, the term sequence of `𝔗` is absolutely
+summable **for every** `b = q^s ≥ 0` — i.e. for every value of `s`. Summability
+at every point of the variable is exactly what "radius of convergence `= ∞`"
+(the series is ENTIRE) means here; it is the direct corollary of
+`summable_abs_zoeTerm`. This is NOT a `FormalMultilinearSeries.radius = ⊤`
+computation — it is the pointwise-everywhere summability statement, which is the
+honest content. Refutes "radius 0 / pole at `s = 1`"; `pairing` abstract; no
+Hodge verdict. -/
+theorem radius_infinite
+    (Z C Bnd : ℝ) (pairing : ℕ → ℝ)
+    (hZ : 0 ≤ Z) (hBnd : 0 ≤ Bnd)
+    (hWeil : ∀ n, |pairing n| ≤ C * Bnd ^ n) :
+    ∀ b : ℝ, 0 ≤ b → Summable (fun n => |zoeTerm Z b pairing n|) :=
+  fun b hb => summable_abs_zoeTerm Z b C Bnd pairing hZ hb hBnd hWeil
+
 /-! ## T4 — the (vacuous) conditional obstruction combinator -/
 
-/-- **T4 (HONEST CONDITIONAL, SORRY-free).** A "divergence ⇒ transcendence"
-bridge for the Zoe Comparison Test, packaged over its SINGLE named-open input
-`hDivToTrans`. It threads `h_div : Diverges ω` through that bridge — nothing more.
+section Obstruction
+variable {Cls : Type*} (Diverges Transcendental : Cls → Prop) (ω : Cls)
+
+/-- **The single named-open analytic input.** `AnalyticObstruction` is the
+"divergence ⇒ transcendence" bridge for a class `ω`, packaged as ONE `Prop`. It
+is the only open hypothesis behind the conditional obstruction; it is **never
+discharged** here. This is the Wall256/Wall300 named-open-Prop pattern. -/
+def AnalyticObstruction : Prop := Diverges ω → Transcendental ω
+
+/-- **T4 (HONEST CONDITIONAL, SORRY-free).** Threads `h_div : Diverges ω`
+through the single named-open input `h : AnalyticObstruction Diverges
+Transcendental ω` — nothing more.
 
 CRUCIALLY this combinator is VACUOUS for the actual object: T3
-(`summable_abs_zoeTerm`) shows `𝔗(ω, s)` is entire, so `Diverges ω` is never
-satisfied for the genuine series. Hence this proves transcendence of NO actual
-class. `Cls`, `Transcendental`, `Diverges` are ABSTRACT; HODGE stays Open. -/
+(`radius_infinite` / `summable_abs_zoeTerm`) shows `𝔗(ω, s)` is entire, so
+`Diverges ω` is never satisfied for the genuine series. Hence it proves
+transcendence of NO actual class. `Cls`, `Transcendental`, `Diverges` are
+ABSTRACT; `AnalyticObstruction` stays OPEN; HODGE stays Open. -/
 theorem hodge_obstruction_conditional
-    {Cls : Type*} {Transcendental Diverges : Cls → Prop} (ω : Cls)
     (h_div : Diverges ω)
-    (hDivToTrans : Diverges ω → Transcendental ω) :
+    (h : AnalyticObstruction Diverges Transcendental ω) :
     Transcendental ω :=
-  hDivToTrans h_div
+  h h_div
+
+end Obstruction
 
 /-- **REFUTATION of Lemma 7.6, Step 3** (arithmetic witness). Step 3 bounds the
 Zoe invariant of an algebraic class by `dim (∧^p NS(X)_ℚ) = C(dim NS, p)`. For
