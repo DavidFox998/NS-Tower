@@ -141,10 +141,10 @@ const rows: CardRow[] = [
     moduleId: "M8",
     title: "M8 — Bost-Connes Input Checks — X_0(397)",
     claim:
-      "For each N in the 280-level table: |a_p(f)| ≤ 2√p (Deligne 1974) holds, and CM status is read from LMFDB (CM = 0 for 268 N, CM = 1 for 12 N).",
-    status: "CERTIFIED",
+      "Paper-level input checks for the proposed Bost–Connes step: the Deligne/Ramanujan bound |a_p(f)| ≤ 2√p (Deligne 1974) and the LMFDB CM status (CM = 0 for 268 N, CM = 1 for 12 N) over the 280-level table. NOT a machine-checked proof.",
+    status: "AWAITING",
     notes:
-      "Theorem 3.2 (Deligne Check) was spot-checked in M8.1 for 164 primes at N = 143 with maximal observed ratio 0.970269 < 1; the general case is Deligne 1974, which is in mathlib. Together with the LMFDB CM flag, these two inputs (Ramanujan bound + CM status) are exactly what Bost–Connes 1995 Theorem 6 consumes in M9.",
+      "AWAITING — paper-level / computational input check, NOT a machine-checked proof. The Deligne/Ramanujan bound was numerically spot-checked for 164 primes at N = 143 (max observed ratio 0.970269 < 1); the general bound is Deligne 1974 and the CM status is read from LMFDB. These two inputs are what Bost–Connes 1995 Theorem 6 would consume in M9. The spot-check is computational evidence, not a formal verification of the full 280-level claim.",
     sourceFile: "src/m08_braid.py",
     sourceSha: "beba78736e75ea515c1053d9c1c3ecd4a85f2222014e7e82004b16ff94fb1378",
     stdoutSha: "beba78736e75ea515c1053d9c1c3ecd4a85f2222014e7e82004b16ff94fb1378",
