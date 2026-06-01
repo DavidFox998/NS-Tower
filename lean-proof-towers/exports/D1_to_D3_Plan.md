@@ -40,6 +40,89 @@ the summability premise of `h_bridge` consumes. In the parent KP taxonomy
 
 ---
 
+## 0b. Sorry scan (file-grounded, 2026-06-01)
+
+**Method.** `rg ":=\s*sorry|by\s+sorry|exact\s+sorry"` over
+`Wall256_Scaffold.lean`, `Wall256_Note.lean`, `MassGap574.lean`, `Transfer.lean`.
+
+**Result: BARE PROOF-TERM `sorry` COUNT = 0.** Every `sorry`/`by sorry` string in
+these files is **docstring prose**, not a proof term. Post sorry-purge each
+former `sorry` is an explicit **named open `Prop` / hypothesis**. (E.g.
+`MassGap574.YM_mass_gap` is `:= hsurf`, consuming the hypothesis
+`hsurf : YM_mass_gap_Surface …` — it does NOT carry `by sorry`, despite stale
+docstring lines that still say "keeps its `sorry`".)
+
+So the table below inventories the **named open obligations** (the post-purge
+form of what would otherwise be sorries), tagged per the requested scheme:
+`[NEEDS_NUMERICS]` (needs a verified bound, out-of-tower), `[NEEDS_LEMMA]`
+(needs an absent mathlib/research lemma), `[BLOCKED_BY x]` (depends on another
+open obligation).
+
+| file | line | prop / hypothesis | status | blocker tag |
+| --- | --- | --- | --- | --- |
+| `Towers/YM/Wall256_Scaffold.lean` | 79 | `hw1 : w1 < 1/7` (= D4) | OPEN · OUT_OF_TOWER | `[NEEDS_NUMERICS]` — verified `∫_{SU(3)} e^{−β·S} < 1/7`; CERT_Arb certifies β₀∈[2.079416880123, 2.079416880124] **out-of-tower**, NOT a Lean object |
+| `Towers/YM/Wall256_Scaffold.lean` | 80 | `hOS : w1 < 1/7 → TruncatedActivityBound a` (= D5) | OPEN · OUT_OF_TOWER | `[NEEDS_LEMMA]` Osterwalder–Seiler 1978 Thm 2.1; `[BLOCKED_BY hw1]` |
+| `Towers/YM/Wall256_Scaffold.lean` | 81–82 | `h_bridge : Summable (Σ N n·a n) → ρ∈(0,1) clustering` (= D6) | OPEN · OUT_OF_TOWER | `[NEEDS_LEMMA]` Brydges–Federbush; `[BLOCKED_BY D1,D2,D3]` (its `Summable` premise) |
+| `Towers/YM/Transfer.lean` | 409 | `kotecky_preiss_criterion_Surface` | OPEN · genuine open combinatorics | `[NEEDS_LEMMA]` (D1 polymer count, E2); non-vacuous |
+| `Towers/YM/Transfer.lean` | 669 | `trivial_polymer_set_null_Surface` | OPEN · necessary-NOT-sufficient (different branch) | `[NEEDS_LEMMA]` E5 (`NoAtoms` precond) + E6 (L=1 estimate) |
+| `Towers/YM/MassGap574.lean` | 69 | `YM_mass_gap_Surface` (**Surface #1**, scalar shadow) | OPEN | `[NEEDS_LEMMA]` real Wilson transfer-operator gap (Wall 574); `H U = wilsonAction U • 𝟙` is the scalar/Perron shadow, NOT the real operator |
+
+**Does β > 2.079416880124 discharge any of these? NO.** CERT_Arb is OUT-OF-TOWER
+interval numerics, not a Lean term, so it discharges **zero** Lean obligations —
+not even `hw1` (there is no Lean proof of `w1 < 1/7`). It only certifies the
+*shape* of the constraint `hw1` would impose (β above the certified β₀) and the
+*negative* verdict at β=0.86. Every row stays **OPEN**.
+
+## 0c. Dependency graph (`hOS → … → Surface #1`)
+
+```
+        [NEEDS_NUMERICS, out-of-tower]
+hw1 (D4) ──────────────┐
+                       ▼
+                 hOS (D5)  ── needs ──▶ TruncatedActivityBound  (rate I > log 7)
+                       │
+   D1 polymer count ───┤
+   D2 activity bound ──┤──▶ D3 KP-summable  ⟹  Summable (Σ N n·a n)
+                       │                              │
+                       ▼                              ▼
+                 h_bridge (D6) ── consumes the Summable premise ──▶ ρ∈(0,1) geometric clustering
+                       │
+                       ▼
+   strong_coupling_decay_of_open_inputs  (Wall256_Scaffold.lean:76, abstract corr/sep)
+                       │  ABSTRACT two-point decay shape — LATTICE only, NOT Clay
+                       ▼
+   ┄┄┄ NO Lean edge exists here ┄┄┄  (lattice strong-coupling decay  ↛  real continuum transfer gap)
+                       ▼
+   YM_mass_gap_Surface  (Surface #1, MassGap574.lean:69) — scalar/Perron shadow, real-operator gap OPEN
+```
+
+The dashed gap is critical: closing `hOS`+`h_bridge`+D1–D3 would discharge only
+the **abstract lattice** decay shape of `strong_coupling_decay_of_open_inputs`.
+There is **no Lean implication** from that to `YM_mass_gap_Surface` — the latter
+is the scalar shadow of the *real* Wilson transfer operator, and the real
+continuum mass gap (Surface #1) stays OPEN regardless.
+
+## 0d. Minimal path to close Wall256 (given β₀ certified) — NOT scheduled
+
+Strictly to discharge `strong_coupling_decay_of_open_inputs`'s open inputs
+(this is the **lattice** reduction, NOT Surface #1):
+
+1. **`hw1`** `[NEEDS_NUMERICS]` — port a verified `w1 < 1/7` for `β > 2.079416880124`
+   into Lean. CERT_Arb gives the rigorous interval out-of-tower; a Lean object
+   needs SU(3) character theory or verified cubature — **absent from mathlib v4.12.0**.
+2. **D1** `[NEEDS_LEMMA]` — explicit `C, α > 0` connected-polymer count
+   `#{γ:|γ|=n} ≤ Cⁿ·ε^{α n}` (E2). The single hardest leaf (Clay-grade combinatorics).
+3. **D2** `[NEEDS_LEMMA]` — truncated activity bound `|z(γ)| ≲ e^{−β·energy(γ)}`.
+4. **D3** `[BLOCKED_BY D1,D2]` — KP summability `∑_{γ∋0}|z(γ)|e^{|γ|} < ∞`; gives the `Summable` premise.
+5. **`hOS`** `[NEEDS_LEMMA, BLOCKED_BY hw1]` — Osterwalder–Seiler step ⟹ `TruncatedActivityBound` with `I > log 7`.
+6. **`h_bridge`** `[NEEDS_LEMMA, BLOCKED_BY D3]` — Brydges–Federbush ⟹ geometric clustering.
+
+Even with all six, the result is the **abstract lattice two-point decay shape**,
+**NOT** the YM mass gap and **NOT** Surface #1 (see the dashed edge in §0c). No
+step is scheduled; steps 2–6 are absent from mathlib v4.12.0 / open research.
+
+---
+
 ## 1. `hOS` — the Osterwalder–Seiler cluster step (= KP leaf D5)
 
 - **Lean signature** (`Towers/YM/Wall256_Scaffold.lean:80`, hypothesis of
