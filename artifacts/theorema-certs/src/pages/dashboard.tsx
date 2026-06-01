@@ -1388,7 +1388,7 @@ export default function DashboardPage() {
           className="font-mono text-sm font-bold text-foreground"
           data-testid="text-surface-status-line"
         >
-          YM: OPEN (conditional) · HODGE: OPEN via AnalyticObstruction · NS: OPEN · SORRY: 0 · VACUOUS: 11 (2 deprecated / 9 flagged) · GENUINE OPEN SURFACES: 6
+          YM_Clay: OPEN (conditional) · NS: OPEN · HODGE: OPEN via AnalyticObstruction · classical trio only · SORRY: 0 · VACUOUS: 11 (2 deprecated / 9 flagged) · GENUINE OPEN SURFACES: 6 (YM_Clay_Open + NS_Open). YM "wall" bricks (e.g. Wall263) are proven geometry lemmas that make NO mass-gap claim.
         </p>
         <p className="text-xs font-serif text-muted-foreground mt-2 leading-relaxed max-w-prose">
           Every live <span className="font-mono">sorry</span> proof-term across{" "}
@@ -1404,7 +1404,11 @@ export default function DashboardPage() {
           tautologously true (e.g.{" "}<span className="font-mono">δ₀ ≤ δ₀</span>) or
           unsatisfiable (e.g.{" "}<span className="font-mono">1 &lt; 1</span>) — encoding nothing;
           they are now deprecated or flagged. Only <strong>6 surfaces carry genuine content</strong>{" "}
-          (YM 4, NS 2; see <span className="font-mono">Towers/CanonicalSurfaces.lean</span>). No{" "}
+          (YM 4, NS 2; the 3 genuine YM Clay-type surfaces are bundled in{" "}
+          <span className="font-mono">Towers/YM/CanonicalSurfaces.lean</span> as{" "}
+          <span className="font-mono">YM_Clay_Open</span>, and the 2 NS surfaces in{" "}
+          <span className="font-mono">Towers/NS/CanonicalSurfaces.lean</span> as{" "}
+          <span className="font-mono">NS_Open</span>). No{" "}
           <em>iff</em> with global regularity is claimed — four of the six are Yang–Mills, only two are NS.
         </p>
       </Card>

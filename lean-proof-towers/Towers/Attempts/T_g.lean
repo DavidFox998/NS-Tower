@@ -6,7 +6,8 @@
      field of the placeholder `OSPreHilbert` bundle: non-vacuous as a hypothesis,
      but necessary-not-sufficient (no concrete measure behind it).
    Genuine non-trivial open surfaces are indexed in
-   `Towers/CanonicalSurfaces.lean`. NOT a brick; kept for history. -/
+   `Towers/YM/CanonicalSurfaces.lean` and `Towers/NS/CanonicalSurfaces.lean`.
+   NOT a brick; kept for history. -/
 /-
 ================================================================
 Towers / Attempts / T_g  (Batch 19.1c — Track 3)

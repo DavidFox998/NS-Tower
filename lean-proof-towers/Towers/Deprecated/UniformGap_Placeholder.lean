@@ -1,7 +1,7 @@
 -- DEPRECATED: Vacuous tautology  ∃ δ₀ > 0, ∀ Λ, δ₀ ≤ δ₀  (reflexively TRUE).
 -- Does NOT encode the Uniform Spectral Gap; the body is `δ₀ ≤ δ₀`, never `Δ_Λ`.
 -- The genuine non-trivial open surfaces are indexed in
--- `Towers/CanonicalSurfaces.lean`. Kept for history only; NOT a brick.
+-- `Towers/YM/CanonicalSurfaces.lean` + `Towers/NS/CanonicalSurfaces.lean`. Kept for history only; NOT a brick.
 -- Moved from `Towers/Attempts/UniformGap.lean` on 2026-05-31.
 -- NOTE: post-purge this file is `sorry`-free (named `Prop` hypothesis); the
 -- "sorry-bearing" prose below is HISTORICAL and no longer accurate.

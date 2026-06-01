@@ -18,7 +18,8 @@
      · `Single_plaquette_bound_SU3_Surface`    (0 ≤ exp _)
 
    Genuine non-trivial open surfaces are indexed in
-   `Towers/CanonicalSurfaces.lean`. These remain NOT bricks; kept for history. -/
+   `Towers/YM/CanonicalSurfaces.lean` and `Towers/NS/CanonicalSurfaces.lean`.
+   These remain NOT bricks; kept for history. -/
 /-
 ================================================================
 Towers / Attempts / ClusterExpansion  (Batch 19.1f / 19.1g,
