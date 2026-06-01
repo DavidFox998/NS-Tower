@@ -9,40 +9,52 @@ this file is the version history.
 ## Computable Bost-violation check — `Towers/BostViolations/Compute.lean` (2026-06-01)
 
 A COMPUTABLE (`#eval`-able) rational sanity check of the Bost sum over the REAL
-explicit prime set `S_4 = {2,3,19,191}` (`Defs.S_4`), run across the 12 documented
-CM curves (`Twelve.ExceptionalSet₁₂`). NOT a brick; proves NO theorem; asserts NO
-violation. Direct-lean verify EXIT=0; classical trio; SORRY: 0.
+certified prime data — the full 14-prime exceptional set `S_14` (`Defs.S_14`,
+M4 / `bin/print_S14`) and its 4-prime prefix `S_4 = {2,3,19,191}` (`Defs.S_4`,
+M5) — run across the 12 documented CM curves (`Twelve.ExceptionalSet₁₂`). NOT a
+brick; proves NO theorem; asserts NO violation. Direct-lean verify EXIT=0;
+classical trio; SORRY: 0.
 
-Why direction (C) was REFUSED (no fabrication):
+Why direction (C) was REFUSED (no fabrication), second pass:
 
-- The user's paste of "12 per-discriminant α₀(d) values" contained only `...`
-  placeholders, except `d=32 = 299.31415926535897932384` — which is just the
-  universal constant α₀ = 299 + π/10 (M1), not a per-`d` value. The template's
-  example `27 => 298.1…` has NO source.
+- The user's (re-pasted) "12 per-discriminant α₀(d) values" again contained only
+  `...` placeholders, except `d=32 = 299.31415926535897932384` — the universal
+  constant α₀ = 299 + π/10 (M1), not a per-`d` value. The template's example
+  `27 => 298.1…` has NO source.
+- The attached `attached_assets/alpha_sieve_…pdf` ("Transcendental Sieve α₀",
+  D. Fox, 2026-05-21) is a ONE-PAGE abstract: NO per-`d` α₀(d) table, NO embedded
+  prime list (the only long digit-runs are a timestamp, the π digits of the one
+  α₀, and two figure numbers). It merely NAMES the generator `bin/print_S14` and
+  a SHA-256 "Shaw lock". `print_S14` emits the SINGLE 14-prime set already
+  encoded verbatim as `Defs.S_14` — NOT a per-curve family.
 - Repo-wide search confirms there is NO per-discriminant `α₀(d)` family anywhere.
   M1/M3/M4/M5 (`paper/modules/m01-alpha0def.tex`, etc.) define ONE constant
   α₀ = 299 + π/10 for the SINGLE exceptional set. Encoding 12 distinct `α₀(d)`
   would require fabricating 11 numbers — forbidden by the honesty lock. So
   `Alpha0Data.lean` was NOT created; no opaque, no `sorry`, no invented data.
 
-What the file does provide (direction A, the honest verification):
+What the file does provide (the honest verification):
 
 - `ratLog : ℕ → ℚ` — rounded (3-dp) rational approximation of `Real.log`,
-  hardcoded rounded constants for the primes in `S_4`/`S_14`
-  (2,3,5,7,11,19,191) + `Nat.log2` fallback.
-  APPROXIMATION ONLY; the certified `C(S_4) > 2√13` is M5's external `arb`
-  certificate, not this `#eval`.
+  hardcoded rounded constants for the small primes 2,3,5,7,11,19,191; coarse
+  `Nat.log2` fallback for the large `S_14` primes. APPROXIMATION ONLY; the
+  certified `C(S_4) > 2√13` is M5's external `arb` certificate, not this `#eval`.
 - `C_rat (S) := Σ_{p∈S} ratLog p · p/(p-1)` over ℚ (computable; `Twelve.C` is
-  noncomputable over ℝ). `#eval C_rat S_4 = 19531103/1710000 ≈ 11.42` — reproduces
-  M5's `C(S_4) ≈ 11.4221` to rounding.
-- `bostThreshold := 7211/1000` (2√13 ≈ 7.2111); the ≈ 11.42 vs ≈ 7.21 margin is far
-  larger than the rounding error, so the test result is rounding-independent.
-- `S_of_curve (_X : CM_Curve) := Defs.S_4` — CONSTANT for every curve (the docs give
-  `S_X` numerically only for `S_4`; explicit unused `_X` flags curve-independence).
+  noncomputable over ℝ). `#eval C_rat S_4 ≈ 11.42` reproduces M5's
+  `C(S_4) ≈ 11.4221`; `#eval C_rat S_14 ≈ 842.42` (the full 14-prime set).
+- `bostThreshold := 7211/1000` (2√13 ≈ 7.2111). The `[]` (no-violation) result is
+  ROBUST to the rounding: `ratLog p ≥ 0` and `p/(p-1) > 0`, so `C_rat` is monotone
+  under set inclusion, and `S_4 ⊆ S_14` ⟹ `C_rat S_14 ≥ C_rat S_4 ≈ 11.42 ≫ 7.21`
+  for any nonnegative log estimator (including the current `ratLog`).
+- `S_of_curve (_X : CM_Curve) := Defs.S_14` — CONSTANT 14-prime set for EVERY
+  curve (the source defines ONE exceptional set `S(α₀)`, not a per-`d` family;
+  explicit unused `_X` flags curve-independence). The user's "14-prime
+  exceptional data set" ask is honored with the REAL `S_14`, not a fabricated
+  per-curve family.
 - `curves_12 := (exceptional_12.sort (· ≤ ·)).map CM_Curve.mk` — COMPUTABLE list of
   the same 12 levels (`Finset.toList` is noncomputable in v4.12.0, so we sort).
 - `BostViolation`, `BostViolations_12 := []` — the honest result: NO violations among
-  the 12 (C only grows: C(S_4)≈11.42, M10 C(S_5)≈40.4, both ≫ 2√13). The conjecture
+  the 12 (all 12 share the constant `C_rat S_14 ≈ 842.42 ≫ 2√13`). The conjecture
   `Twelve.TwelveViolation_Surface` stays OPEN and unasserted.
 
 Registered as lakefile root `Towers.BostViolations.Compute` (NOT in `check-towers.sh`

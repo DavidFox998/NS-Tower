@@ -11,20 +11,26 @@ history. Roadmap → `docs/ROADMAP.md`.
   (2026-06-01).** Direction (C) REFUSED, direction (A) DELIVERED. The user's
   paste of "12 per-discriminant α₀(d) values" was ALL `...` placeholders except
   `d=32 = 299.31415926535897932384` (= the universal constant α₀=299+π/10, M1,
-  NOT a per-`d` value); the example `27 => 298.1…` has NO source. Repo-wide
+  NOT a per-`d` value); the example `27 => 298.1…` has NO source. The attached
+  `alpha_sieve_…pdf` (Fox, "Transcendental Sieve α₀") is a ONE-PAGE abstract —
+  NO per-`d` table, NO embedded primes; it only NAMES `bin/print_S14`, the
+  generator of the SINGLE 14-prime set already in `Defs.S_14`. Repo-wide
   search reconfirms there is NO per-discriminant α₀(d) family — M1/M3/M4/M5
   define ONE constant α₀=299+π/10 for the SINGLE exceptional set — so encoding 12
   distinct α₀(d) would FABRICATE 11 numbers (forbidden). `Alpha0Data.lean` was
-  NOT created. Instead, the honest computable (A): `ratLog:ℕ→ℚ` (rounded 3-dp
+  NOT created. Instead, the honest computable check: `ratLog:ℕ→ℚ` (rounded 3-dp
   `Real.log` approx, hardcoded rounded constants for 2,3,5,7,11,19,191 +
-  `Nat.log2` fallback),
+  `Nat.log2` fallback for the large S_14 primes),
   `C_rat S := Σ_{p∈S} ratLog p·p/(p-1)` over ℚ (`Twelve.C` is noncomputable over
   ℝ), `bostThreshold:=7211/1000` (2√13≈7.2111), `S_of_curve (_X:CM_Curve):=
-  Defs.S_4` (CONSTANT — docs give S_X numerically only for S_4),
+  Defs.S_14` (CONSTANT 14-prime certified set for EVERY curve — the source
+  defines ONE exceptional set `S(α₀)`, not a per-`d` family; honors the user's
+  "14-prime data set" ask with REAL S_14),
   `curves_12 := (exceptional_12.sort (·≤·)).map CM_Curve.mk` (`Finset.toList` is
   noncomputable in v4.12.0 → sort), `BostViolation`, `BostViolations_12`. `#eval`
-  results: `C_rat S_4 = 19531103/1710000 ≈ 11.42` (reproduces M5 C(S_4)≈11.4221),
-  all 12 curves identical (≈11.42), `BostViolations_12 = []`. Direct-lean EXIT=0;
+  results: `C_rat S_4 ≈ 11.42` (reproduces M5 C(S_4)≈11.4221), `C_rat S_14 ≈
+  842.42` (all 12 curves identical — constant S_14), `BostViolations_12 = []`
+  (no-violation is ROBUST: ratLog≥0 ⟹ C_rat monotone, S_4⊆S_14). Direct-lean EXIT=0;
   classical trio; SORRY: 0, no axiom/opaque/sorry; NOT a brick; registered as
   lakefile root `Towers.BostViolations.Compute`. Per the user's stopping rule
   (`[]` ⟹ accept no violations in the 12), we STOP — the conjecture

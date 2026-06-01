@@ -1,35 +1,45 @@
 -- Axiom status: Uses [propext, Classical.choice, Quot.sound] (subset)
 -- Scope: COMPUTABLE rational sanity-check of the Bost sum over the REAL
---        explicit prime set S_4. Proves NO theorem; asserts NO violation.
+--        14-prime certified set S_14 (and its prefix S_4). Proves NO theorem;
+--        asserts NO violation.
 /-
 ================================================================
 Towers / BostViolations / Compute — computable rational Bost-sum check
 ================================================================
 
 **THIS FILE IS NOT A BRICK.** It is a COMPUTABLE (`#eval`-able) rational
-sanity check that reproduces Module 5's numeric Bost sum `C(S_4) ≈ 11.42`
-over the REAL, explicit 4-prime set `S_4 = {2,3,19,191}` (`Defs.S_4`), and
+sanity check of the Bost sum over the REAL certified prime data: the full
+14-prime exceptional set `S_14` (`Defs.S_14`, Module 4 / `bin/print_S14`) and
+its leading 4-prime prefix `S_4 = {2,3,19,191}` (`Defs.S_4`, Module 5). It
 runs the Bost-bound test across the 12 documented CM curves
 (`Twelve.ExceptionalSet₁₂`).
 
 HONESTY NOTES — read before trusting any number printed here:
 
-  * There is NO per-discriminant `α₀(d)` family. Battle Plan v1.6 (M1)
-    defines ONE constant α₀ = 299 + π/10 (see `Defs.alpha_0`), used for the
-    SINGLE exceptional set. The documents give the per-curve prime set `S_X`
-    numerically only for `S_4` (M4/M5). So `S_of_curve` is the CONSTANT
-    `Defs.S_4` for EVERY curve — there is no honest per-`d` prime data to
-    encode, and fabricating 12 distinct sets/α₀'s is refused.
-  * `ratLog` is a ROUNDED (3-dp) rational approximation of `Real.log`; `C_rat`
-    is therefore an APPROXIMATION of the real Bost sum `Twelve.C`, for
-    `#eval`/visualisation only. The CERTIFIED inequality `C(S_4) > 2√13` is
-    Module 5's external `arb` certificate, NOT this `#eval`. The margin
-    (≈ 11.42 vs ≈ 7.21) is far larger than the rounding error, so the test
-    result does not depend on the rounding.
-  * `BostViolations_12` is EXPECTED to be `[]` (no violations): the certified
-    data only GROWS the Bost sum (C(S_4) ≈ 11.42, C(S_5) ≈ 40.4, both ≫ 2√13).
-    A non-empty list would indicate a violation; under the real data there is
-    none. This file asserts NO theorem either way — the violation conjecture
+  * `attached_assets/alpha_sieve_1780282002329.pdf` ("Transcendental Sieve α₀",
+    D. Fox) is a ONE-PAGE abstract. It contains NO per-discriminant `α₀(d)`
+    table and NO embedded prime list — it only NAMES the generator
+    `bin/print_S14` and a SHA-256 "Shaw lock". `print_S14` emits the SINGLE
+    14-prime set already encoded verbatim as `Defs.S_14`; it is NOT a
+    per-curve family.
+  * There is therefore NO per-discriminant `α₀(d)` family. Battle Plan v1.6
+    (M1) defines ONE constant α₀ = 299 + π/10 (`Defs.alpha_0`) for the SINGLE
+    exceptional set `S(α₀)`. Encoding "12 distinct `α₀(d)`" would require
+    fabricating 11 numbers with no source — REFUSED. Hence `S_of_curve` is the
+    CONSTANT `Defs.S_14` for every curve (curve-INDEPENDENT, explicit unused
+    `_X`); no `opaque`, no `sorry`, no invented data.
+  * `ratLog` is a ROUNDED (3-dp) rational approximation of `Real.log` with exact
+    table entries only for the small primes 2,3,5,7,11,19,191; the large `S_14`
+    primes fall to the coarse `Nat.log2` fallback. So `C_rat` is an
+    APPROXIMATION of the real Bost sum `Twelve.C`, for `#eval`/visualisation
+    only — the CERTIFIED inequality `C(S_4) > 2√13` is Module 5's external `arb`
+    certificate, NOT this `#eval`.
+  * The `[]` (no-violation) result is ROBUST to the rounding: `ratLog p ≥ 0` and
+    `p/(p-1) > 0` for every prime, so `C_rat` is monotone under set inclusion,
+    and `S_4 ⊆ S_14` gives `C_rat S_14 ≥ C_rat S_4 ≈ 11.42 ≫ 7.21` for any
+    nonnegative log estimator (including the current `ratLog`). Adding primes
+    only GROWS the sum.
+    This file asserts NO theorem either way — the violation conjecture
     `Twelve.TwelveViolation_Surface` stays OPEN and unasserted.
 
 SORRY: 0. No `sorry`/`axiom`/`opaque`. Axioms: classical-trio subset.
@@ -46,9 +56,10 @@ open TheoremaAureum.Towers.Hodge.Twelve
 open TheoremaAureum.Towers.Hodge.Defs
 open BigOperators
 
-/-- Rounded (3-dp) rational approximation of `Real.log n`, for the primes that
-actually occur in `S_4` / `S_14`; coarse `Nat.log2` fallback otherwise.
-APPROXIMATION ONLY — see file header. -/
+/-- Rounded (3-dp) rational approximation of `Real.log n`: hardcoded rounded
+constants for the small primes 2,3,5,7,11,19,191; coarse `Nat.log2` fallback for
+everything else (incl. the large `S_14` primes). APPROXIMATION ONLY — see file
+header. Note `ratLog p ≥ 0` for every `p`. -/
 def ratLog (n : ℕ) : ℚ :=
   if n = 2 then 693/1000
   else if n = 3 then 1099/1000
@@ -67,10 +78,11 @@ def C_rat (S : Finset ℕ) : ℚ :=
 /-- The Bost threshold `2√13 ≈ 7.2111`, as a rational approximation. -/
 def bostThreshold : ℚ := 7211/1000
 
-/-- The prime set attached to a curve. CONSTANT `Defs.S_4` for every curve:
-the documents give `S_X` numerically only for `S_4`; there is NO per-`d` prime
-data (see file header). The unused argument is explicit `_X`. -/
-def S_of_curve (_X : CM_Curve) : Finset ℕ := S_4
+/-- The prime set attached to a curve. CONSTANT `Defs.S_14` (the full 14-prime
+certified exceptional set, M4 / `bin/print_S14`) for EVERY curve: the source
+defines ONE exceptional set `S(α₀)`, not a per-`d` family, so there is no honest
+per-curve prime data (see file header). The unused argument is explicit `_X`. -/
+def S_of_curve (_X : CM_Curve) : Finset ℕ := S_14
 
 /-- The 12 documented CM curves as a COMPUTABLE list, derived from the real
 `Twelve.exceptional_12` via `Finset.sort` (ascending). `Finset.toList` is
@@ -92,7 +104,8 @@ def BostViolations_12 : List ℕ :=
 
 -- Computable witnesses (run at elaboration time):
 #eval C_rat S_4                                              -- ≈ 11.42 (M5 reproduction)
-#eval curves_12.map (fun X => (X.id, C_rat (S_of_curve X)))
+#eval C_rat S_14                                             -- full 14-prime set (≫ 11.42)
+#eval curves_12.map (fun X => (X.id, C_rat (S_of_curve X))) -- 12 × C_rat S_14 (constant)
 #eval BostViolations_12                                     -- expected: []
 
 end TheoremaAureum.Towers.BostViolations
