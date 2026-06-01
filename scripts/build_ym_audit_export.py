@@ -34,6 +34,7 @@ import datetime
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 YM_DIR = os.path.join(REPO, "lean-proof-towers", "Towers", "YM")
 OUT = os.path.join(REPO, "lean-proof-towers", "exports", "ym-audit-export.json")
+META_OUT = os.path.join(REPO, "lean-proof-towers", "exports", "ym-audit-export.meta.json")
 REL = "Towers/YM"
 
 KEYWORDS = ["mass", "gap", "glueball", "su3", "su(3)", "wilson", "physical"]
@@ -190,6 +191,43 @@ def extract_theorem(text: str, name: str):
     return statement, proof
 
 
+def validate_schema(export: dict) -> None:
+    """Hard-fail if the contract JSON drifts from the user's AUDIT_EXPORT schema.
+
+    Enforces EXACT top-level keys and EXACT per-object key sets (no extras
+    anywhere) so the file stays machine-ingestible by a strict parser. Any
+    out-of-schema key here is a contract violation, not a warning.
+    """
+    top = {
+        "transfer_operator", "su3_files", "massgap574",
+        "bridge_data", "kappa_history", "comments_raw",
+    }
+    assert set(export) == top, "top-level keys drift: %s" % (set(export) ^ top)
+
+    assert set(export["transfer_operator"]) == {
+        "file", "definition_H", "is_scalar_shadow", "proven_bound"
+    }, "transfer_operator keys drift"
+
+    for it in export["su3_files"]:
+        assert set(it) == {"path", "sha256", "content"}, "su3_files keys drift"
+
+    assert set(export["massgap574"]) == {
+        "path", "full_text", "statement", "proof_body", "sorry_count"
+    }, "massgap574 keys drift"
+
+    assert set(export["bridge_data"]) == {"P%d" % k for k in range(6, 21)}, \
+        "bridge_data keys drift"
+    for v in export["bridge_data"].values():
+        assert set(v) == {"best_q", "best_m", "best_defect"}, \
+            "bridge_data entry keys drift"
+
+    for it in export["kappa_history"]:
+        assert set(it) == {"version", "value", "source"}, "kappa_history keys drift"
+
+    for it in export["comments_raw"]:
+        assert set(it) == {"file", "line", "text"}, "comments_raw keys drift"
+
+
 def main():
     files = list_ym_files()
 
@@ -207,7 +245,8 @@ def main():
             "content": None,  # stubs null per spec; full content only in dedicated blocks
         })
 
-    # --- transfer_operator (step 2) -----------------------------------------
+    # --- transfer_operator (step 2): STRICT schema = file/definition_H/
+    #     is_scalar_shadow/proven_bound ONLY. T_L + notes go to the sidecar. ---
     lpr = read(os.path.join(YM_DIR, "LatticePositivityReal.lean"))
     transfer_src = read(os.path.join(YM_DIR, "Transfer.lean"))
     H_def = extract_def(lpr, "H")
@@ -217,24 +256,6 @@ def main():
         "definition_H": H_def,
         "is_scalar_shadow": True,
         "proven_bound": None,
-        "_note": (
-            "H is the SCALAR / Perron-sector shadow `H U = wilsonAction U \u2022 \U0001D7D9`, "
-            "NOT the real Wilson transfer operator on L\u00b2(\u220f SU(3), Haar). It is "
-            "DEFINED in LatticePositivityReal.lean (line 73) and consumed downstream by "
-            "the Step-5 spectral predicates (e.g. SpectrumBound.lean) and the MassGap574 "
-            "scaffold. No `m > 0` / mass-gap / Surface-#1 bound is proven anywhere."
-        ),
-        "T_L": {
-            "file": "%s/Transfer.lean" % REL,
-            "definition_T_L": T_L_def,
-            "proven_bound": "\u2016T_L\u2016 \u2264 1 (sub-Markov contraction; transfer_operator_norm_le)",
-            "_note": (
-                "Genuine integral operator over the REAL product Haar measure. Only the "
-                "UPPER bound \u2016T_L\u2016 \u2264 1 is proven \u2014 NOT a spectral gap, NOT a strict "
-                "contraction, NO `m > 0` / mass-gap claim. The spectral gap stays OPEN as "
-                "Transfer.kotecky_preiss_criterion."
-            ),
-        },
     }
 
     # --- su3_files (step 3) -------------------------------------------------
@@ -247,7 +268,8 @@ def main():
             "content": content,
         })
 
-    # --- massgap574 (step 4) ------------------------------------------------
+    # --- massgap574 (step 4): STRICT schema = path/full_text/statement/
+    #     proof_body/sorry_count ONLY. Notes/companion go to the sidecar. -----
     mg = read(os.path.join(YM_DIR, "MassGap574.lean"))
     mg_real_sorry = count_real_sorry(mg)
     mg_raw_tokens = len(re.findall(r"sorry", mg))
@@ -258,66 +280,23 @@ def main():
         "statement": statement,
         "proof_body": proof_body,
         "sorry_count": mg_real_sorry,
-        "_sorry_note": (
-            "sorry_count is the TRUE count of `sorry`/`admit` PROOF TERMS = %d. "
-            "The file's own header/docstrings still say it 'carries a sorry' "
-            "(%d raw 'sorry' tokens appear, ALL inside comments/docstrings) \u2014 that "
-            "prose is STALE. Post the 2026-05-31 SORRY PURGE the unproved spectral "
-            "gap is carried as the NAMED-OPEN Prop `YM_mass_gap_Surface` (a hypothesis "
-            "`hsurf`), NOT a `by sorry`. The theorem is OPEN/conditional, but it is "
-            "NOT discharged by sorry. The repo-wide Lean proof-term sorry count is 0."
-            % (mg_real_sorry, mg_raw_tokens)
-        ),
-        "is_open": True,
-        "is_scalar_shadow": True,
-        "companion": {
-            "name": "YM_mass_gap_nontrivial",
-            "real_sorry_proof_terms": 0,
-            "_note": (
-                "Discharges the SCALAR-shadow statement for non-trivial U (\u2265 1 "
-                "non-identity plaquette), sorry-free, classical trio \u2014 but still only "
-                "over H U = wilsonAction U \u2022 \U0001D7D9, the scalar shadow. NO real YM mass "
-                "gap; Surface #1 stays OPEN."
-            ),
-        },
     }
 
     # --- bridge_data + kappa_history (step 5, OUT-OF-TOWER) ------------------
+    #     STRICT bridge_data: P6..P20 each {best_q,best_m,best_defect} ONLY.
     bridge_csv = os.path.join(REPO, "data", "desert_map_bridge.csv")
     bridge_rows = {}
     if os.path.exists(bridge_csv):
         with open(bridge_csv, newline="") as fh:
             for row in csv.DictReader(fh):
                 bridge_rows[row["k"]] = row
-    bridge_data = {
-        "_provenance": (
-            "OUT-OF-TOWER. NOT part of Towers/YM/*. Sourced from "
-            "data/desert_map_bridge.csv + scripts/build_desert_map_site_data.py "
-            "(Hodge/BDP desert-map programme). Bridge witness "
-            "|q\u00b7\u03ba^m \u2212 p \u2212 k\u00b7\u03c0| < 1. Only P5 is a tight computable VERIFIED "
-            "witness; P1\u2013P4 are trivial (q=p, m=0 \u21d2 error 0). P6\u2013P20 are "
-            "BEYOND_TOLERANCE at 15-digit \u03ba \u2014 never reported as a pass."
-        ),
-    }
+    bridge_data = {}
     for k in range(6, 21):
-        row = bridge_rows.get(str(k), {})
         bridge_data["P%d" % k] = {
             "best_q": None,
             "best_m": None,
             "best_defect": None,
-            "status": row.get("bdp_status", "BEYOND_TOLERANCE"),
-            "tolerance_log10": float(row["bdp_tolerance_log10"]) if row.get("bdp_tolerance_log10") else None,
         }
-    # P5 is recorded honestly alongside (it is the one verified witness), still out-of-tower.
-    p5 = bridge_rows.get("5", {})
-    bridge_data["_P5_verified"] = {
-        "best_q": int(p5["bdp_q"]) if p5.get("bdp_q") else None,
-        "best_m": int(p5["bdp_m"]) if p5.get("bdp_m") else None,
-        "best_k": int(p5["bdp_k"]) if p5.get("bdp_k") else None,
-        "best_defect": float(p5["bdp_error"]) if p5.get("bdp_error") else None,
-        "status": p5.get("bdp_status"),
-        "_note": "The single tight computable bridge witness; OUT-OF-TOWER (BDP, not YM).",
-    }
 
     kappa_src = (
         "OUT-OF-TOWER. data/desert_map_bridge.csv + "
@@ -347,35 +326,116 @@ def main():
                     "text": ctext,
                 })
 
+    # --- STRICT contract export (ONLY the user's AUDIT_EXPORT schema keys) ---
     export = {
-        "_meta": {
-            "task": "Project Task #316 \u2014 YM tower audit export",
-            "scope": "lean-proof-towers/Towers/YM/*.lean (%d files, %d stubs)" % (
-                len(files), sum(1 for f in files if is_stub(f))),
-            "generated_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "generator": "scripts/build_ym_audit_export.py",
-            "honesty_notes": [
-                "TRUE repo state only. No mass-gap / \u03bc>0 / Surface-#1-closed / Clay claim.",
-                "Repo-wide Lean proof-term sorry/admit count across Towers/YM = 0 (all 'sorry' tokens are prose).",
-                "H and T_L are scalar-shadow / contraction objects \u2014 NOT the real Wilson transfer operator.",
-                "bridge_data + kappa_history are OUT-OF-TOWER (Hodge/BDP desert-map), included only because the schema asks; P6\u2013P20 are BEYOND_TOLERANCE, never a pass.",
-                "Stub (*Stub.lean) content is null by design.",
-            ],
-        },
         "transfer_operator": transfer_operator,
         "su3_files": su3_files,
         "massgap574": massgap574,
         "bridge_data": bridge_data,
         "kappa_history": kappa_history,
         "comments_raw": comments_raw,
-        "_manifest": manifest,
+    }
+    validate_schema(export)
+
+    # --- sidecar META export (provenance / T_L / honesty notes / manifest) --
+    p5 = bridge_rows.get("5", {})
+    meta = {
+        "_about": (
+            "Sidecar for ym-audit-export.json. The contract JSON follows the "
+            "user's AUDIT_EXPORT schema EXACTLY (no extra keys). This file holds "
+            "the provenance, the second (T_L) operator, and honesty annotations "
+            "that did not fit the strict schema. Nothing here weakens the "
+            "contract data; it only explains it."
+        ),
+        "task": "Project Task #316 \u2014 YM tower audit export",
+        "scope": "lean-proof-towers/Towers/YM/*.lean (%d files, %d stubs)" % (
+            len(files), sum(1 for f in files if is_stub(f))),
+        "generated_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generator": "scripts/build_ym_audit_export.py",
+        "honesty_notes": [
+            "TRUE repo state only. No mass-gap / \u03bc>0 / Surface-#1-closed / Clay claim.",
+            "Repo-wide Lean proof-term sorry/admit count across Towers/YM = 0 (all 'sorry' tokens are prose).",
+            "H and T_L are scalar-shadow / contraction objects \u2014 NOT the real Wilson transfer operator.",
+            "bridge_data + kappa_history are OUT-OF-TOWER (Hodge/BDP desert-map); P6\u2013P20 are BEYOND_TOLERANCE, never a pass.",
+            "Stub (*Stub.lean) content is null by design.",
+        ],
+        "transfer_operator_notes": {
+            "H_real_location": "%s/LatticePositivityReal.lean (line 73)" % REL,
+            "H_note": (
+                "H is the SCALAR / Perron-sector shadow `H U = wilsonAction U \u2022 \U0001D7D9`, "
+                "NOT the real Wilson transfer operator on L\u00b2(\u220f SU(3), Haar). Defined in "
+                "LatticePositivityReal.lean and consumed downstream by the Step-5 spectral "
+                "predicates (e.g. SpectrumBound.lean) and the MassGap574 scaffold. The "
+                "schema example named Transfer.lean; the true definition site is reported."
+            ),
+            "T_L": {
+                "file": "%s/Transfer.lean" % REL,
+                "definition_T_L": T_L_def,
+                "proven_bound": "\u2016T_L\u2016 \u2264 1 (sub-Markov contraction; transfer_operator_norm_le)",
+                "note": (
+                    "Genuine integral operator over the REAL product Haar measure. Only the "
+                    "UPPER bound \u2016T_L\u2016 \u2264 1 is proven \u2014 NOT a spectral gap, NOT a strict "
+                    "contraction, NO `m > 0` / mass-gap claim. The spectral gap stays OPEN as "
+                    "Transfer.kotecky_preiss_criterion."
+                ),
+            },
+        },
+        "massgap574_notes": {
+            "is_open": True,
+            "is_scalar_shadow": True,
+            "sorry_note": (
+                "sorry_count is the TRUE count of `sorry`/`admit` PROOF TERMS = %d. "
+                "The file's own header/docstrings still say it 'carries a sorry' "
+                "(%d raw 'sorry' tokens appear, ALL inside comments/docstrings) \u2014 that "
+                "prose is STALE. Post the 2026-05-31 SORRY PURGE the unproved spectral "
+                "gap is carried as the NAMED-OPEN Prop `YM_mass_gap_Surface` (a hypothesis "
+                "`hsurf`), NOT a `by sorry`. The repo-wide Lean proof-term sorry count is 0."
+                % (mg_real_sorry, mg_raw_tokens)
+            ),
+            "companion": {
+                "name": "YM_mass_gap_nontrivial",
+                "real_sorry_proof_terms": 0,
+                "note": (
+                    "Discharges the SCALAR-shadow statement for non-trivial U (\u2265 1 "
+                    "non-identity plaquette), sorry-free, classical trio \u2014 but still only "
+                    "over H U = wilsonAction U \u2022 \U0001D7D9, the scalar shadow. NO real YM mass "
+                    "gap; Surface #1 stays OPEN."
+                ),
+            },
+        },
+        "bridge_data_notes": {
+            "provenance": (
+                "OUT-OF-TOWER. NOT part of Towers/YM/*. Sourced from "
+                "data/desert_map_bridge.csv + scripts/build_desert_map_site_data.py "
+                "(Hodge/BDP desert-map programme). Bridge witness "
+                "|q\u00b7\u03ba^m \u2212 p \u2212 k\u00b7\u03c0| < 1. Only P5 is a tight computable VERIFIED "
+                "witness; P1\u2013P4 are trivial (q=p, m=0 \u21d2 error 0). P6\u2013P20 are "
+                "BEYOND_TOLERANCE at 15-digit \u03ba \u2014 never reported as a pass."
+            ),
+            "statuses": {
+                "P%d" % k: bridge_rows.get(str(k), {}).get("bdp_status", "BEYOND_TOLERANCE")
+                for k in range(6, 21)
+            },
+            "P5_verified": {
+                "best_q": int(p5["bdp_q"]) if p5.get("bdp_q") else None,
+                "best_m": int(p5["bdp_m"]) if p5.get("bdp_m") else None,
+                "best_k": int(p5["bdp_k"]) if p5.get("bdp_k") else None,
+                "best_defect": float(p5["bdp_error"]) if p5.get("bdp_error") else None,
+                "status": p5.get("bdp_status"),
+                "note": "The single tight computable bridge witness; OUT-OF-TOWER (BDP, not YM).",
+            },
+        },
+        "manifest": manifest,
     }
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(export, f, ensure_ascii=False, indent=2)
+    with open(META_OUT, "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
 
     print("WROTE", OUT)
+    print("WROTE", META_OUT)
     print("files=%d stubs=%d comments_raw=%d total_real_sorry=%d" % (
         len(files),
         sum(1 for f in files if is_stub(f)),
