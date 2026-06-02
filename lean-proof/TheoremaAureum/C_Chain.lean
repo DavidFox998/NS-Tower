@@ -10,7 +10,7 @@ import TheoremaAureum.M9_WeilTransfer
   Their full mathematical content (attested by the SHA chain):
 
     RiemannHypothesis ≡ ∀ ρ : ℂ, riemannZeta ρ = 0 ∧ ρ ≠ 1 → ρ.re = 1/2
-    GRH_E_143a1       ≡ ∀ ρ : ℂ, L(ρ, E/X₀(143)) = 0 → ρ.re = 1/2
+    GRH_E_143a1       ≡ ∀ ρ : ℂ, L(E/X₀(143), ρ) = 0 → ρ.re = 1/2
 
   After M1–M9 there are NO open assumptions.  H2_WeilTransfer is now a
   theorem (delegated to `M9_WeilTransfer_All`) rather than an axiom, and

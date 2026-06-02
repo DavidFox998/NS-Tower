@@ -9,7 +9,7 @@ namespace TheoremaAureum
 
   Mathematical content attested by the SHA chain:
   • `RiemannHypothesis` ≡ ∀ ρ : ℂ, riemannZeta ρ = 0 ∧ ρ ≠ 1 → ρ.re = 1/2
-  • `GRH_E_143a1`       ≡ ∀ ρ : ℂ, L(ρ, E/X₀(143)) = 0 → ρ.re = 1/2
+  • `GRH_E_143a1`       ≡ ∀ ρ : ℂ, L(E/X₀(143), ρ) = 0 → ρ.re = 1/2
 -/
 
 -- Proposition stubs — mathematical content attested by M1–M7 certificates
