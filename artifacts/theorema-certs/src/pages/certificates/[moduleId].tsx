@@ -14,7 +14,7 @@ import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 
 function getStaticPdfPath(moduleId: string): string | null {
-  const match = moduleId.match(/^M([1-7])$/i);
+  const match = moduleId.match(/^M([1-8])$/i);
   if (!match) return null;
   return `${import.meta.env.BASE_URL}pdfs/m${match[1]}.pdf`;
 }

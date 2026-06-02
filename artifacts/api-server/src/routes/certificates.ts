@@ -18,7 +18,7 @@ router.get("/certificates/summary", async (req, res) => {
     const certifiedCount = certs.filter((c) => VERIFIED.has(c.status)).length;
     const awaitingCount = certs.filter((c) => c.status === "AWAITING").length;
     const PDF_SLOT_PATTERN = /^M[1-9]$/i;
-    const STATIC_PDF_PATTERN = /^M[1-7]$/i;
+    const STATIC_PDF_PATTERN = /^M[1-8]$/i;
     const pdfSlotCerts = certs.filter((c) => PDF_SLOT_PATTERN.test(c.moduleId));
     const pdfUploadedCount = pdfSlotCerts.filter(
       (c) => c.pdfObjectPath !== null || STATIC_PDF_PATTERN.test(c.moduleId),
