@@ -24,116 +24,27 @@ history. Roadmap → `docs/ROADMAP.md`.
   file hash — the real file hashes are tabled above (recorded honestly in
   `H4Core.data.json`). **`C13_Law_Open` stays a CONJECTURE (empirical 6/6), NOT
   asserted as a theorem.** No `∀`-law claimed; no YM/mass-gap/Surface-#1 result.
-- **MODULE D — `Towers/YM/H4_Derivation.lean` (2026-06-02): boundary law stays
-  OPEN, NOT proven.** The proposed `C13_law : ∀ p, p.Prime → digit_len p ≥ 13 →
-  symOf p = 1` is **REFUSED as a theorem** — recorded as the NAMED OPEN `Prop`
-  `C13_Law_Open` (no `theorem` discharges it). Three independent blockers: (1)
-  infinite/undecidable ∀ over all primes — no finite computation settles it and
-  no general structural lemma is established (may be false for some large prime);
-  (2) `symOf` is NOT kernel-checkable — kernel `decide` overflows `maxRecDepth`
-  on a single `symOf 191` (confirmed), so even one prime is unprovable by
-  `decide`/`rfl` (that is why A/B/C use `#eval`); (3) `p.Prime` / `Nat.log10`
-  need mathlib, absent from the mathlib-free direct-compile line. Leaf carries a
-  mathlib-free `isPrime` (to state the Prop), the `#eval` sample evidence
-  `boundary_proven : Bool` (`[1000000001119,1000000001357,1000000001511,
-  1000000001723,1000000001831,1000000002111]` all `(digit_len,symOf)=(13,1)` →
-  `true`, SAMPLE ONLY), and the axiom-free `C13_val` (`#print axioms` = none).
-  `data.json` (`Towers/YM/H4_Derivation.data.json`) records
-  `{theorem_name:"C13_law", status:"OPEN_UNPROVEN", proved:false,
-  lean_file_hash_sha256:
-  e21ae1ba9990fdb560fd851c56964b4439aefeeab217f5c5fc48ddd50a2ee2b2}`. NO
-  `sorry`/`admit`/`sorryAx`/axiom; NOT a brick; compiled direct (EXIT 0). Proves
-  NOTHING new; `symOf 19 = 2` still. **The "boundary law" is a sample pattern,
-  NOT a proved universal law.**
-- **MODULE C LANDED — `Towers/YM/H4_TimeBound.lean` (2026-06-02).** Magnitude
-  comparison over the Module-A decode; imports `Towers.YM.H4Core`, mathlib-FREE,
-  `sorry`/`admit`/`sorryAx`/`native_decide`-free, NOT a brick, NOT in BRICKS, NOT
-  a lakefile root, compiled direct (EXIT 0). `N40:=40`, `TimeHorizon:=3^40 =
-  12157665459056928801` (a plain integer — NO temporal/dynamical meaning),
-  `C13_digit_min:=10^12=1000000000000` (smallest 13-digit number). For the six
-  13-digit witnesses `[1000000001119,1000000001357,1000000001511,1000000001723,
-  1000000001831,1000000002111]` the engine gives `digit_len=[13×6]`,
-  `symOf=[1×6]` (from `H4Core.symOf`, NOT hardcoded), `p>3^40=[false×6]`,
-  `below_3_40=[true×6]`. `time_bound_test` (`p>10^12 ⟹ symOf=1`) is `true` on all
-  six — CHECKED SAMPLE FACT, NOT a proved ∀-law (NOT shown that every `p>10^12`
-  has `Sym=1`, NOR that `10^12` is a universal boundary). Axiom-free kernel facts
-  `N40_val` and `min_lt_horizon` (`10^12 < 3^40`; `#print axioms` = none). Per-
-  module `data.json` (`Towers/YM/H4_TimeBound.data.json`, SHA-256
-  `3e8cea21a15afbaffdd5bf1611d9219c6147d41643d9c0afed4e6520196b6187`) records
-  `{p,digit_len,sym,below_3_40}`. **HONEST FRAMING:** `10^12 < 3^40` by ~7 orders
-  of magnitude, so as a collapse horizon `3^40` sits far above where the sample
-  collapse first appears — a magnitude observation, NOT a proof about all `p`.
-  Proves NO YM/mass-gap/Surface-#1 result; pure finite geometry + ℕ arithmetic.
-- **MODULE B LANDED — `Towers/YM/H4_Boundary.lean` (2026-06-02).** Boundary
-  check over the Module-A decode; imports the shared core `Towers.YM.H4Core`,
-  mathlib-FREE, `sorry`/`admit`/`sorryAx`/`native_decide`-free, NOT a brick, NOT
-  in BRICKS, NOT a lakefile root, compiled direct (EXIT 0). `digit_len p :=
-  (toString p).length` (`Nat.log10` is mathlib-only), `C13 := 13`. For the nine
-  proposed witnesses `[2,3,19,191,10000000001119,1000000001357,1000000001511,
-  1000000001723,1000000001831]` the engine gives `digit_len =
-  [1,1,2,3,14,13,13,13,13]` and `symOf = [120,20,2,2,1,1,1,1,1]` (from
-  `H4Core.symOf`, NOT hardcoded). `boundary_test` (`digit_len≥13 ⟹ symOf=1`,
-  else `symOf≥2`) is `true` on all nine — a CHECKED SAMPLE FACT, NOT a proved
-  ∀-law. **HONEST FINDING:** the proposed `P5 = 10000000001119` has `digit_len
-  14`, NOT 13, so the proposed identity `digit_len P5 = C13` is FALSE; the real
-  13-digit boundary prime is `1000000001119` (Module A) with `digit_len=13`,
-  `symOf=1`. `symOf 19 = 2` (NOT 20) reconfirmed. Cheap axiom-free fact
-  `C13_val` (`#print axioms` = none). Per-module `data.json`
-  (`Towers/YM/H4_Boundary.data.json`, SHA-256
-  `121ff80c61831b34de8f3826787cfe90907557471798ee9269862a8ce9eb481c`) records
-  the real per-witness `{p, digit_len, sym}`. Proves NO YM/mass-gap/Surface-#1
-  result; pure finite geometry. Companion `#326` NOT built (user STOP).
-- **MODULE A LANDED — `Towers/YM/H4_Strata_Ztau.lean` (2026-06-02).** Real
-  W(H₄) point-stabilizer computation over exact `ℤ[τ]` (`τ²=τ+1`), mathlib-FREE
-  (Lean core only), `sorry`/`admit`/`sorryAx`/`native_decide`-free, NOT a brick,
-  NOT imported, NOT in `scripts/check-towers.sh` BRICKS. `V` = 120 doubled
-  icosians stored as a flat `List Int` (`vflat`, 960 ints) reshaped by a
-  structural `chunk` (avoids the super-linear elaboration blow-up of 120 nested
-  anonymous-constructor literals). `W(H₄)` (order 14400) acts via the EXACT
-  integer maps `p·x·q̄=4x` (proper) / `p·x̄·q̄=4x` (improper) with the `±(p,q)`
-  identification; `Sym x` enumerates `V×V`. **Verified `#eval` outputs:**
-  `Sym(origin)=14400`, `Sym(vertex)=120`; Module-A witness primes
-  `[2,3,19,191,1000000001119] → [120,20,2,2,1]` (nine: `[120,20,2,2,1,1,1,1,1]`);
-  Lagrange divisibility all `true`. **HONEST FINDING:** the natAbs Euclidean
-  decode yields `[120,20,2,2,1]`, NOT David's conjectured `[120,20,20,2,1]` —
-  the `20` at `p=19` came from a different (signed) decode; per the geometry-wins
-  rule the table is corrected. Kernel-checked axiom-clean facts: `tau_sq`
-  (`τ²=τ+1`), `vflat_card` (`vflat.length=960`) — both `#print axioms` = none.
-  PURE FINITE GEOMETRY: proves NO YM/NS/RH/Bost/BSD, makes NO mass-gap/μ>0/
-  Surface-#1 claim, NOT keyed to any prime or L-function. Compiled via the
-  v4.12.0 toolchain (the registered milestone is prose+SHA only — main-agent git
-  is write-blocked; Replit checkpoints capture the merged state).
-  **REFACTOR (2026-06-02):** the reusable engine (ℤ[τ]/Quat arithmetic, `vflat`/
-  `chunk`/`V`, the `W(H₄)` action, `Sym`, `ilog3`, `decodeQuat`/`symOf`) is now
-  factored into the shared mathlib-free core `Towers/YM/H4Core.lean`; Module A
-  `import`s it and its `#eval` outputs are BYTE-IDENTICAL (`[120,20,2,2,1]`,
-  `Sym origin=14400`, `Sym vertex=120`, Lagrange all `true`), with
-  `tau_sq`/`vflat_card` still axiom-free (`#print axioms` = none). Core+leaf
-  both EXIT 0 via direct `lean` over a hand-built `LEAN_PATH` (no lake). The
-  per-module `data.json` + SHA-256 / certified-prime-source output convention is
-  DEFERRED at the user's request ("come back to .json") — NOT yet built.
-- **H1 AXIOM-DERIVED PACKAGING — `Towers/YM/Hw1_Surface.lean` (2026-06-01).** H1
-  (`w1 β₀ < 1/7`) is DERIVED from two disclosed OPEN `[NEEDS_LEMMA]` axioms (NOT
-  proved). Direct proof infeasible in mathlib v4.12.0 (NO Bessel/`Real.besselI`,
-  NO SU(3) Weyl/Gross–Witten, `norm_num` can't decimalise `Real.exp`/Bessel; any
-  `sorry` ⟹ `sorryAx`), so the two analytic facts are carried as VISIBLE axioms,
-  not hidden in a `sorry`. Over `opaque w1`, `opaque besselI` (Bessel stand-in),
-  `β₀ := 2.079416880124` (CERT_Arb upper endpoint): concrete `def w1_weyl β :=
-  e^{-β}·∑_{k∈ℤ} det[besselI ((i-j)+k) (β/3)]_{3×3}` (Toeplitz det at β/3);
-  `axiom w1_eq_weyl : w1 β₀ = w1_weyl β₀` `[NEEDS_LEMMA]`; `axiom w1_weyl_beta0_lt
-  : w1_weyl β₀ < 1/7` `[NEEDS_LEMMA]`; `theorem hw1 : w1 β₀ < 1/7` (`rw
-  [w1_eq_weyl]; exact w1_weyl_beta0_lt`) — `#print axioms` = trio +
-  `w1_eq_weyl` + `w1_weyl_beta0_lt` exactly. `w1_beta0_lt_seventh := hw1` (alias).
-  Trio-only checkable facts: `cert_value_lt_seventh` (`0.142856757048 < 1/7`),
-  `beta0_in_cert` (`β₀ ∈ [beta0_lo, beta0_hi]`). `lattice_decay_conditional` =
-  the HONEST `closes_surface_1` (REFUSED that name): threads `hw1` + the two
-  further OPEN inputs `hOS`+`h_bridge` through
-  `Wall256Scaffold.strong_coupling_decay_of_open_inputs` to a LATTICE two-point
-  decay shape (necessary-not-sufficient; does NOT close Surface #1). The two
-  axioms are CONSISTENT (`w1`/`besselI` opaque ⟹ model `w1 β₀ = w1_weyl β₀ = 0`).
-  Direct-lean EXIT=0; SORRY: 0; NOT a brick / lakefile root. Evidence OUT-OF-TOWER
-  only (CERT_Arb + `w1_repo_normalization.py`). Surface #1 / YM stay OPEN; NO
-  mass-gap / μ>0 / Clay claim. Detail → `docs/CHANGELOG.md`.
+- **H4 strata modules A / A.1 / E / D (2026-06-02; full detail → `docs/CHANGELOG.md`).**
+  Shared mathlib-free engine `Towers/YM/H4Core.lean` + four leaves over the real
+  W(H₄) point-stabilizer geometry (the v2.3 table above is the live snapshot).
+  KEY HONEST FACTS: `symOf [2,3,19,191,1000000001119] = [120,20,2,2,1]` (NOT
+  David's `[120,20,20,2,1]`; `symOf 19 = 2`); proposed `P5 = 10000000001119` has
+  `digit_len 14` NOT 13 (real 13-digit boundary prime is `1000000001119`); `10^12
+  < 3^40` (axiom-free), so `3^40` is a magnitude horizon ~7 orders above where the
+  sample collapse first appears; **`C13_law` (∀-prime boundary law) is REFUSED as
+  a theorem — a named OPEN `Prop` `C13_Law_Open`, empirical 6/6 only** (blockers:
+  infinite/undecidable ∀; `symOf` not kernel-checkable — `decide` overflows
+  `maxRecDepth` on `symOf 191`; `p.Prime`/`Nat.log10` need mathlib). All
+  mathlib-free, `sorry`/axiom-free, NONE bricks, compiled direct EXIT 0; per-module
+  `data.json` carries `author: "D. Fox"`. Prove NOTHING new; no YM/mass-gap/
+  Surface-#1 claim.
+- **H1 AXIOM-DERIVED PACKAGING — `Towers/YM/Hw1_Surface.lean` (2026-06-01; full
+  detail → `docs/CHANGELOG.md`).** H1 (`w1 β₀ < 1/7`) is DERIVED from two disclosed
+  OPEN `[NEEDS_LEMMA]` axioms (`w1_eq_weyl`, `w1_weyl_beta0_lt`), made VISIBLE in
+  `#print axioms` — NOT proved, NOT hidden in a `sorry`. `lattice_decay_conditional`
+  threads `hw1` + two further OPEN inputs to a LATTICE two-point decay shape
+  (necessary-not-sufficient; does NOT close Surface #1). SORRY: 0; NOT a brick.
+  Surface #1 / YM stay OPEN; NO mass-gap / μ>0 / Clay claim.
 - **Older 2026-06-01 leaves (full detail → `docs/CHANGELOG.md`):** Bost-violation
   check `Towers/BostViolations/Compute.lean` (computable `C_rat` over ℚ,
   `BostViolations_12 = []` — no violations; conjecture stays OPEN); Hodge

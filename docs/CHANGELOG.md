@@ -6,6 +6,102 @@ this file is the version history.
 
 ---
 
+## H4 strata modules A / A.1 / E / D + BUILD_MANIFEST v2.3 (2026-06-02)
+
+Shared mathlib-free engine + four leaves over the real W(H₄) point-stabilizer
+geometry. Author: D. Fox (ORCID 0009-0008-1290-6105). All mathlib-FREE (Lean core
+only), `sorry`/`admit`/`sorryAx`/`native_decide`-free, axioms 0, NONE bricks, NOT
+lakefile roots, each compiled direct (EXIT 0) via a hand-built `LEAN_PATH` over
+the v4.12.0 toolchain (no lake). `symOf` values come verbatim from `H4Core.symOf`
+— never hardcoded. Pure finite geometry: prove NO YM/NS/RH/Bost/BSD result, make
+NO mass-gap/μ>0/Surface-#1 claim. Milestones are prose+SHA (main-agent git is
+write-blocked); Replit checkpoints capture the merged state.
+
+**BUILD_MANIFEST v2.3 verification table (file SHA-256):**
+
+| Module | File | Status | SHA-256 (file) | Key #eval |
+|---|---|---|---|---|
+| A `H4Core` | `H4Core.lean` / `H4_Strata_Ztau.lean` | PROVEN | `aa8c1180…a6ce` / `69bdcd6c…ca34` | `symOf[2,3,19,191,1000000001119]=[120,20,2,2,1]` |
+| A.1 `H4Boundary` | `H4_Boundary.lean` | EMPIRICAL | `05bf6022…c871a` | `digit_len 1000000001119=13`, `sym=1`; 9 samples, 0 ctrex |
+| E `H4TimeBound` | `H4_TimeBound.lean` | EMPIRICAL | `5f172143…f8a7` | `10^12<3^40=true`; 6×13-digit `sym=1` |
+| D `H4Derivation` | `H4_Derivation.lean` | CONJECTURE | `e21ae1ba…e2b2` | `C13_Law_Open` UNPROVEN; empirical 6/6 = true |
+
+SHA notes: D file hash matches the manifest exactly (`e21ae1ba…e2b2`). The
+manifest's A SHA `48536d9d…ba997` is the prose milestone RECORD hash, NOT a file
+hash; the real file hashes are tabled above and recorded in `H4Core.data.json`.
+No forbidden terms in any leaf. Per-module `data.json` carries `author: "D. Fox"`.
+
+### Module A — `Towers/YM/H4_Strata_Ztau.lean` + core `Towers/YM/H4Core.lean`
+
+Real W(H₄) point-stabilizer computation over exact `ℤ[τ]` (`τ²=τ+1`), Lean core
+only, NOT imported, NOT in `scripts/check-towers.sh` BRICKS. `V` = 120 doubled
+icosians stored as a flat `List Int` (`vflat`, 960 ints) reshaped by a structural
+`chunk` (avoids the super-linear elaboration blow-up of 120 nested
+anonymous-constructor literals). `W(H₄)` (order 14400) acts via the EXACT integer
+maps `p·x·q̄=4x` (proper) / `p·x̄·q̄=4x` (improper) with the `±(p,q)`
+identification; `Sym x` enumerates `V×V`. Verified `#eval`: `Sym(origin)=14400`,
+`Sym(vertex)=120`; witness primes `[2,3,19,191,1000000001119] → [120,20,2,2,1]`
+(nine: `[120,20,2,2,1,1,1,1,1]`); Lagrange divisibility all `true`. HONEST
+FINDING: the natAbs Euclidean decode yields `[120,20,2,2,1]`, NOT David's
+conjectured `[120,20,20,2,1]` — the `20` at `p=19` came from a different (signed)
+decode; per the geometry-wins rule the table is corrected. Kernel-checked
+axiom-clean facts: `tau_sq` (`τ²=τ+1`), `vflat_card` (`vflat.length=960`) — both
+`#print axioms` = none. REFACTOR (2026-06-02): the reusable engine (ℤ[τ]/Quat
+arithmetic, `vflat`/`chunk`/`V`, the `W(H₄)` action, `Sym`, `ilog3`,
+`decodeQuat`/`symOf`) is factored into the shared mathlib-free core `H4Core.lean`;
+Module A `import`s it and its `#eval` outputs are BYTE-IDENTICAL.
+
+### Module A.1 (B) — `Towers/YM/H4_Boundary.lean`
+
+Boundary check over the Module-A decode; imports `H4Core`. `digit_len p :=
+(toString p).length` (`Nat.log10` is mathlib-only), `C13 := 13`. For the nine
+proposed witnesses `[2,3,19,191,10000000001119,1000000001357,1000000001511,
+1000000001723,1000000001831]` the engine gives `digit_len =
+[1,1,2,3,14,13,13,13,13]` and `symOf = [120,20,2,2,1,1,1,1,1]`. `boundary_test`
+(`digit_len≥13 ⟹ symOf=1`, else `symOf≥2`) is `true` on all nine — a CHECKED
+SAMPLE FACT, NOT a proved ∀-law. HONEST FINDING: the proposed `P5 =
+10000000001119` has `digit_len 14`, NOT 13, so the proposed identity `digit_len P5
+= C13` is FALSE; the real 13-digit boundary prime is `1000000001119` (Module A)
+with `digit_len=13`, `symOf=1`. `symOf 19 = 2` (NOT 20) reconfirmed. Cheap
+axiom-free fact `C13_val`. `data.json`: `Towers/YM/H4_Boundary.data.json`
+(SHA-256 `121ff80c…b481c`) records the real per-witness `{p, digit_len, sym}`.
+
+### Module E (C) — `Towers/YM/H4_TimeBound.lean`
+
+Magnitude comparison over the Module-A decode; imports `H4Core`. `N40:=40`,
+`TimeHorizon:=3^40 = 12157665459056928801` (a plain integer — NO temporal/
+dynamical meaning), `C13_digit_min:=10^12=1000000000000` (smallest 13-digit
+number). For the six 13-digit witnesses `[1000000001119,1000000001357,
+1000000001511,1000000001723,1000000001831,1000000002111]` the engine gives
+`digit_len=[13×6]`, `symOf=[1×6]`, `p>3^40=[false×6]`, `below_3_40=[true×6]`.
+`time_bound_test` (`p>10^12 ⟹ symOf=1`) is `true` on all six — CHECKED SAMPLE
+FACT, NOT a proved ∀-law. Axiom-free kernel facts `N40_val` and `min_lt_horizon`
+(`10^12 < 3^40`). `data.json`: `Towers/YM/H4_TimeBound.data.json` (SHA-256
+`3e8cea21…b6187`). HONEST FRAMING: `10^12 < 3^40` by ~7 orders of magnitude, so as
+a collapse horizon `3^40` sits far above where the sample collapse first appears —
+a magnitude observation, NOT a proof about all `p`.
+
+### Module D — `Towers/YM/H4_Derivation.lean` (boundary law stays OPEN, NOT proven)
+
+The proposed `C13_law : ∀ p, p.Prime → digit_len p ≥ 13 → symOf p = 1` is REFUSED
+as a theorem — recorded as the NAMED OPEN `Prop` `C13_Law_Open` (no `theorem`
+discharges it). Three independent blockers: (1) infinite/undecidable ∀ over all
+primes — no finite computation settles it and no general structural lemma is
+established (may be false for some large prime); (2) `symOf` is NOT
+kernel-checkable — kernel `decide` overflows `maxRecDepth` on a single `symOf 191`
+(confirmed), so even one prime is unprovable by `decide`/`rfl` (that is why
+A/A.1/E use `#eval`); (3) `p.Prime` / `Nat.log10` need mathlib, absent from the
+mathlib-free direct-compile line. Leaf carries a mathlib-free `isPrime` (to state
+the Prop), the `#eval` sample evidence `boundary_proven : Bool` (six 13-digit
+witnesses all `(digit_len,symOf)=(13,1)` → `true`, SAMPLE ONLY), and the
+axiom-free `C13_val` (`#print axioms` = none). `data.json`:
+`Towers/YM/H4_Derivation.data.json` records `{theorem_name:"C13_law",
+status:"CONJECTURE", proved:false, lean_file_hash_sha256: e21ae1ba…e2b2,
+empirical_support:"6/6"}`. Proves NOTHING new; `symOf 19 = 2` still. The
+"boundary law" is a sample pattern, NOT a proved universal law.
+
+---
+
 ## H1 axiom-derived packaging — `Towers/YM/Hw1_Surface.lean` (2026-06-01)
 
 H1 (`w1 β₀ < 1/7`) is DERIVED from two disclosed OPEN `[NEEDS_LEMMA]` axioms —
