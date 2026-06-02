@@ -1,0 +1,29 @@
+{
+  "module": "H4_Boundary",
+  "engine": "Towers.YM.H4Core",
+  "decode": "natAbs-euclidean-remainder",
+  "source": "computed by H4Core.symOf and (toString p).length; NOT hardcoded",
+  "C13": 13,
+  "witnesses": [
+    { "id": "P1", "p": 2,              "digit_len": 1,  "sym": 120 },
+    { "id": "P2", "p": 3,              "digit_len": 1,  "sym": 20 },
+    { "id": "P3", "p": 19,             "digit_len": 2,  "sym": 2 },
+    { "id": "P4", "p": 191,            "digit_len": 3,  "sym": 2 },
+    { "id": "P5", "p": 10000000001119, "digit_len": 14, "sym": 1 },
+    { "id": "P6", "p": 1000000001357, "digit_len": 13, "sym": 1 },
+    { "id": "P7", "p": 1000000001511, "digit_len": 13, "sym": 1 },
+    { "id": "P8", "p": 1000000001723, "digit_len": 13, "sym": 1 },
+    { "id": "P9", "p": 1000000001831, "digit_len": 13, "sym": 1 }
+  ],
+  "boundary_test_all": true,
+  "empirical_sample_checks": {
+    "ge_13_implies_sym_eq_1": { "holds_on_sample": true, "n": 5 },
+    "lt_13_implies_sym_ge_2": { "holds_on_sample": true, "n": 4 }
+  },
+  "honest_findings": [
+    "P5 = 10000000001119 has digit_len 14, NOT 13; the rule-4 identity 'digit_len P5 = C13' is FALSE for this P5.",
+    "The genuine 13-digit boundary prime is 1000000001119 (Module A / Task #324): digit_len 13, sym 1.",
+    "symOf 19 = 2, not 20 (real W(H4) engine).",
+    "The two empirical laws hold on this 9-point sample only; they are NOT proved as universal theorems."
+  ]
+}

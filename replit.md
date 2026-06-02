@@ -7,6 +7,25 @@ history. Roadmap → `docs/ROADMAP.md`.
 
 ## Current status — 2026-06-02
 
+- **MODULE B LANDED — `Towers/YM/H4_Boundary.lean` (2026-06-02).** Boundary
+  check over the Module-A decode; imports the shared core `Towers.YM.H4Core`,
+  mathlib-FREE, `sorry`/`admit`/`sorryAx`/`native_decide`-free, NOT a brick, NOT
+  in BRICKS, NOT a lakefile root, compiled direct (EXIT 0). `digit_len p :=
+  (toString p).length` (`Nat.log10` is mathlib-only), `C13 := 13`. For the nine
+  proposed witnesses `[2,3,19,191,10000000001119,1000000001357,1000000001511,
+  1000000001723,1000000001831]` the engine gives `digit_len =
+  [1,1,2,3,14,13,13,13,13]` and `symOf = [120,20,2,2,1,1,1,1,1]` (from
+  `H4Core.symOf`, NOT hardcoded). `boundary_test` (`digit_len≥13 ⟹ symOf=1`,
+  else `symOf≥2`) is `true` on all nine — a CHECKED SAMPLE FACT, NOT a proved
+  ∀-law. **HONEST FINDING:** the proposed `P5 = 10000000001119` has `digit_len
+  14`, NOT 13, so the proposed identity `digit_len P5 = C13` is FALSE; the real
+  13-digit boundary prime is `1000000001119` (Module A) with `digit_len=13`,
+  `symOf=1`. `symOf 19 = 2` (NOT 20) reconfirmed. Cheap axiom-free fact
+  `C13_val` (`#print axioms` = none). Per-module `data.json`
+  (`Towers/YM/H4_Boundary.data.json`, SHA-256
+  `121ff80c61831b34de8f3826787cfe90907557471798ee9269862a8ce9eb481c`) records
+  the real per-witness `{p, digit_len, sym}`. Proves NO YM/mass-gap/Surface-#1
+  result; pure finite geometry. Companion `#326` NOT built (user STOP).
 - **MODULE A LANDED — `Towers/YM/H4_Strata_Ztau.lean` (2026-06-02).** Real
   W(H₄) point-stabilizer computation over exact `ℤ[τ]` (`τ²=τ+1`), mathlib-FREE
   (Lean core only), `sorry`/`admit`/`sorryAx`/`native_decide`-free, NOT a brick,
