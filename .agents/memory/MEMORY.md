@@ -22,7 +22,7 @@
 - [Explicit 4x4 det in v4.12.0](explicit-matrix-det-v4_12.md) — no det_fin_four; Laplace via PLAIN simp (not simp only)+Fin.succAbove/Fin.lt_def then ring; φ∉spectrum via spectrum.not_mem_iff+isUnit_iff_isUnit_det; `-/` in docstring closes it early.
 - [w1 SU(3) normalization & Wall256 β₀](w1-su3-normalization-threshold.md) — repo action is (3−Re tr)/3; w1<1/7 needs β>~2.08 NOT the stale doc's 0.85 (that's the un-normalized 3−Re tr); numerical only, discharges nothing.
 - [exp(constant) enclosure recipe](exp-constant-enclosure-recipe.md) — bracket Real.exp(-c) via taylor_mean_remainder_lagrange (alternating ℚ bracket); HasDerivAt.derivWithin missing → .hasDerivWithinAt.derivWithin; positivity can't sign cast-ℚ; float can't check 3e-27 widths.
-- [Bessel I0 series tail enclosure](bessel-tail-enclosure-recipe.md) — one-sided S_N≤I0≤S_N+err geometric-tail bracket; summable_nat_add_iff HOU trap (bind hT via have;exact); rw[div_eq_mul_inv] hits wrong slash (use ring).
+- [Bessel I0/I1 tail enclosure](bessel-tail-enclosure-recipe.md) — one-sided S_N≤I≤S_N+err geometric bracket (I0 & I1); odd-power I1 needs 0≤y; isolate pow identities in `have`s so div_pow targets one subterm.
 - [Rat.cast_min/max gap v4.12.0](rat-cast-min-max-gap.md) — no Rat.cast_min/Rat.cast_max for ℚ→ℝ; prove cast/min(max) commute inline via le_total + min_eq_left/right.
 - [SU(3) heat-kernel Varadhan honesty trap](su3-heat-kernel-varadhan.md) — at-identity envelope blows up ~C/t⁴ (NO e^{-c/t}); `≤C·e^{-c/t}/t⁴` is FALSE small-t; minC₂=4 (=4/3) is large-t gap only.
 - [omega + nonlinear ℕ goals](omega-nonlinear-atoms.md) — omega abstracts m²/m*n as nonneg atoms; feed it the one nonlinear bound (e.g. 1≤m²) and it closes the linear rest.

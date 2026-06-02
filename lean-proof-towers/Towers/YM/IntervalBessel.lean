@@ -208,7 +208,204 @@ def besselI0_beta0_interval : RatInterval := besselI0_interval (ofRat (β₀_rat
 #eval besselI0_beta0_interval.hi                                       -- S_40 + err
 #eval besselI0_beta0_interval.hi - besselI0_beta0_interval.lo          -- width = err
 
+/-! ### Phase 2c — enclosure of `I₁(β₀/3)`
+
+`I₁(x) = ∑_{k≥0} (x/2)^(2k+1) / (k!·(k+1)!)` (all-positive for `x ≥ 0`), so the
+partial sum is a LOWER bound and the tail past `N+1` terms is dominated by the
+geometric majorant `a_{N+1}/(1 - t/(N+3))` with `a_k = (x/2)^(2k+1)/(k!·(k+1)!)`,
+`t = (x/2)²`. The looser `N+3` denominator (vs the sharp `(N+2)(N+3)`) keeps the
+requested error shape and is still a valid over-estimate. Same honest scope as the
+`I₀` block: bounds ONE Bessel value, discharges NOTHING, NO mass-gap claim. -/
+
+/-- Partial sum `∑_{k≤N} (x/2)^(2k+1) / (k!·(k+1)!)` of the `I₁` series. -/
+def besselI1_partial (x : ℚ) (N : ℕ) : ℚ :=
+  ∑ k ∈ Finset.range (N + 1),
+    (x / 2) ^ (2 * k + 1) / ((k.factorial : ℚ) * ((k + 1).factorial : ℚ))
+
+/-- Geometric tail bound `(x/2)^(2N+3)/((N+1)!·(N+2)!) / (1 - (x/2)²/(N+3))`. -/
+def besselI1_error (x : ℚ) (N : ℕ) : ℚ :=
+  (x / 2) ^ (2 * N + 3) / (((N + 1).factorial : ℚ) * ((N + 2).factorial : ℚ))
+    / (1 - (x / 2) ^ 2 / ((N : ℚ) + 3))
+
+/-- The enclosing interval for `I₁(x)` (point case: `[S_N, S_N + err]`).
+Built with `min`/`max` so `lo ≤ hi` is structural. -/
+def besselI1_interval (x : RatInterval) (N : ℕ) : RatInterval :=
+  let a := besselI1_partial x.lo N
+  let b := besselI1_partial x.hi N + besselI1_error x.hi N
+  ⟨min a b, max a b, min_le_max⟩
+
+/-- **Termwise geometric tail bound** for the `I₁` series at a real argument `y ≥ 0`.
+For `t = (y/2)²` with `t/(N+3) < 1`, the tail past `N+1` terms is dominated by the
+geometric majorant `a_{N+1}/(1 - t/(N+3))`. -/
+private theorem bessel1_term_tail_le (y : ℝ) (N : ℕ) (hy : 0 ≤ y)
+    (hr1 : (y / 2) ^ 2 / ((N : ℝ) + 3) < 1) :
+    (∑' i : ℕ, (y / 2) ^ (2 * (i + (N + 1)) + 1)
+        / (((i + (N + 1)).factorial : ℝ) * ((i + (N + 1) + 1).factorial : ℝ)))
+      ≤ ((y / 2) ^ (2 * (N + 1) + 1) / (((N + 1).factorial : ℝ) * ((N + 2).factorial : ℝ)))
+        / (1 - (y / 2) ^ 2 / ((N : ℝ) + 3)) := by
+  have hr0 : 0 ≤ (y / 2) ^ 2 / ((N : ℝ) + 3) := by positivity
+  -- Summability of the bessel-1 term function `a k = (y/2)^(2k+1)/(k!·(k+1)!)`.
+  have hT1 : Summable (fun k : ℕ =>
+      (y / 2) ^ (2 * k + 1) / ((k.factorial : ℝ) * ((k + 1).factorial : ℝ))) :=
+    (besselI_series_summable 1 y).congr (fun k => by
+      rw [show (1 : ℕ) + 2 * k = 2 * k + 1 from by omega,
+          show (1 : ℕ) + k = k + 1 from by omega])
+  have htail_summable : Summable (fun i : ℕ =>
+      (y / 2) ^ (2 * (i + (N + 1)) + 1)
+        / (((i + (N + 1)).factorial : ℝ) * ((i + (N + 1) + 1).factorial : ℝ))) := by
+    have h := (summable_nat_add_iff (N + 1)).mpr hT1
+    exact h
+  have hgeom_summable : Summable (fun i : ℕ =>
+      ((y / 2) ^ (2 * (N + 1) + 1) / (((N + 1).factorial : ℝ) * ((N + 2).factorial : ℝ)))
+        * ((y / 2) ^ 2 / ((N : ℝ) + 3)) ^ i) :=
+    (summable_geometric_of_lt_one hr0 hr1).mul_left _
+  -- Termwise domination.
+  have hterm : ∀ i : ℕ,
+      (y / 2) ^ (2 * (i + (N + 1)) + 1)
+          / (((i + (N + 1)).factorial : ℝ) * ((i + (N + 1) + 1).factorial : ℝ))
+        ≤ ((y / 2) ^ (2 * (N + 1) + 1) / (((N + 1).factorial : ℝ) * ((N + 2).factorial : ℝ)))
+          * ((y / 2) ^ 2 / ((N : ℝ) + 3)) ^ i := by
+    intro i
+    have h1 : (N + 1).factorial ≤ (i + (N + 1)).factorial := Nat.factorial_le (by omega)
+    have h2 : (N + 2).factorial * (N + 3) ^ i ≤ (i + (N + 1) + 1).factorial := by
+      have h := Nat.factorial_mul_pow_le_factorial (m := N + 2) (n := i)
+      have he : N + 2 + i = i + (N + 1) + 1 := by omega
+      rw [he] at h
+      exact h
+    have hnat : (N + 1).factorial * (N + 2).factorial * (N + 3) ^ i
+        ≤ (i + (N + 1)).factorial * (i + (N + 1) + 1).factorial := by
+      calc (N + 1).factorial * (N + 2).factorial * (N + 3) ^ i
+          = (N + 1).factorial * ((N + 2).factorial * (N + 3) ^ i) := by ring
+        _ ≤ (i + (N + 1)).factorial * (i + (N + 1) + 1).factorial := Nat.mul_le_mul h1 h2
+    have hnatR : ((N + 1).factorial : ℝ) * ((N + 2).factorial : ℝ) * ((N : ℝ) + 3) ^ i
+        ≤ ((i + (N + 1)).factorial : ℝ) * ((i + (N + 1) + 1).factorial : ℝ) := by
+      exact_mod_cast hnat
+    have hy2 : (0 : ℝ) ≤ y / 2 := by linarith
+    have hnum : (y / 2) ^ (2 * (i + (N + 1)) + 1)
+        = (y / 2) ^ (2 * (N + 1) + 1) * ((y / 2) ^ 2) ^ i := by
+      rw [show 2 * (i + (N + 1)) + 1 = (2 * (N + 1) + 1) + 2 * i from by ring, pow_add, pow_mul]
+    have hgeomterm : ((y / 2) ^ 2 / ((N : ℝ) + 3)) ^ i
+        = ((y / 2) ^ 2) ^ i / ((N : ℝ) + 3) ^ i := div_pow _ _ _
+    rw [hnum, hgeomterm]
+    rw [show ((y / 2) ^ (2 * (N + 1) + 1) / (((N + 1).factorial : ℝ) * ((N + 2).factorial : ℝ)))
+          * (((y / 2) ^ 2) ^ i / ((N : ℝ) + 3) ^ i)
+        = ((y / 2) ^ (2 * (N + 1) + 1) * ((y / 2) ^ 2) ^ i)
+          / ((((N + 1).factorial : ℝ) * ((N + 2).factorial : ℝ)) * ((N : ℝ) + 3) ^ i)
+        from by ring]
+    exact div_le_div_of_nonneg_left
+      (mul_nonneg (pow_nonneg hy2 _) (pow_nonneg (sq_nonneg _) _))
+      (by positivity) hnatR
+  calc (∑' i : ℕ, (y / 2) ^ (2 * (i + (N + 1)) + 1)
+          / (((i + (N + 1)).factorial : ℝ) * ((i + (N + 1) + 1).factorial : ℝ)))
+      ≤ ∑' i : ℕ, ((y / 2) ^ (2 * (N + 1) + 1)
+            / (((N + 1).factorial : ℝ) * ((N + 2).factorial : ℝ)))
+          * ((y / 2) ^ 2 / ((N : ℝ) + 3)) ^ i :=
+        tsum_le_tsum hterm htail_summable hgeom_summable
+    _ = ((y / 2) ^ (2 * (N + 1) + 1) / (((N + 1).factorial : ℝ) * ((N + 2).factorial : ℝ)))
+          * ∑' i : ℕ, ((y / 2) ^ 2 / ((N : ℝ) + 3)) ^ i := tsum_mul_left
+    _ = ((y / 2) ^ (2 * (N + 1) + 1) / (((N + 1).factorial : ℝ) * ((N + 2).factorial : ℝ)))
+          * (1 - (y / 2) ^ 2 / ((N : ℝ) + 3))⁻¹ := by
+        rw [tsum_geometric_of_lt_one hr0 hr1]
+    _ = ((y / 2) ^ (2 * (N + 1) + 1) / (((N + 1).factorial : ℝ) * ((N + 2).factorial : ℝ)))
+          / (1 - (y / 2) ^ 2 / ((N : ℝ) + 3)) := by ring
+
+/-- **Phase-2c enclosure.** `I₁(β₀/3) ∈ besselI1_interval (ofRat (β₀/3)) 40`, with
+width `< 5·10⁻⁸`. The interval is `[S_40, S_40 + (β₀/6)^83/(41!·42!)/(1-(β₀/6)²/43)]`.
+Scope: soundness is established here only for the concrete point `ofRat (β₀/3)` (where
+`0 < q` is discharged); this is NOT a fully general interval theorem for arbitrary `q`,
+and it discharges no YM surface / makes no mass-gap claim. -/
+theorem besselI1_beta0_enclosure :
+    ∃ I : RatInterval, besselI1_interval (ofRat (β₀_rat / 3)) 40 = I
+      ∧ I.contains (besselI_series 1 ((β₀_rat / 3 : ℚ) : ℝ))
+      ∧ I.hi - I.lo < 5 / 10 ^ 8 := by
+  set q : ℚ := β₀_rat / 3 with hq
+  have hqpos : 0 < q := by rw [hq]; norm_num [β₀_rat]
+  have hqR : (0 : ℝ) < (q : ℝ) := by exact_mod_cast hqpos
+  have hr1Q : (q / 2) ^ 2 / ((40 : ℚ) + 3) < 1 := by rw [hq]; norm_num [β₀_rat]
+  have hTsum : Summable (fun k : ℕ =>
+      ((q : ℝ) / 2) ^ (2 * k + 1) / ((k.factorial : ℝ) * ((k + 1).factorial : ℝ))) :=
+    (besselI_series_summable 1 (q : ℝ)).congr (fun k => by
+      rw [show (1 : ℕ) + 2 * k = 2 * k + 1 from by omega,
+          show (1 : ℕ) + k = k + 1 from by omega])
+  have hg_nonneg : ∀ k : ℕ,
+      0 ≤ ((q : ℝ) / 2) ^ (2 * k + 1) / ((k.factorial : ℝ) * ((k + 1).factorial : ℝ)) := by
+    intro k
+    exact div_nonneg (pow_nonneg (by linarith) _) (by positivity)
+  have bessel1_eq : besselI_series 1 ((q : ℝ))
+      = ∑' k : ℕ, ((q : ℝ) / 2) ^ (2 * k + 1) / ((k.factorial : ℝ) * ((k + 1).factorial : ℝ)) := by
+    unfold besselI_series
+    exact tsum_congr (fun k => by
+      rw [show (1 : ℕ) + 2 * k = 2 * k + 1 from by omega,
+          show (1 : ℕ) + k = k + 1 from by omega])
+  have hcast_partial : ((besselI1_partial q 40 : ℚ) : ℝ)
+      = ∑ k ∈ Finset.range (40 + 1),
+          ((q : ℝ) / 2) ^ (2 * k + 1) / ((k.factorial : ℝ) * ((k + 1).factorial : ℝ)) := by
+    unfold besselI1_partial
+    rw [Rat.cast_sum]
+    refine Finset.sum_congr rfl (fun k _ => ?_)
+    push_cast; ring
+  have hcast_error : ((besselI1_error q 40 : ℚ) : ℝ)
+      = ((q : ℝ) / 2) ^ (2 * (40 + 1) + 1)
+          / (((40 + 1).factorial : ℝ) * ((40 + 2).factorial : ℝ))
+        / (1 - ((q : ℝ) / 2) ^ 2 / ((40 : ℝ) + 3)) := by
+    unfold besselI1_error
+    push_cast; ring
+  have herr_nonneg : 0 ≤ besselI1_error q 40 := by
+    unfold besselI1_error
+    apply div_nonneg
+    · exact div_nonneg (pow_nonneg (div_nonneg hqpos.le (by norm_num)) _) (by positivity)
+    · push_cast; linarith [hr1Q]
+  have hab : besselI1_partial q 40 ≤ besselI1_partial q 40 + besselI1_error q 40 :=
+    le_add_of_nonneg_right herr_nonneg
+  have hlo : (besselI1_interval (ofRat q) 40).lo = besselI1_partial q 40 := by
+    dsimp only [besselI1_interval, RatInterval.ofRat]; exact min_eq_left hab
+  have hhi : (besselI1_interval (ofRat q) 40).hi
+      = besselI1_partial q 40 + besselI1_error q 40 := by
+    dsimp only [besselI1_interval, RatInterval.ofRat]; exact max_eq_right hab
+  refine ⟨besselI1_interval (ofRat q) 40, rfl, ⟨?_, ?_⟩, ?_⟩
+  · -- lower bound
+    rw [hlo, hcast_partial, bessel1_eq]
+    exact sum_le_tsum _ (fun i _ => hg_nonneg i) hTsum
+  · -- upper bound
+    rw [hhi]
+    have hsplit : besselI_series 1 ((q : ℝ))
+        = (∑ k ∈ Finset.range (40 + 1),
+            ((q : ℝ) / 2) ^ (2 * k + 1) / ((k.factorial : ℝ) * ((k + 1).factorial : ℝ)))
+          + ∑' i : ℕ, ((q : ℝ) / 2) ^ (2 * (i + (40 + 1)) + 1)
+              / (((i + (40 + 1)).factorial : ℝ) * ((i + (40 + 1) + 1).factorial : ℝ)) := by
+      rw [bessel1_eq]; exact (sum_add_tsum_nat_add (40 + 1) hTsum).symm
+    have htail_le : (∑' i : ℕ, ((q : ℝ) / 2) ^ (2 * (i + (40 + 1)) + 1)
+            / (((i + (40 + 1)).factorial : ℝ) * ((i + (40 + 1) + 1).factorial : ℝ)))
+          ≤ ((besselI1_error q 40 : ℚ) : ℝ) := by
+      have h := bessel1_term_tail_le (q : ℝ) 40 hqR.le (by exact_mod_cast hr1Q)
+      rw [hcast_error]
+      simpa only [Nat.cast_ofNat] using h
+    calc besselI_series 1 ((q : ℝ))
+        = (∑ k ∈ Finset.range (40 + 1),
+            ((q : ℝ) / 2) ^ (2 * k + 1) / ((k.factorial : ℝ) * ((k + 1).factorial : ℝ)))
+          + ∑' i : ℕ, ((q : ℝ) / 2) ^ (2 * (i + (40 + 1)) + 1)
+              / (((i + (40 + 1)).factorial : ℝ) * ((i + (40 + 1) + 1).factorial : ℝ)) := hsplit
+      _ ≤ (∑ k ∈ Finset.range (40 + 1),
+            ((q : ℝ) / 2) ^ (2 * k + 1) / ((k.factorial : ℝ) * ((k + 1).factorial : ℝ)))
+          + ((besselI1_error q 40 : ℚ) : ℝ) := add_le_add_left htail_le _
+      _ = ((besselI1_partial q 40 : ℚ) : ℝ) + ((besselI1_error q 40 : ℚ) : ℝ) := by
+            rw [hcast_partial]
+      _ = ((besselI1_partial q 40 + besselI1_error q 40 : ℚ) : ℝ) := by rw [Rat.cast_add]
+  · -- width
+    rw [hhi, hlo,
+      show besselI1_partial q 40 + besselI1_error q 40 - besselI1_partial q 40
+        = besselI1_error q 40 from by ring, hq]
+    norm_num [besselI1_error, β₀_rat, Nat.factorial]
+
+/-- The concrete Phase-2c enclosure of `I₁(β₀/3)` at `N = 40`. -/
+def besselI1_beta0_interval : RatInterval := besselI1_interval (ofRat (β₀_rat / 3)) 40
+
+#eval besselI1_beta0_interval.lo                                       -- S_40
+#eval besselI1_beta0_interval.hi                                       -- S_40 + err
+#eval besselI1_beta0_interval.hi - besselI1_beta0_interval.lo          -- width = err
+
 end TheoremaAureum.Towers.YM.IntervalArith
 
 -- **VERIFICATION (direct-lean bypass; pin v4.12.0 unresolved, do NOT run `lake env`):**
 #print axioms TheoremaAureum.Towers.YM.IntervalArith.besselI0_beta0_enclosure
+#print axioms TheoremaAureum.Towers.YM.IntervalArith.besselI1_beta0_enclosure
