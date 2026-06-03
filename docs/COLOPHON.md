@@ -25,9 +25,17 @@ On-disk filenames use underscores; the published module names are listed first.
    hash, NOT a file hash). Real file SHA-256 `aa8c1180…a6ce`, recorded in
    `H4Core.data.json`.
 2. **H4Boundary** (`Towers/YM/H4_Boundary.lean`) — Task #325 — `C13 := 13`.
-   Genuine 13-digit boundary prime: **`1000000001119`** (`digit_len = 13`,
-   `Sym = 1`). The originally-proposed `P5 = 10000000001119` has `digit_len = 14`,
-   so its `digit_len P5 = C13` claim is **FALSE** — corrected per geometry-wins.
+   **P5 distinction (LOCKED):**
+   - `P5_genuine = 1000000001119` — **13 digits** (`digit_len = 13`, `Sym = 1`).
+     The real 13-digit boundary prime. **ACCEPTED.**
+   - `P5_proposed = 10000000001119` — **14 digits** (`digit_len = 14`). Its
+     `digit_len P5 = C13` (i.e. `= 13`) claim is **FALSE**, so this proposed P5 is
+     **REJECTED** as the 13-digit boundary — corrected per geometry-wins.
+
+   The two differ by a single leading-block zero (13 vs 14 digits); do not
+   conflate them. The witness table in `H4_Boundary.data.json` carries the
+   rejected `P5_proposed = 10000000001119` with `digit_len 14` as the honest
+   counter-record.
 3. **H4TimeBound** (`Towers/YM/H4_TimeBound.lean`) — Task #326 — `N40 := 40`;
    `TimeHorizon := 3^40` carries no causal/temporal meaning; `10^12 << 3^40`
    (by ~7 orders of magnitude).
