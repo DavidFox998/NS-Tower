@@ -1,0 +1,51 @@
+Batch 19.1p — Infinite Peter-Weyl convergence. Wall 443 → ~455.
+
+Constraints:
+1. {propext, Classical.choice, Quot.sound} only. No sorries in BRICKS.
+2. Real convergence proof → Towers/YM/ClusterExpansion.lean sorry-free.
+3. Genesis seal exit 0 required. YM tower stays Status: Open.
+4. LOCKED: replit.md, docs/ROADMAP.md, Towers/YM/Spectrum.lean, lean-proof/
+5. New LOCKED: Towers/YM/ClusterExpansion.lean after this batch.
+
+Track 1: Towers/YM/ClusterExpansion.lean — 12 BRICKS
+
+1. def Weyl_sum_SU3 (t : ℝ) : ℝ := tsum (fun mn : Weyl_label => 
+     (Weyl_dim_SU3_explicit mn : ℝ)^2 * Real.exp(-(t * Weyl_dim_SU3_explicit mn)))
+
+2. theorem Weyl_sum_tsum_eq_heat_kernel (t) (ht : 0 < t) : 
+     Weyl_sum_SU3 t = Heat_kernel_def_real t
+   -- Proof: Use Peter-Weyl theorem for SU(3) + Molchanov asymptotics.
+   -- Cite: Varadhan 1967, Ben Arous 1988. Classical trio only.
+
+3. theorem Weyl_sum_summable (t) (ht : 0 < t) : 
+     Summable (fun mn => (Weyl_dim_SU3_explicit mn : ℝ)^2 * Real.exp(-(t * Weyl_dim_SU3_explicit mn)))
+   -- Proof: Compare to ∫∫ (x+1)²(y+1)²(x+y+2)² exp(-t(x²+y²)) dx dy.
+
+4. theorem Heat_kernel_asymptotics_infinite (t) (ht : 0 < t) :
+     Heat_kernel_def_real t ≤ C_1 / t^4 * Real.exp (-c_1 / t)
+   -- Promote 19.1m result from finite to infinite using Weyl_sum_tsum_eq_heat_kernel.
+
+5. theorem Small_t_dominance_infinite (t) (ht : 0 < t) :
+     ∃ c > 0, Heat_kernel_def_real t ≥ c / t^4 * Real.exp (-c / t)
+   -- Lower bound. Uses stationary phase at trivial rep.
+
+6. theorem Single_plaquette_bound_SU3_finite_N (N t) (ht : 0 < t) :
+     Weyl_sum_explicit_SU3_real t N ≤ Heat_kernel_def_real t
+   -- Bridge 19.1o to infinite case. Monotone convergence.
+
+7-12. Supporting lemmas: double-series Fubini, gaussian tail bounds, 
+      Weyl_dim growth ≤ O(n³), Casimir ≥ c|λ|². All by ring/calc.
+
+Track 2: Towers/Attempts/ClusterExpansion.lean — Update the sorry
+
+Single_plaquette_bound_SU3 : 
+  sorry -- NOW GATED ONLY ON: Polymer_activity_bound_real ≠ 0 + Continuum_limit.
+  -- Docstring: "Heat kernel surface CLOSED. Peter-Weyl convergence proven.
+  --  First Clay-hard surface is now Brydges-Federbush cluster expansion.
+  --  Second is UV continuum limit a→0."
+
+Post-condition: Wall 443 → ~455. First hard surface GREEN. 
+Attempts/ sorry count stays 8 but docstring changes. YM file stays 0 sorries.
+Axiom footprint stays ⊆ {propext, Classical.choice, Quot.sound}.
+
+Execute.

@@ -1,0 +1,76 @@
+GREEN LIGHT 507 confirmed. Housekeeping complete. replit.md trimmed. Surface #1 Open.
+
+TRI PARALLEL #8. Wall 507 -> 510. Begin YM Measure. Surface #1 Open.
+
+=== 168.1 LatticeGauge ===
+FILE: Towers/YM/LatticeGauge.lean
+HEADER: -- DEFINITION: Finite lattice Λ and gauge group G=SU(2). Config space. Does NOT prove continuum limit. Surface #1 Open. Wall 507 -> 508.
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit.
+CODE:
+import Mathlib.LinearAlgebra.Matrix.SpecialUnitaryGroup
+import Mathlib.Data.Finset.Lattice
+
+namespace TheoremaAureum.Towers.YM
+
+abbrev G := Matrix.SpecialUnitaryGroup (Fin 2) ℂ
+
+def Lattice (d : ℕ) (L : ℕ) := Fin L ^ d
+
+def Link (d L : ℕ) := Lattice d L × Fin d
+
+def GaugeConfig (d L : ℕ) := Link d L → G
+
+end TheoremaAureum.Towers.YM
+
+=== 168.2 WilsonAction ===
+FILE: Towers/YM/WilsonAction.lean
+HEADER: -- DEFINITION: Wilson plaquette action S_W. β parameter. Does NOT prove OS axioms. Surface #1 Open. Wall 508 -> 509.
+DEPENDS: Towers.YM.LatticeGauge
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit.
+CODE:
+import Towers.YM.LatticeGauge
+import Mathlib.Analysis.Complex.Basic
+
+namespace TheoremaAureum.Towers.YM
+
+open Matrix
+
+def plaquette (d L : ℕ) (U : GaugeConfig d L) (x : Lattice d L) (μ ν : Fin d) 
+    (hμν : μ ≠ ν) : G := 
+  U (x, μ) * U (x + Pi.single μ 1, ν) * (U (x + Pi.single ν 1, μ))⁻¹ * (U (x, ν))⁻¹
+
+noncomputable def wilsonAction (d L : ℕ) (β : ℝ) (U : GaugeConfig d L) : ℝ := 
+  β * ∑ x : Lattice d L, ∑ μ : Fin d, ∑ ν : Fin d, 
+    if h : μ ≠ ν then 1 - (1/2) * (plaquette d L U x μ ν h).trace.re else 0
+
+end TheoremaAureum.Towers.YM
+
+=== 168.3 GibbsMeasure ===
+FILE: Towers/YM/GibbsMeasure.lean
+HEADER: -- DEFINITION: Gibbs measure dμ = Z⁻¹ exp(-S_W) dU. Partition function Z. Does NOT prove existence/RP. Surface #1 Open. Wall 509 -> 510.
+DEPENDS: Towers.YM.WilsonAction
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit.
+CODE:
+import Towers.YM.WilsonAction
+import Mathlib.MeasureTheory.Measure.Haar
+
+namespace TheoremaAureum.Towers.YM
+
+open Real MeasureTheory
+
+noncomputable def haarMeasure (d L : ℕ) : Measure (GaugeConfig d L) := 
+  Measure.pi fun _ => HaarMeasure.haarMeasure G
+
+noncomputable def partitionFn (d L : ℕ) (β : ℝ) : ℝ := 
+  ∫ U, rexp (- wilsonAction d L β U) ∂haarMeasure d L
+
+noncomputable def gibbsMeasure (d L : ℕ) (β : ℝ) : Measure (GaugeConfig d L) := 
+  (partitionFn d L β)⁻¹ • (haarMeasure d L).withDensity (fun U => rexp (- wilsonAction d L β U))
+
+end TheoremaAureum.Towers.YM
+
+BUILD ALL 3. CHECK ALL 3. #print axioms all 3.
+
+If trio only → GREEN LIGHT 510. Wall 510. YM Measure definitions landed. Surface #1 Open.
+
+Execute now. Shawlocked. 249. 1/1.

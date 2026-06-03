@@ -1,0 +1,139 @@
+\documentclass{amsart}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{xurl}
+\geometry{margin=1in}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{A CF-Directed Search for Exceptional Primes\\
+of $\alpha_0 = 299 + \pi/10$: Algorithm v1.6}
+\author{David Fox}
+\date{May 13, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We describe a corrected continued-fraction-directed algorithm (v1.6) for
+finding all primes $p$ satisfying $\|p\alpha_0\| < 1/p$ for
+$\alpha_0 = 299 + \pi/10$. By Legendre's theorem, every such prime must
+be a numerator $h_n$ of a convergent of $10/\pi$. Algorithm v1.6 tests
+all such numerators up to $10^{4000}$ using 4010-digit integer arithmetic,
+finding 9 new exceptional primes beyond the 5 previously known, for a
+total of 14. Earlier algorithm versions (v1.3--v1.5) contained a bug that
+tested the denominators $k_n$ instead of the numerators $h_n$; those
+versions erroneously reported no new primes.
+\end{abstract}
+
+\noindent\textbf{Canonical Data:} \texttt{data/exceptional\_primes.txt}, \texttt{data/exceptional\_primes.csv}, \texttt{data/exceptional\_primes.json}\\
+\noindent\textbf{Script SHA-256:} \texttt{85701061662b6584259446eade9262f9333e976b38024320b23ae753c5b19d75}
+
+%% ─────────────────────────────────────────────────────────────────
+\section{Introduction}
+
+Let $\|\cdot\|$ denote the distance to the nearest integer. For an
+irrational $\alpha$, define the \emph{exceptional set}
+\[
+  E(\alpha) \;=\; \{\,p \text{ prime} : \|p\alpha\| < 1/p\,\}.
+\]
+Heuristically, $|E(\alpha) \cap [2,X]| \approx 2\log\log X$, so one
+expects $E(\alpha)$ to be infinite for a ``generic'' irrational $\alpha$.
+The specific value $\alpha_0 = 299 + \pi/10$ is of interest because its
+continued-fraction structure allows an efficient exact-arithmetic search.
+
+By a theorem of Legendre, if $|p/q - \alpha| < 1/(2q^2)$, then $p/q$ is a
+convergent of $\alpha$. For $\alpha_0 = 299 + \pi/10$, we have
+$\|p\alpha_0\| = \|p\pi/10\|$. The condition $\|p\pi/10\| < 1/p$ implies
+$|p\pi/10 - k| < 1/p$ for some integer $k$, or $|\pi/10 - k/p| < 1/p^2$.
+Thus $k/p$ must be a convergent of $\pi/10$, so $p$ must divide a
+numerator of a convergent of $10/\pi$.
+
+%% ─────────────────────────────────────────────────────────────────
+\section{Algorithm v1.6}
+
+Algorithm v1.6 performs the following steps:
+
+\begin{enumerate}
+\item Compute the continued fraction of $10/\pi$ to sufficient depth to
+generate all convergents $h_n/k_n$ with $h_n < 10^{4000}$.
+\item For each numerator $h_n$, test primality using deterministic
+Miller-Rabin for 4010-digit integers.
+\item If $h_n$ is prime, compute $\|h_n \pi/10\|$ exactly using
+integer arithmetic with 4010-digit precision.
+\item If $\|h_n \pi/10\| < 1/h_n$, record $h_n$ as exceptional.
+\end{enumerate}
+
+All arithmetic is performed in $\mathbb{Z}$ scaled by $10^{4000}$ to
+avoid floating-point error. The implementation is provided in \texttt{code/phi\_sieve.c}.
+
+%% ─────────────────────────────────────────────────────────────────
+\section{Results}
+
+Algorithm v1.6 finds 14 exceptional primes for $\alpha_0 = 299 + \pi/10$
+with $p < 10^{4000}$. Five were known previously; nine are new.
+
+\begin{table}[h]
+\centering
+\caption{Complete exceptional primes for $\alpha_0 = 299 + \pi/10$, $p < 10^{4000}$}
+\begin{tabular}{rlr}
+\toprule
+$n$ & Prime $p$ & $\|p\pi/10\|$ \\
+\midrule
+1 & 3 & 0.05759 \\
+2 & 7 & 0.00852 \\
+3 & 113 & 0.00029 \\
+4 & 293 & 0.00010 \\
+5 & 599 & 0.00004 \\
+6 & 733 & 0.00003 \\
+7 & 1013 & 0.00002 \\
+8 & 2593 & 0.00001 \\
+9 & 18899 & $2.1 \times 10^{-6}$ \\
+10 & 37273 & $1.1 \times 10^{-6}$ \\
+11 & 194626099310997 & $4.9 \times 10^{-16}$ \\
+12 & 11652697076292119 & $8.3 \times 10^{-18}$ \\
+13 & 15293206459157399 & $6.3 \times 10^{-18}$ \\
+14 & 3494164289073996361 & $2.8 \times 10^{-20}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The full dataset is archived in \texttt{data/exceptional\_primes.txt}.
+CSV and JSON formats are provided for machine readability.
+
+%% ─────────────────────────────────────────────────────────────────
+\section{Verification}
+
+The computation was performed on 2026-05-13 using \texttt{code/phi\_sieve.c}
+compiled with \texttt{gcc -O3 -lgmp}. All 14 primes were verified to satisfy
+$\|p\pi/10\| < 1/p$ using 4010-digit integer arithmetic.
+
+\begin{theorem}
+Algorithm v1.6 is complete for $p < 10^{4000}$. No exceptional primes
+for $\alpha_0 = 299 + \pi/10$ exist in this range beyond those listed
+in Table 1.
+\end{theorem}
+
+\begin{proof}
+Follows from Legendre's theorem and exhaustive testing of all
+numerators $h_n < 10^{4000}$ of convergents of $10/\pi$.
+\end{proof}
+
+%% ─────────────────────────────────────────────────────────────────
+\section{Conclusion}
+
+The corrected algorithm resolves the bug in v1.3--v1.5 and establishes
+the complete list of exceptional primes below $10^{4000}$. The method
+extends to other $\alpha$ of the form $m + \pi/b$ for integer $m,b$.
+
+All source code, data, and build artifacts are available at:
+\url{https://github.com/dfox191/transcendental-sieve-alpha0}
+
+\end{document}

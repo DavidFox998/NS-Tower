@@ -1,0 +1,62 @@
+plan:
+  id: CERT_Arb
+  title: "Interval enclosure for w1 threshold β₀ (rigorous numerics, no Lean)"
+  parent_plan: kp-surface-discharge-decomposition
+  parent_leaf: D4_w1_strict_bound        # KP-plan leaf D4 / out-of-tower estimate E1
+  mode_intended: BUILD
+  output_type: plan_only
+  code_changes: false
+  lean_changes: false
+  scope: "Interval enclosure for β₀, no Lean"
+  export_date: "2026-06-01"
+
+objective: >
+  Upgrade the EXISTING numerical result (β₀ ≈ 2.07942, w1(0.86) ≈ 0.4324 > 1/7,
+  TESTED NEGATIVE) from floating-point quadrature/MC to a RIGOROUS interval
+  enclosure β₀ ∈ [2.07941, 2.07943] using verified interval arithmetic (Arb /
+  MPFI). This certifies the threshold and the D4 NEGATIVE verdict to interval
+  precision. It remains OUT-OF-TOWER: it produces NO Lean object and discharges
+  NO surface.
+
+target:
+  quantity: "β₀ such that w1(β₀) = 1/7, where w1(β) = ∫_{SU(3)} exp(-β·S) d haar, S = (3 - Re tr U)/3"
+  claimed_enclosure_to_certify: "β₀ ∈ [2.07941, 2.07943]"
+  secondary_enclosures:
+    - "w1(0.86) ∈ [I_lo, I_hi] with I_lo > 1/7   (certifies D4 FAILS at 0.86)"
+    - "w1(β₀_upper) < 1/7  and  w1(β₀_lower) > 1/7  (brackets the root rigorously)"
+
+method:
+  representation: "Weyl integration: eigenangles t1,t2,t3=-t1-t2 on the maximal torus; density |Δ|² = ∏_{j<k}(2 - 2 cos(t_j - t_k)); self-normalize w1(β)=N(β)/N(0)."
+  rigorous_quadrature:
+    tool_options: ["Arb (acb_calc / real ball integration)", "Python mpmath + interval (mpmath.iv)", "MPFI"]
+    requirement: "enclose the 2D torus integral with a verified remainder bound (e.g. Taylor-model or adaptive ball integration), NOT sampled points."
+    note: "self-normalization cancels global Weyl/Haar constants, so only the RATIO needs enclosing."
+  root_bracketing: "interval Newton / bisection on the enclosed monotone w1(β) to bracket β₀."
+  cross_check: "must agree with the existing float estimate β₀ ≈ 2.07942 to within the enclosure width."
+
+deliverables:
+  - "CERT_Arb_beta0_<date>.yaml — enclosure intervals + tool/version + remainder-bound argument"
+  - "arb_w1_enclosure.py (or .c) — reproducible script producing the verified intervals"
+  - "(optional) PDF certificate, ASCII-only, mirroring the YAML"
+
+honesty_locks:
+  status: PLAN_DRAFT_ONLY
+  out_of_tower: true
+  produces_lean_object: false
+  discharges_surface: false
+  closes_D4: false
+  closes_mass_gap: false
+  mass_gap_proven: false
+  m_gt_0_claimed: false
+  surface_1_status: OPEN
+  ym_tower_status: OPEN
+  replit_invariants_modified: false
+  rh_grh_c05_claims: none      # YM-side cert; the M7/GRH/C05 tower stays SEPARATE
+  note: >
+    Even a PERFECT Arb enclosure of β₀ only certifies the NEGATIVE numerical fact
+    (the submitted w1(0.86)<1/7 is false; the bound needs β>β₀≈2.0794). It is NOT
+    a Lean/trio-clean object, does NOT discharge D4/D5/D6, does NOT close the KP
+    surface or Surface #1, and makes NO mass-gap claim. Interval-certified numerics
+    ≠ formal proof.
+
+dependencies_blocking: []   # pure out-of-tower numerics; needs only Arb/MPFI tooling, not mathlib

@@ -1,0 +1,1591 @@
+{
+  "model": "claude-haiku-4-5",
+  "temperature": 0,
+  "trials_per_case": 5,
+  "cases": [
+    {
+      "n": 0,
+      "x": 0.5,
+      "sym": 1,
+      "true_value": 1.0634833707413236,
+      "trials": [
+        {
+          "raw": "1.06348337646362",
+          "value": 1.06348337646362,
+          "ok": true
+        },
+        {
+          "raw": "1.06348337646362",
+          "value": 1.06348337646362,
+          "ok": true
+        },
+        {
+          "raw": "1.06348826",
+          "value": 1.06348826,
+          "ok": true
+        },
+        {
+          "raw": "1.06348337646362",
+          "value": 1.06348337646362,
+          "ok": true
+        },
+        {
+          "raw": "1.06348337646362",
+          "value": 1.06348337646362,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 0,
+      "x": 1.0,
+      "sym": 1,
+      "true_value": 1.2660658777520084,
+      "trials": [
+        {
+          "raw": "1.2660502732457020651",
+          "value": 1.266050273245702,
+          "ok": true
+        },
+        {
+          "raw": "1.2660502732457020651",
+          "value": 1.266050273245702,
+          "ok": true
+        },
+        {
+          "raw": "1.2660502732457020651",
+          "value": 1.266050273245702,
+          "ok": true
+        },
+        {
+          "raw": "1.2660502732457020651",
+          "value": 1.266050273245702,
+          "ok": true
+        },
+        {
+          "raw": "1.2660502732457020651",
+          "value": 1.266050273245702,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 0,
+      "x": 1.5,
+      "sym": 1,
+      "true_value": 1.646723189772891,
+      "trials": [
+        {
+          "raw": "1.6467025573",
+          "value": 1.6467025573,
+          "ok": true
+        },
+        {
+          "raw": "1.6467025573",
+          "value": 1.6467025573,
+          "ok": true
+        },
+        {
+          "raw": "1.6467025573",
+          "value": 1.6467025573,
+          "ok": true
+        },
+        {
+          "raw": "1.6467025573",
+          "value": 1.6467025573,
+          "ok": true
+        },
+        {
+          "raw": "1.6467025573",
+          "value": 1.6467025573,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 0,
+      "x": 2.0,
+      "sym": 1,
+      "true_value": 2.2795853023360673,
+      "trials": [
+        {
+          "raw": "2.2795853023360673612",
+          "value": 2.2795853023360673,
+          "ok": true
+        },
+        {
+          "raw": "2.2795853023360673612",
+          "value": 2.2795853023360673,
+          "ok": true
+        },
+        {
+          "raw": "2.2795853023360673612",
+          "value": 2.2795853023360673,
+          "ok": true
+        },
+        {
+          "raw": "2.2795853023360673612",
+          "value": 2.2795853023360673,
+          "ok": true
+        },
+        {
+          "raw": "2.2795853023360673612",
+          "value": 2.2795853023360673,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 0,
+      "x": 2.5,
+      "sym": 1,
+      "true_value": 3.289839144050123,
+      "trials": [
+        {
+          "raw": "2.516716639612071",
+          "value": 2.516716639612071,
+          "ok": true
+        },
+        {
+          "raw": "3.289839144050123",
+          "value": 3.289839144050123,
+          "ok": true
+        },
+        {
+          "raw": "2.516716245288748",
+          "value": 2.516716245288748,
+          "ok": true
+        },
+        {
+          "raw": "3.289839144050123",
+          "value": 3.289839144050123,
+          "ok": true
+        },
+        {
+          "raw": "2.516716245288748",
+          "value": 2.516716245288748,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 0,
+      "x": 3.0,
+      "sym": 1,
+      "true_value": 4.8807925858650245,
+      "trials": [
+        {
+          "raw": "4.880792585865024",
+          "value": 4.880792585865024,
+          "ok": true
+        },
+        {
+          "raw": "4.880792585865024",
+          "value": 4.880792585865024,
+          "ok": true
+        },
+        {
+          "raw": "4.880792585865024",
+          "value": 4.880792585865024,
+          "ok": true
+        },
+        {
+          "raw": "4.880792585865024",
+          "value": 4.880792585865024,
+          "ok": true
+        },
+        {
+          "raw": "4.880792585865024",
+          "value": 4.880792585865024,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 0,
+      "x": 5.0,
+      "sym": 1,
+      "true_value": 27.239871823604446,
+      "trials": [
+        {
+          "raw": "27.2398718",
+          "value": 27.2398718,
+          "ok": true
+        },
+        {
+          "raw": "27.2398718",
+          "value": 27.2398718,
+          "ok": true
+        },
+        {
+          "raw": "27.2398718",
+          "value": 27.2398718,
+          "ok": true
+        },
+        {
+          "raw": "27.2398718",
+          "value": 27.2398718,
+          "ok": true
+        },
+        {
+          "raw": "27.2398718",
+          "value": 27.2398718,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 0,
+      "x": 10.0,
+      "sym": 1,
+      "true_value": 2815.7166284662544,
+      "trials": [
+        {
+          "raw": "2815.716628466254",
+          "value": 2815.716628466254,
+          "ok": true
+        },
+        {
+          "raw": "2815.716628466254",
+          "value": 2815.716628466254,
+          "ok": true
+        },
+        {
+          "raw": "2815.716628466254",
+          "value": 2815.716628466254,
+          "ok": true
+        },
+        {
+          "raw": "2815.716628466254",
+          "value": 2815.716628466254,
+          "ok": true
+        },
+        {
+          "raw": "2815.716628466254",
+          "value": 2815.716628466254,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 1,
+      "x": 0.5,
+      "sym": 1,
+      "true_value": 0.2578943053908963,
+      "trials": [
+        {
+          "raw": "0.2423271801207355",
+          "value": 0.2423271801207355,
+          "ok": true
+        },
+        {
+          "raw": "0.2423271801207355",
+          "value": 0.2423271801207355,
+          "ok": true
+        },
+        {
+          "raw": "0.2423271801207355",
+          "value": 0.2423271801207355,
+          "ok": true
+        },
+        {
+          "raw": "0.2423271801207355",
+          "value": 0.2423271801207355,
+          "ok": true
+        },
+        {
+          "raw": "0.2423271801207355",
+          "value": 0.2423271801207355,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 1,
+      "x": 1.0,
+      "sym": 1,
+      "true_value": 0.565159103992485,
+      "trials": [
+        {
+          "raw": "0.4400505857449335",
+          "value": 0.4400505857449335,
+          "ok": true
+        },
+        {
+          "raw": "0.4400505857449335",
+          "value": 0.4400505857449335,
+          "ok": true
+        },
+        {
+          "raw": "0.4400505857449335",
+          "value": 0.4400505857449335,
+          "ok": true
+        },
+        {
+          "raw": "0.4400505857449335",
+          "value": 0.4400505857449335,
+          "ok": true
+        },
+        {
+          "raw": "0.4400505857449335",
+          "value": 0.4400505857449335,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 1,
+      "x": 1.5,
+      "sym": 1,
+      "true_value": 0.9816664285779075,
+      "trials": [
+        {
+          "raw": "0.9816271834",
+          "value": 0.9816271834,
+          "ok": true
+        },
+        {
+          "raw": "0.9816271834",
+          "value": 0.9816271834,
+          "ok": true
+        },
+        {
+          "raw": "0.9816271834",
+          "value": 0.9816271834,
+          "ok": true
+        },
+        {
+          "raw": "0.9816271834",
+          "value": 0.9816271834,
+          "ok": true
+        },
+        {
+          "raw": "0.9816271834",
+          "value": 0.9816271834,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 1,
+      "x": 2.0,
+      "sym": 1,
+      "true_value": 1.590636854637329,
+      "trials": [
+        {
+          "raw": "1.2589596424571640313518433438566",
+          "value": 1.258959642457164,
+          "ok": true
+        },
+        {
+          "raw": "1.2589596424571640",
+          "value": 1.258959642457164,
+          "ok": true
+        },
+        {
+          "raw": "1.2589596424571640313518433438566",
+          "value": 1.258959642457164,
+          "ok": true
+        },
+        {
+          "raw": "1.2589596424571640",
+          "value": 1.258959642457164,
+          "ok": true
+        },
+        {
+          "raw": "1.2589596424571640",
+          "value": 1.258959642457164,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 1,
+      "x": 2.5,
+      "sym": 1,
+      "true_value": 2.5167162452886984,
+      "trials": [
+        {
+          "raw": "1.2020569031595942853997381536503",
+          "value": 1.2020569031595942,
+          "ok": true
+        },
+        {
+          "raw": "1.2020569031595942853997381536503",
+          "value": 1.2020569031595942,
+          "ok": true
+        },
+        {
+          "raw": "1.2020569031595942853997381536503",
+          "value": 1.2020569031595942,
+          "ok": true
+        },
+        {
+          "raw": "1.2020569031595942853997381536503",
+          "value": 1.2020569031595942,
+          "ok": true
+        },
+        {
+          "raw": "1.2020569031595942853997381536503",
+          "value": 1.2020569031595942,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 1,
+      "x": 3.0,
+      "sym": 1,
+      "true_value": 3.9533702174026093,
+      "trials": [
+        {
+          "raw": "3.953370217402609",
+          "value": 3.953370217402609,
+          "ok": true
+        },
+        {
+          "raw": "3.953370217402609",
+          "value": 3.953370217402609,
+          "ok": true
+        },
+        {
+          "raw": "3.953370217402609",
+          "value": 3.953370217402609,
+          "ok": true
+        },
+        {
+          "raw": "3.953370217402609",
+          "value": 3.953370217402609,
+          "ok": true
+        },
+        {
+          "raw": "3.953370217402609",
+          "value": 3.953370217402609,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 1,
+      "x": 5.0,
+      "sym": 1,
+      "true_value": 24.335642142450528,
+      "trials": [
+        {
+          "raw": "3.287842385646377",
+          "value": 3.287842385646377,
+          "ok": true
+        },
+        {
+          "raw": "3.287842385646377",
+          "value": 3.287842385646377,
+          "ok": true
+        },
+        {
+          "raw": "3.287842385646377",
+          "value": 3.287842385646377,
+          "ok": true
+        },
+        {
+          "raw": "3.287842385646377",
+          "value": 3.287842385646377,
+          "ok": true
+        },
+        {
+          "raw": "3.287842385646377",
+          "value": 3.287842385646377,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 1,
+      "x": 10.0,
+      "sym": 1,
+      "true_value": 2670.9883037012546,
+      "trials": [
+        {
+          "raw": "2.670585034182409699588047535305529515047412147613793571854510799076496249481",
+          "value": 2.67058503418241,
+          "ok": true
+        },
+        {
+          "raw": "2.670585034182409699588047535305529515047412147613793571854510799076496249481",
+          "value": 2.67058503418241,
+          "ok": true
+        },
+        {
+          "raw": "2.670585034182409699588047535305529515047412147613793571854510799076496249481",
+          "value": 2.67058503418241,
+          "ok": true
+        },
+        {
+          "raw": "2.670585034182409699588047535305529515047412147613793571854510799076496249481",
+          "value": 2.67058503418241,
+          "ok": true
+        },
+        {
+          "raw": "2.670585034182409699588047535305529515047412147613793571854510799076496249481",
+          "value": 2.67058503418241,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "x": 0.5,
+      "sym": 2,
+      "true_value": 0.031906149177738256,
+      "trials": [
+        {
+          "raw": "0.03084564",
+          "value": 0.03084564,
+          "ok": true
+        },
+        {
+          "raw": "0.03084564",
+          "value": 0.03084564,
+          "ok": true
+        },
+        {
+          "raw": "0.03084564",
+          "value": 0.03084564,
+          "ok": true
+        },
+        {
+          "raw": "0.03084564",
+          "value": 0.03084564,
+          "ok": true
+        },
+        {
+          "raw": "0.03084564",
+          "value": 0.03084564,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "x": 1.0,
+      "sym": 2,
+      "true_value": 0.13574766976703828,
+      "trials": [
+        {
+          "raw": "0.13574766790857857",
+          "value": 0.13574766790857856,
+          "ok": true
+        },
+        {
+          "raw": "0.13574766790857857",
+          "value": 0.13574766790857856,
+          "ok": true
+        },
+        {
+          "raw": "0.13574766790",
+          "value": 0.1357476679,
+          "ok": true
+        },
+        {
+          "raw": "0.13574766790",
+          "value": 0.1357476679,
+          "ok": true
+        },
+        {
+          "raw": "0.13574766790",
+          "value": 0.1357476679,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "x": 1.5,
+      "sym": 2,
+      "true_value": 0.33783461833568074,
+      "trials": [
+        {
+          "raw": "0.2320873006",
+          "value": 0.2320873006,
+          "ok": true
+        },
+        {
+          "raw": "0.2320873006",
+          "value": 0.2320873006,
+          "ok": true
+        },
+        {
+          "raw": "0.2320873006",
+          "value": 0.2320873006,
+          "ok": true
+        },
+        {
+          "raw": "0.2320873006",
+          "value": 0.2320873006,
+          "ok": true
+        },
+        {
+          "raw": "0.2320873006",
+          "value": 0.2320873006,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "x": 2.0,
+      "sym": 2,
+      "true_value": 0.6889484476987382,
+      "trials": [
+        {
+          "raw": "0.2714953395340765",
+          "value": 0.2714953395340765,
+          "ok": true
+        },
+        {
+          "raw": "0.2714953395340765",
+          "value": 0.2714953395340765,
+          "ok": true
+        },
+        {
+          "raw": "0.2714953395340765",
+          "value": 0.2714953395340765,
+          "ok": true
+        },
+        {
+          "raw": "0.2714953395340765",
+          "value": 0.2714953395340765,
+          "ok": true
+        },
+        {
+          "raw": "0.2714953395340765",
+          "value": 0.2714953395340765,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "x": 2.5,
+      "sym": 2,
+      "true_value": 1.2764661478191643,
+      "trials": [
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "x": 3.0,
+      "sym": 2,
+      "true_value": 2.245212440929951,
+      "trials": [
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "x": 5.0,
+      "sym": 2,
+      "true_value": 17.505614966624236,
+      "trials": [
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        }
+      ]
+    },
+    {
+      "n": 2,
+      "x": 10.0,
+      "sym": 2,
+      "true_value": 2281.5189677260037,
+      "trials": [
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "x": 0.5,
+      "sym": 2,
+      "true_value": 0.002645111968990286,
+      "trials": [
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "x": 1.0,
+      "sym": 2,
+      "true_value": 0.022168424924331902,
+      "trials": [
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "x": 1.5,
+      "sym": 2,
+      "true_value": 0.0807741130160923,
+      "trials": [
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "x": 2.0,
+      "sym": 2,
+      "true_value": 0.21273995923985264,
+      "trials": [
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "x": 2.5,
+      "sym": 2,
+      "true_value": 0.4743704087780356,
+      "trials": [
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "x": 3.0,
+      "sym": 2,
+      "true_value": 0.9597536294960078,
+      "trials": [
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "HTTPError 429: {\n            \"error\": {\n                \"code\": \"RATELIMIT_EXCEEDED\",\n                \"message\": \"Rate limit exceeded. Refer to 'x-ratelimit-*' headers for details, and 'retry-after' header for when ",
+          "value": null,
+          "ok": false
+        },
+        {
+          "raw": "0.2670988303",
+          "value": 0.2670988303,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "x": 5.0,
+      "sym": 2,
+      "true_value": 10.331150169151138,
+      "trials": [
+        {
+          "raw": "17.505609",
+          "value": 17.505609,
+          "ok": true
+        },
+        {
+          "raw": "17.505609",
+          "value": 17.505609,
+          "ok": true
+        },
+        {
+          "raw": "17.505609",
+          "value": 17.505609,
+          "ok": true
+        },
+        {
+          "raw": "17.505609",
+          "value": 17.505609,
+          "ok": true
+        },
+        {
+          "raw": "17.505609",
+          "value": 17.505609,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "x": 10.0,
+      "sym": 2,
+      "true_value": 1758.3807166108531,
+      "trials": [
+        {
+          "raw": "2.670440220208393e+03",
+          "value": 2670.440220208393,
+          "ok": true
+        },
+        {
+          "raw": "2.670440220208393e+03",
+          "value": 2670.440220208393,
+          "ok": true
+        },
+        {
+          "raw": "2.670440220208393e+03",
+          "value": 2670.440220208393,
+          "ok": true
+        },
+        {
+          "raw": "2.670440220208393e+03",
+          "value": 2670.440220208393,
+          "ok": true
+        },
+        {
+          "raw": "2.670440220208393e+03",
+          "value": 2670.440220208393,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "x": 0.5,
+      "sym": 2,
+      "true_value": 0.00016480554985482353,
+      "trials": [
+        {
+          "raw": "0.00001564",
+          "value": 1.564e-05,
+          "ok": true
+        },
+        {
+          "raw": "0.00001564",
+          "value": 1.564e-05,
+          "ok": true
+        },
+        {
+          "raw": "0.00001564",
+          "value": 1.564e-05,
+          "ok": true
+        },
+        {
+          "raw": "0.00001564",
+          "value": 1.564e-05,
+          "ok": true
+        },
+        {
+          "raw": "0.00001564",
+          "value": 1.564e-05,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "x": 1.0,
+      "sym": 2,
+      "true_value": 0.002737120221046866,
+      "trials": [
+        {
+          "raw": "0.0061125247518633",
+          "value": 0.0061125247518633,
+          "ok": true
+        },
+        {
+          "raw": "0.0061125247518633",
+          "value": 0.0061125247518633,
+          "ok": true
+        },
+        {
+          "raw": "0.0061125247518633",
+          "value": 0.0061125247518633,
+          "ok": true
+        },
+        {
+          "raw": "0.0061125247518633",
+          "value": 0.0061125247518633,
+          "ok": true
+        },
+        {
+          "raw": "0.0061125247518633",
+          "value": 0.0061125247518633,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "x": 1.5,
+      "sym": 2,
+      "true_value": 0.014738166271311515,
+      "trials": [
+        {
+          "raw": "0.0737393",
+          "value": 0.0737393,
+          "ok": true
+        },
+        {
+          "raw": "0.0737393",
+          "value": 0.0737393,
+          "ok": true
+        },
+        {
+          "raw": "0.0737393",
+          "value": 0.0737393,
+          "ok": true
+        },
+        {
+          "raw": "0.0737393",
+          "value": 0.0737393,
+          "ok": true
+        },
+        {
+          "raw": "0.0737393",
+          "value": 0.0737393,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "x": 2.0,
+      "sym": 2,
+      "true_value": 0.05072856997918024,
+      "trials": [
+        {
+          "raw": "0.2127399850",
+          "value": 0.212739985,
+          "ok": true
+        },
+        {
+          "raw": "0.2127399850",
+          "value": 0.212739985,
+          "ok": true
+        },
+        {
+          "raw": "0.2127399850",
+          "value": 0.212739985,
+          "ok": true
+        },
+        {
+          "raw": "0.2127399850",
+          "value": 0.212739985,
+          "ok": true
+        },
+        {
+          "raw": "0.2127399850",
+          "value": 0.212739985,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "x": 2.5,
+      "sym": 2,
+      "true_value": 0.13797716675187888,
+      "trials": [
+        {
+          "raw": "0.2714631559",
+          "value": 0.2714631559,
+          "ok": true
+        },
+        {
+          "raw": "0.2714631559",
+          "value": 0.2714631559,
+          "ok": true
+        },
+        {
+          "raw": "0.2714631559",
+          "value": 0.2714631559,
+          "ok": true
+        },
+        {
+          "raw": "0.2714631559",
+          "value": 0.2714631559,
+          "ok": true
+        },
+        {
+          "raw": "0.2714631559",
+          "value": 0.2714631559,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "x": 3.0,
+      "sym": 2,
+      "true_value": 0.32570518193793546,
+      "trials": [
+        {
+          "raw": "0.3208",
+          "value": 0.3208,
+          "ok": true
+        },
+        {
+          "raw": "0.3208",
+          "value": 0.3208,
+          "ok": true
+        },
+        {
+          "raw": "0.3208",
+          "value": 0.3208,
+          "ok": true
+        },
+        {
+          "raw": "0.3208",
+          "value": 0.3208,
+          "ok": true
+        },
+        {
+          "raw": "0.3208",
+          "value": 0.3208,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "x": 5.0,
+      "sym": 2,
+      "true_value": 5.10823476364287,
+      "trials": [
+        {
+          "raw": "17.505614915",
+          "value": 17.505614915,
+          "ok": true
+        },
+        {
+          "raw": "17.505614915",
+          "value": 17.505614915,
+          "ok": true
+        },
+        {
+          "raw": "17.505614915",
+          "value": 17.505614915,
+          "ok": true
+        },
+        {
+          "raw": "17.505614915",
+          "value": 17.505614915,
+          "ok": true
+        },
+        {
+          "raw": "17.505614915",
+          "value": 17.505614915,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "x": 10.0,
+      "sym": 2,
+      "true_value": 1226.4905377594916,
+      "trials": [
+        {
+          "raw": "2.670440106217523e+03",
+          "value": 2670.440106217523,
+          "ok": true
+        },
+        {
+          "raw": "2.670440106217523e+03",
+          "value": 2670.440106217523,
+          "ok": true
+        },
+        {
+          "raw": "2.670440106217523e+03",
+          "value": 2670.440106217523,
+          "ok": true
+        },
+        {
+          "raw": "2.670440106217345e+03",
+          "value": 2670.440106217345,
+          "ok": true
+        },
+        {
+          "raw": "2.670440106696124",
+          "value": 2.670440106696124,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "x": 0.5,
+      "sym": 2,
+      "true_value": 8.223171313109265e-06,
+      "trials": [
+        {
+          "raw": "0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "value": 0.0,
+          "ok": true
+        },
+        {
+          "raw": "0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "value": 0.0,
+          "ok": true
+        },
+        {
+          "raw": "0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "value": 0.0,
+          "ok": true
+        },
+        {
+          "raw": "0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "value": 0.0,
+          "ok": true
+        },
+        {
+          "raw": "0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "value": 0.0,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "x": 1.0,
+      "sym": 2,
+      "true_value": 0.0002714631559569719,
+      "trials": [
+        {
+          "raw": "0.00271463155070",
+          "value": 0.0027146315507,
+          "ok": true
+        },
+        {
+          "raw": "0.00271463155070",
+          "value": 0.0027146315507,
+          "ok": true
+        },
+        {
+          "raw": "0.00271463155070",
+          "value": 0.0027146315507,
+          "ok": true
+        },
+        {
+          "raw": "0.00271463155070",
+          "value": 0.0027146315507,
+          "ok": true
+        },
+        {
+          "raw": "0.00271463155070",
+          "value": 0.0027146315507,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "x": 1.5,
+      "sym": 2,
+      "true_value": 0.002170559569097556,
+      "trials": [
+        {
+          "raw": "0.0001289646",
+          "value": 0.0001289646,
+          "ok": true
+        },
+        {
+          "raw": "0.0001289646",
+          "value": 0.0001289646,
+          "ok": true
+        },
+        {
+          "raw": "0.0001564110",
+          "value": 0.000156411,
+          "ok": true
+        },
+        {
+          "raw": "0.0001564110",
+          "value": 0.000156411,
+          "ok": true
+        },
+        {
+          "raw": "0.0001289646",
+          "value": 0.0001289646,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "x": 2.0,
+      "sym": 2,
+      "true_value": 0.009825679323131702,
+      "trials": [
+        {
+          "raw": "0.2127666",
+          "value": 0.2127666,
+          "ok": true
+        },
+        {
+          "raw": "0.2127666",
+          "value": 0.2127666,
+          "ok": true
+        },
+        {
+          "raw": "0.2127666",
+          "value": 0.2127666,
+          "ok": true
+        },
+        {
+          "raw": "0.2127666",
+          "value": 0.2127666,
+          "ok": true
+        },
+        {
+          "raw": "0.2127666",
+          "value": 0.2127666,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "x": 2.5,
+      "sym": 2,
+      "true_value": 0.03284347517202321,
+      "trials": [
+        {
+          "raw": "0.2178",
+          "value": 0.2178,
+          "ok": true
+        },
+        {
+          "raw": "0.2178",
+          "value": 0.2178,
+          "ok": true
+        },
+        {
+          "raw": "0.2178",
+          "value": 0.2178,
+          "ok": true
+        },
+        {
+          "raw": "0.2178",
+          "value": 0.2178,
+          "ok": true
+        },
+        {
+          "raw": "0.2178",
+          "value": 0.2178,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "x": 3.0,
+      "sym": 2,
+      "true_value": 0.09120647766151335,
+      "trials": [
+        {
+          "raw": "0.2670988303",
+          "value": 0.2670988303,
+          "ok": true
+        },
+        {
+          "raw": "0.2670988303",
+          "value": 0.2670988303,
+          "ok": true
+        },
+        {
+          "raw": "0.2670988303",
+          "value": 0.2670988303,
+          "ok": true
+        },
+        {
+          "raw": "0.2670988303",
+          "value": 0.2670988303,
+          "ok": true
+        },
+        {
+          "raw": "0.2670988303",
+          "value": 0.2670988303,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "x": 5.0,
+      "sym": 2,
+      "true_value": 2.1579745473225467,
+      "trials": [
+        {
+          "raw": "0.27146880403233",
+          "value": 0.27146880403233,
+          "ok": true
+        },
+        {
+          "raw": "0.27146880403233",
+          "value": 0.27146880403233,
+          "ok": true
+        },
+        {
+          "raw": "0.27146880403233",
+          "value": 0.27146880403233,
+          "ok": true
+        },
+        {
+          "raw": "0.27146880403233",
+          "value": 0.27146880403233,
+          "ok": true
+        },
+        {
+          "raw": "0.27146880403233",
+          "value": 0.27146880403233,
+          "ok": true
+        }
+      ]
+    },
+    {
+      "n": 5,
+      "x": 10.0,
+      "sym": 2,
+      "true_value": 777.18828640326,
+      "trials": [
+        {
+          "raw": "777.188378",
+          "value": 777.188378,
+          "ok": true
+        },
+        {
+          "raw": "777.188378",
+          "value": 777.188378,
+          "ok": true
+        },
+        {
+          "raw": "777.188378",
+          "value": 777.188378,
+          "ok": true
+        },
+        {
+          "raw": "777.188378",
+          "value": 777.188378,
+          "ok": true
+        },
+        {
+          "raw": "777.188378",
+          "value": 777.188378,
+          "ok": true
+        }
+      ]
+    }
+  ]
+}

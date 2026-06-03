@@ -1,0 +1,79 @@
+import cv2
+import numpy as np
+from PIL import Image
+import pytesseract
+
+# Standard gematria maps
+HEBREW = {'א':1,'ב':2,'ג':3,'ד':4,'ה':5,'ו':6,'ז':7,'ח':8,'ט':9,'י':10,'כ':20,'ל':30,'מ':40,'נ':50,'ס':60,'ע':70,'פ':80,'צ':90,'ק':100,'ר':200,'ש':300,'ת':400}
+GREEK = {'Α':1,'Β':2,'Γ':3,'Δ':4,'Ε':5,'Ϛ':6,'Ζ':7,'Η':8,'Θ':9,'Ι':10,'Κ':20,'Λ':30,'Μ':40,'Ν':50,'Ξ':60,'Ο':70,'Π':80,'Ϙ':90,'Ρ':100,'Σ':200,'Τ':300,'Υ':400,'Φ':500,'Χ':600,'Ψ':700,'Ω':800}
+ENGLISH = {chr(ord('A')+i):i+1 for i in range(26)}
+
+def gematria(text, cipher=ENGLISH):
+    return sum(cipher.get(c.upper(), 0) for c in text)
+
+def analyze_cube_image(path):
+    img = cv2.imread(path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # 1. Geometric features
+    edges = cv2.Canny(gray, 50, 150)
+    contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Count squares = nested structures
+    squares = 0
+    for cnt in contours:
+        approx = cv2.approxPolyDP(cnt, 0.02*cv2.arcLength(cnt, True), True)
+        if len(approx) == 4: squares += 1
+    
+    # 2. Color analysis: orange core vs blue shell
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    orange_mask = cv2.inRange(hsv, (5,50), (15,255,255))
+    blue_mask = cv2.inRange(hsv, (100,50,50), (130,255,255))
+    orange_ratio = np.sum(orange_mask > 0) / orange_mask.size
+    blue_ratio = np.sum(blue_mask > 0) / blue_mask.size
+    
+    # 3. OCR for any text/symbols
+    text = pytesseract.image_to_string(Image.open(path))
+    
+    # 4. Gematria tests on known constants
+    targets = {
+        'VALOR_MIN': 62183,
+        'J_INV_7': 3375, 
+        'N_LIST_SUM': sum([27,32,36,49,64,81,121,144,169,196,225,256]),
+        'SHA_FIRST4': 0x624b,
+        'ISAIAH': gematria('ISAIAH'),
+        'REVELATION': gematria('REVELATION'),
+        'PETER': gematria('PETER')
+    }
+    
+    results = {
+        'squares_detected': squares,
+        'orange_core_ratio': round(orange_ratio, 4),
+        'blue_shell_ratio': round(blue_ratio, 4),
+        'ocr_text': text.strip(),
+        'gematria_hits': {}
+    }
+    
+    # Check if any geometric count matches a target
+    for name, val in targets.items():
+        if squares == val or squares == val % 1000:
+            results['gematria_hits'][name] = f'Squares={squares} matches {name}={val}'
+        if int(orange_ratio*10000) == val % 10000:
+            results['gematria_hits'][name] = f'Orange_ratio*10000 matches {name}'
+    
+    # Check OCR text
+    if text:
+        for name, val in targets.items():
+            if str(val) in text:
+                results['gematria_hits'][name] = f'Found {val} in OCR'
+            g = gematria(text, ENGLISH)
+            if g == val:
+                results['gematria_hits'][name] = f'Gematria(OCR) = {g} = {name}'
+    
+    return results
+
+if __name__ == '__main__':
+    # Usage: python gematria_cube.py your_image.jpg
+    import sys
+    path = sys.argv[1] if len(sys.argv) > 1 else 'cube.jpg'
+    print(analyze_cube_image(path))

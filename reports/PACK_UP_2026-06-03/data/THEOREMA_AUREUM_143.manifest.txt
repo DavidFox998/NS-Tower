@@ -1,0 +1,134 @@
+================================================================
+  THEOREMA AUREUM 143 — Morning Star Project
+  Public manifest for the Genesis-sealed probe ledger
+================================================================
+
+PROJECT          Morning Star Project
+VOLUME           I — Theorema Aureum 143
+PUBLISHER        Morning Star Project (independent research)
+LICENSE          All rights reserved (license pending review)
+GENERATED        2026-05-25
+
+----------------------------------------------------------------
+  WHAT THIS IS
+----------------------------------------------------------------
+
+An applied-science certificate ledger for a Lean 4-checked
+deductive chain (M1 through M9, plus M10/M13 BC-CM). The Lean
+spine `TheoremaAureum.main_theorem` has axiom debt = [] (zero
+axioms), re-verified on every merge by `scripts/post-merge.sh`
+and in CI by the `lean-proof` workflow.
+
+This is NOT a refereed publication and NOT a claim of proof of
+the Riemann Hypothesis. The load-bearing claim is the much
+narrower:
+
+  (a) The Lean spine is axiom-free.
+  (b) The probe ledger is Genesis-sealed and tamper-evident.
+
+Both are reproducible from a fresh checkout in three commands —
+see `docs/REPRODUCE.md`.
+
+----------------------------------------------------------------
+  CANONICAL FILES
+----------------------------------------------------------------
+
+  data/hits.txt
+      The Genesis-sealed append-only probe ledger.
+      Also published under the friendlier name
+      `data/theorema-aureum-143-hits.txt` (symlink, byte-identical).
+
+  data/M13_CERT.txt
+      Human-readable M13 certificate header.
+
+  data/CASUALTY_LOG.md
+      Incident log. Every recorded mistake / correction lives
+      here. Visible by design.
+
+  lean-proof/VERIFY.txt
+      Latest `lake env lean Verify.lean` output. The lines
+      "depends on axioms: []" are the load-bearing evidence.
+
+  docs/MorningStar_Architecture.pdf
+      Full write-up (Part I Math Kernel, Part II Engineering
+      Manifest, Appendices A–D).
+
+  docs/REPRODUCE.md
+      Three-command reproducibility recipe.
+
+----------------------------------------------------------------
+  GENESIS SEAL (sealed preamble of data/hits.txt, lines 1–9)
+----------------------------------------------------------------
+
+  SHA-256: eecbcd9a540aa7a2c90edd23827c73e4d1bb5af641d352f70a5de849b21f875f
+
+  Verify:  python3 scripts/check-genesis-seal.py
+
+  This seal protects the *preamble* — the contract — not the
+  truth of any individual probe. The per-line SHAs make the
+  probes a hash chain. Neither one is a truth oracle for RH.
+
+----------------------------------------------------------------
+  LEDGER SNAPSHOT (2026-05-25)
+----------------------------------------------------------------
+
+  Total lines                  20,964
+    sealed preamble                 9
+    probes                     20,955
+
+  Tag breakdown
+    MPMATH_ZETA                20,936
+    MPMATH_DIRICHLET_TRIVIAL        8
+    NEEDS_SAGE                      9
+    ELLIPTIC_STUB                   1
+
+  RH_ok flag (|L| < 1e-10 threshold)
+    RH_ok=True                 11,737
+    RH_ok=False                 9,216
+
+  Among MPMATH_ZETA lines
+    unique im(t) values        11,410
+    im(t) values w/ freq > 1    8,223
+
+  Whole-file SHA-256:
+    86e787e0aef39461d19e5dde5c7fa35e1bf98c4bfeb415d26e9f6e415eb3e8d0
+    (changes with every append; the *preamble* seal above does not.)
+
+----------------------------------------------------------------
+  HONEST-SCOPE GUARDS
+----------------------------------------------------------------
+
+  * `hit_437` / `hit_1094` Lean lemmas are tautologies
+    (`True := trivial`). Their *names* reference OpenCV cube
+    counts; their *statements* claim nothing about number
+    theory.
+
+  * `probe()` and friends never call SageMath. Out-of-scope
+    inputs are recorded with tag `NEEDS_SAGE` and a `reason=`
+    field, never silently stubbed.
+
+  * `elliptic_probe` writes a SHA-stamped intent line tagged
+    `ELLIPTIC_STUB` with `reason=elliptic_L_requires_sage`. The
+    returned dict has no `L_real`/`L_imag`/`L_abs` keys.
+    `tests/test_kernel.py` pins this invariant.
+
+  * `zeta_sieve` is a parallelised sign-change sieve plus a
+    Brent refinement pass — NOT the Odlyzko-Schönhage 1991 FFT.
+    The docstring says so.
+
+  * `RH_ok=False` is recorded honestly. ~44% of probes land
+    outside the |L| < 1e-10 threshold and are logged as misses,
+    not as failures.
+
+----------------------------------------------------------------
+  CONTACT / PROVENANCE
+----------------------------------------------------------------
+
+  This file is unsealed and may be regenerated freely. The
+  Genesis seal of `data/hits.txt` is the authoritative anchor.
+  If this manifest's SHA snapshot above disagrees with a fresh
+  `sha256sum data/hits.txt`, the ledger has grown (new probes
+  appended) — that is expected. If the Genesis-seal verification
+  command above ever fails, the preamble has been tampered
+  with — that is not.
+================================================================

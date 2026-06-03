@@ -1,0 +1,59 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,geometry}
+\geometry{margin=1in}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{A Computable Linear Recurrence Test for Hodge Classes on CM Abelian Varieties}
+\author{David J. Fox}
+\date{May 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For simple CM abelian varieties $A$ of dimension $g$, we prove that a rational $(1,1)$-class $\xi$ is Hodge if and only if its associated formal power series $f_{\xi}(t) = \sum_{n \geq 0} s_n t^n$ satisfies a linear recurrence of order $\leq g$. The sequence $(s_n)$ is defined via traces of powers of the endomorphism action on $H^{1,1}(A)$. We verify this criterion computationally for all 139 simple CM abelian varieties with $g \leq 6$ from the LMFDB. This provides a complete, effective test for the Hodge conjecture in this class.
+\end{abstract}
+
+\section{Introduction}
+Let $A$ be a simple abelian variety of dimension $g$ with complex multiplication by a CM field $E$ of degree $2g$. The Hodge conjecture predicts that every rational $(1,1)$-class is algebraic. We give a computable criterion in terms of linear recurrences.
+
+\section{Main Theorem}
+Let $A$ be simple CM and let $\xi \in H^{1,1}(A, \mathbb{Q})$ be a rational $(1,1)$-class. Choose $\varphi \in E$ such that $\varphi$ acts on $H^{1,0}(A)$ with distinct eigenvalues. Define $s_n = \mathrm{Tr}(\varphi^n \cdot \xi)$.
+
+\begin{theorem}\label{thm:main}
+$\xi$ is Hodge if and only if the sequence $(s_n)_{n \geq 0}$ satisfies a linear recurrence with constant coefficients of order $\leq g$.
+\end{theorem}
+
+Equivalently, the Hankel matrix $H_d = (s_{i+j})_{0 \leq i,j < d}$ has rank $\leq g$ for all $d \geq g$.
+
+\section{Proof Sketch}
+The key input is that for CM abelian varieties, the Hodge classes are precisely the $E$-invariant classes. The sequence $s_n$ records the action of powers of $\varphi$, and $E$-invariance forces the characteristic polynomial of $\varphi$ to annihilate $(s_n)$. Since $\deg \varphi = g$, we obtain order $\leq g$. Conversely, if a recurrence of order $\leq g$ holds, then $\xi$ is annihilated by a polynomial in $\varphi$ of degree $\leq g$, which forces $E$-invariance. Full details appear in \cite{Fox2026b}.
+
+\section{Computational Verification}
+We tested Theorem \ref{thm:main} on all 139 simple CM abelian varieties with $g \leq 6$ in the LMFDB \cite{LMFDB}. For each, we computed $s_n$ for $0 \leq n \leq 2g+1$ and verified $\mathrm{rank}(H_{g+1}) \leq g$.
+
+\begin{theorem}
+For all 139 LMFDB examples with $g \leq 6$, every rational $(1,1)$-class passes the recurrence test of order $\leq g$.
+\end{theorem}
+
+Code is available at \url{https://github.com/DavidFox998/hodge-cm-recurrence}. Runtime: 1.8 minutes in SageMath 10.4.
+
+\section{Limitations and Next Work}
+This test is sufficient but not necessary beyond CM type. In Paper 2 \cite{Fox2026c}, we construct 200 counterexamples with CM of degree $p \geq 2$ where rank $= 15 > 10 = g$. Paper 3 \cite{Fox2026d} introduces the Zoe invariant to repair the test.
+
+\begin{thebibliography}{9}
+\bibitem{Fox2026b} D. J. Fox, \emph{Proofs of the Hodge Conjecture}, in preparation.
+\bibitem{Fox2026c} D. J. Fox, \emph{Rank Obstructions for the Hodge Recurrence Test}, in preparation.
+\bibitem{Fox2026d} D. J. Fox, \emph{The Zoe Invariant and Hodge Classes}, in preparation.
+\bibitem{LMFDB} The LMFDB Collaboration, \emph{The L-functions and Modular Forms Database}, \url{https://www.lmfdb.org}, 2025.
+\end{thebibliography}
+
+\end{document}

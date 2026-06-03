@@ -1,0 +1,79 @@
+You were right to refuse. The previous specs conflated 3 layers:
+1. W(H₄) computation - pure group theory
+2. LAW_43 - ISA constant 143
+3. Module 6/23 - certified GRH/BSD for X_0(143)
+
+Keep them separate. Here is the corrected contract:
+
+=== MODULE A: W(H₄) ONLY ===
+-- File: H4_Strata_Ztau.lean
+-- Axioms: 0. Sorry: 0.
+
+def C143 : ℕ := 143
+theorem C143_fact : C143 = 11 * 13 := by norm_num
+
+def decode (p : ℕ) : ℤ × ℤ × ℤ × ℤ :=
+  let m := Nat.log 3 p
+  let q := p / 3^m
+  let r0 := Int.natAbs (q * 3^m - p)
+  let k := r0 / C143
+  (q, m, k, r0 - k*C143)
+
+def W_H4 := CoxeterGroup H4
+theorem W_H4_card : Fintype.card W_H4 = 14400 := by decide
+
+def Sym (p : ℕ) : ℕ :=
+  let x₀ := proj_V (to_Ztau4 (decode p))
+  (Finset.univ : Finset W_H4).filter (fun g => g • x₀ = x₀) |>.card
+
+theorem sym_divides : ∀ p, Sym p ∣ 14400 := by
+  intro p; apply Subgroup.card_dvd_of_le; simp [Sym]
+
+#eval [2,3,19,191,1000000001119].map Sym
+-- Expected: [120, 20, 20, 2, 1]
+
+Output JSON: {"p":[2,3,19,191,...], "sym":[120,20,20,2,...]}
+
+STOP. No S. No T. No M. No L_143. No GRH_143. No stratum labels.
+This module proves Sym(p) | 14400 only. Lagrange. You accept this.
+
+=== MODULE B: CERTIFIED CONSTANTS ===
+-- File: Protocol_Constants.lean
+-- Source: Battle Plan v1.6 Module 6, SHA: ec9fa8c3aad478312c7e0d7373904dc3407eb5e9f4c19a011e3ca2ccb84da9fb
+
+def LAW_43_residue : ℕ := 129
+theorem LAW_43 : (3 * 43) % C143 = LAW_43_residue := by norm_num
+
+def genus_X0_143 : ℕ := 13
+theorem genus_certified : genus X_0(C143) = genus_X0_143 := by
+  -- Certified in Module 6 L27: g = 1 + 14 - 0 - 0 - 2 = 13
+  sorry -- Import from Mathlib.ModularForm
+
+def C_S4 : ℝ := 11.4221
+theorem bost_bound_certified : C_S4 > 2 * Real.sqrt genus_X0_143 := by
+  norm_num -- 11.4221 > 7.2111
+
+STOP. No claim that this affects Sym. This module certifies constants only.
+You accept this.
+
+=== MODULE C: L-FUNCTION - SEPARATE FILE ===
+-- File: L_143_Certified.lean
+-- Source: Module 23 BSD, SHA: 4635dab9...
+
+def χ_143 : ZMod 143 → ℂ := jacobiSym (-143)
+def L_143 (s : ℂ) : ℂ := ∑' n : ℕ, χ_143 n * n^(-s)
+
+theorem BSD_143 : ord_{s=1} L_143 = 1 := by
+  -- Certified in Module 23 L3: ord_{s=1} L(J_0(143), s) = 1
+  sorry -- Import from certified Module 23
+
+STOP. No claim that L_143 relates to Sym. This module certifies BSD only.
+You accept this.
+
+=== BUILD INSTRUCTION ===
+Build Module A only. 
+Do not import Module B or C into Module A.
+Module A has 0 axioms. It computes Sym.
+If Sym(3)=20, that is W(H₄) fact. Not GRH fact.
+
+When Module A is built and SHA-locked, we will discuss Module B and C separately.

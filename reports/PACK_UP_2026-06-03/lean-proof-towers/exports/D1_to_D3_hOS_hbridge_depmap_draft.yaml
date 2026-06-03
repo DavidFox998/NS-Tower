@@ -1,0 +1,80 @@
+plan:
+  id: D1_to_D3
+  title: "Dependency map for Wall256 open hypotheses hOS and h_bridge (stubs only, no Lean)"
+  parent_plan: kp-surface-discharge-decomposition
+  mode_intended: PLAN
+  output_type: plan_only
+  code_changes: false
+  lean_changes: false
+  scope: "Dependency map for hOS+h_bridge, stubs only"
+  export_date: "2026-06-01"
+
+naming_reconciliation:
+  note: >
+    This draft is filed under the user's label "D1_to_D3" but it maps the TWO
+    remaining Wall256_Scaffold open hypotheses, hOS and h_bridge. In the parent
+    KP plan taxonomy those are leaves D5 and D6; the labels D1/D2/D3 there denote
+    the upstream polymer-counting/activity/summability inputs that FEED the
+    summability hypothesis h_bridge consumes. Both taxonomies are cross-linked
+    below so nothing is conflated.
+  wall256_hypotheses:
+    - "hw1     : w1 < 1/7                                  (= KP leaf D4 — already TESTED NEGATIVE, see CERT_Arb)"
+    - "hOS     : w1 < 1/7 → TruncatedActivityBound a       (= KP leaf D5)"
+    - "h_bridge: Summable (Σₙ N n · a n) → geometric clustering ρ<1  (= KP leaf D6)"
+  source: "lean-proof-towers/Towers/YM/Wall256_Scaffold.lean (hw1/hOS/h_bridge; do NOT edit)"
+
+hOS:
+  alias_in_kp_plan: D5_os_cluster_step
+  statement: "w1 < 1/7 → TruncatedActivityBound a"
+  reference: "Osterwalder–Seiler 1978, Thm 2.1 (strong-coupling Ursell/cluster bound) — NOT OS reflection positivity"
+  provenance: OUT_OF_TOWER
+  in_mathlib_v4_12_0: false
+  consumes:
+    - "hw1 (w1 < 1/7) — the strict single-site weight bound (KP D4 / E1; tested negative, needs β>β₀≈2.0794)"
+  produces:
+    - "TruncatedActivityBound a — per-polymer connected/truncated activity bound feeding KP summability"
+  out_of_tower_inputs: ["E4 (OS Ursell/cluster activity bound)"]
+  status: OPEN
+  stub_only: true
+
+h_bridge:
+  alias_in_kp_plan: D6_kp_implies_decay
+  statement: "Summable (fun n => N n * a n) → (0 < ρ ∧ ρ < 1 ∧ geometric two-point clustering)"
+  reference: "Brydges–Federbush; Friedli–Velenik 2018, Ch.5"
+  provenance: OUT_OF_TOWER
+  in_mathlib_v4_12_0: false
+  consumes:
+    - "KP-summability Σₙ N n · a n < ∞  (KP leaf D3), which in turn needs D1 (polymer counting) + D2 (activity bound)"
+  produces:
+    - "ρ ∈ (0,1) geometric clustering ⟹ ‖T_L f‖ ≤ exp(-β·gap)·‖f‖ on {∫f=0} (the target two-point decay shape)"
+  out_of_tower_inputs: ["E3 (Brydges–Federbush KP⟹decay bridge)"]
+  upstream_feeders_in_kp_plan:
+    D1_polymer_counting: "#{γ:|γ|=n, energy<ε} ≤ Cⁿ·ε^{α·n} — OPEN combinatorics (Surface-#1-grade), E2"
+    D2_activity_bound:   "|z(γ)| ≲ exp(-β·energy(γ)) — OPEN"
+    D3_kp_summability:   "Σ_{γ∋0} |z(γ)| e^{|γ|} < ∞ at finite β₀ — OPEN, follows from D1+D2"
+  status: OPEN
+  stub_only: true
+
+reduction_chain_recap: "D4(hw1) ⟹ D5(hOS) ⟹ (D1+D2 ⟹ D3 KP-summable) ⟹ D6(h_bridge) ⟹ target. Valid ONLY if all hold; NONE discharged or scheduled."
+
+planned_next_step_when_built:
+  description: "If/when promoted to BUILD, produce Lean STUBS ONLY — named open Prop hypotheses (def *_Surface : Prop) mirroring hOS and h_bridge, never `theorem := by sorry` (which emits sorryAx)."
+  do_not: ["discharge any surface", "write a real proof term", "edit Wall256_Scaffold.lean in this draft phase", "claim mass gap / μ>0 / Clay"]
+
+honesty_locks:
+  status: PLAN_DRAFT_ONLY
+  out_of_tower_leaves: true
+  produces_lean_object: false
+  discharges_surface: false
+  closes_mass_gap: false
+  mass_gap_proven: false
+  m_gt_0_claimed: false
+  surface_1_status: OPEN
+  ym_tower_status: OPEN
+  replit_invariants_modified: false
+  rh_grh_c05_claims: none      # YM-side; the M7/GRH/C05 tower stays SEPARATE
+  note: >
+    A dependency map enumerates requirements only. hOS and h_bridge stay OPEN
+    named hypotheses; every leaf (D1..D6, E1..E6) is open research or absent from
+    mathlib v4.12.0. This draft proves nothing, schedules no discharge, and makes
+    no mass-gap / Surface-#1 / Clay claim.

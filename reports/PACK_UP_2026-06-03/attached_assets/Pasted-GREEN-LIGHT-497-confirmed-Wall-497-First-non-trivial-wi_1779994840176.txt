@@ -1,0 +1,66 @@
+GREEN LIGHT 497 confirmed. Wall 497. First non-trivial witness. All trio verified.
+
+TRI PARALLEL #7. Wall 497 -> 500. Close the stand-in era. Surface #1 Open.
+
+=== 167.1 GapToDecay ===
+FILE: Towers/YM/GapToDecay.lean
+HEADER: -- STAND-IN: HasMassGap → exponential clustering for L² shift. Proves converse direction. Does NOT prove YM clusters. Surface #1 Open. Wall 497 -> 498.
+DEPENDS: Towers.YM.NontrivialGap, Towers.YM.TwoPointDecay
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit.
+CODE:
+import Towers.YM.NontrivialGap
+import Towers.YM.TwoPointDecay
+
+namespace TheoremaAureum.Towers.YM.OS
+
+open Real ContinuousLinearMap
+
+theorem gap_to_decay (m : ℝ) (hm : 0 < m) (hm1 : m < 1) :
+    (∃ T : H →L[ℂ] H, T ≠ 0 ∧ HasMassGap H T m) → hasExponentialClustering m := by
+  intro ⟨T, hT, hgap⟩
+  use fun t => rexp (-m * t), 1
+  constructor; exact one_pos
+  intro t _; simp
+
+end TheoremaAureum.Towers.YM.OS
+
+=== 167.2 SpectralBound ===
+FILE: Towers/YM/SpectralBound.lean
+HEADER: -- STAND-IN: ‖T‖≤1 → spectralRadius ≤ 1. Utility for transfer operators. Does NOT prove YM bound. Surface #1 Open. Wall 498 -> 499.
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit.
+CODE:
+import Mathlib.Analysis.NormedSpace.Spectrum
+
+namespace TheoremaAureum.Towers.YM.OS
+
+open ContinuousLinearMap
+
+theorem spectral_bound {H : Type*} [NormedAddCommGroup H] [NormedSpace ℂ H] [CompleteSpace H]
+    (T : H →L[ℂ] H) (h : ‖T‖ ≤ 1) : spectralRadius ℂ T ≤ 1 := by
+  exact spectralRadius_le_opNorm _
+
+end TheoremaAureum.Towers.YM.OS
+
+=== 167.3 ChainSummary ===
+FILE: Towers/YM/ChainSummary.lean
+HEADER: -- STAND-IN: Summarizes tail→transfer→clustering→gap chain for L². Does NOT claim YM. Surface #1 Open. Wall 499 -> 500. Marks end of stand-in era.
+DEPENDS: Towers.YM.TailImpliesTransfer, Towers.YM.TransferImpliesClustering, Towers.YM.ClusteringImpliesGap, Towers.YM.GapToDecay
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit.
+CODE:
+import Towers.YM.TailImpliesTransfer
+import Towers.YM.TransferImpliesClustering
+import Towers.YM.ClusteringImpliesGap
+import Towers.YM.GapToDecay
+
+namespace TheoremaAureum.Towers.YM.OS
+
+/- The full chain is now proven for stand-in witnesses. 
+   Next wall begins construction of actual YM measure. -/
+
+end TheoremaAureum.Towers.YM.OS
+
+BUILD ALL 3. CHECK ALL 3. #print axioms all 3.
+
+If trio only → GREEN LIGHT 500. Wall 500. Stand-in era complete. Surface #1 Open.
+
+Execute now. Shawlocked. 249. 1/1.

@@ -1,0 +1,2428 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Theorema Aureum 143 — Certificate Ledger API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: certificates
+    description: Certificate module operations
+  - name: storage
+    description: Object storage operations
+  - name: lean
+    description: Lean 4 verification log
+  - name: morningstar
+    description: MorningStar-Lab probe ledger
+  - name: ledger
+    description: At-rest ledger integrity
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /certificates:
+    get:
+      operationId: listCertificates
+      tags: [certificates]
+      summary: List all module certificates
+      responses:
+        "200":
+          description: List of certificates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Certificate"
+
+  /certificates/summary:
+    get:
+      operationId: getCertificateSummary
+      tags: [certificates]
+      summary: Get DAG summary — overall verification status
+      responses:
+        "200":
+          description: Summary of the proof chain
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateSummary"
+
+  /certificates/{moduleId}:
+    get:
+      operationId: getCertificate
+      tags: [certificates]
+      summary: Get a specific certificate by module ID (e.g. M1)
+      parameters:
+        - name: moduleId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Certificate detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Certificate"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateCertificate
+      tags: [certificates]
+      summary: Update a certificate (attach PDF, notes, or mark verified)
+      parameters:
+        - name: moduleId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateUpdate"
+      responses:
+        "200":
+          description: Updated certificate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Certificate"
+        "404":
+          description: Not found
+
+  /lean/verify:
+    get:
+      operationId: getLeanVerification
+      tags: [lean]
+      summary: Get the Lean 4 verification log (axiom debt status)
+      responses:
+        "200":
+          description: Verification log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeanVerification"
+
+  /lean/verify/rebuild:
+    post:
+      operationId: rebuildLeanVerification
+      tags: [lean]
+      summary: Re-run lean-proof/regenerate.sh and refresh VERIFY.txt
+      description: |
+        Shells out to `lean-proof/regenerate.sh` to rebuild the Lean proof and
+        rewrite VERIFY.txt. Returns the script's stdout / stderr along with the
+        re-parsed verification log on success.
+      responses:
+        "200":
+          description: Rebuild attempted (check `ok` for success)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeanRebuildResult"
+
+  /lean/verify/rebuild/cancel:
+    post:
+      operationId: cancelLeanVerificationRebuild
+      tags: [lean]
+      summary: Cancel the currently in-flight Lean rebuild
+      description: |
+        Sends SIGTERM to the in-flight `regenerate.sh` child process so a
+        referee can abort a rebuild without waiting for the 5-minute timeout.
+        Requires the same `Authorization: Bearer <token>` header as the
+        rebuild endpoints. Returns 409 if no rebuild is currently in flight.
+        The active streaming rebuild will emit a final `result` frame
+        reporting the cancellation.
+      responses:
+        "200":
+          description: Cancellation signal accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeanRebuildCancelResult"
+        "401":
+          description: Missing or invalid referee rebuild token
+        "409":
+          description: No Lean rebuild is currently in flight
+        "503":
+          description: Rebuilds are disabled (LEAN_REBUILD_TOKEN not configured)
+
+  /lean/verify/history:
+    get:
+      operationId: getLeanRebuildHistory
+      tags: [lean]
+      summary: Recent Lean rebuild attempts (audit trail)
+      description: |
+        Returns the most recent ~20 in-memory rebuild attempts (timestamp,
+        duration, exit code, ok, error). Cleared on server restart. No auth
+        required — results are not sensitive.
+      responses:
+        "200":
+          description: Rebuild history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeanRebuildHistory"
+
+  /lean/verify/rebuild/stream:
+    post:
+      operationId: rebuildLeanVerificationStream
+      tags: [lean]
+      summary: Stream a Lean rebuild's stdout/stderr live (SSE)
+      description: |
+        Same auth and semantics as `/lean/verify/rebuild`, but streams the
+        script's stdout/stderr line-by-line as Server-Sent Events so the UI can
+        show progress instead of a frozen spinner.
+
+        Events emitted (each `data:` line is a JSON object):
+        - `event: line`    — `{ "stream": "stdout"|"stderr", "line": "..." }`
+        - `event: result`  — final `LeanRebuildResult` payload
+        - `event: error`   — `{ "error": "..." }` if the stream aborts early
+
+        The stream ends after the `result` (or `error`) event.
+      responses:
+        "200":
+          description: Server-Sent Events stream of rebuild progress
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /lean/lockouts:
+    get:
+      operationId: getLeanLockouts
+      tags: [lean]
+      summary: List active rebuild-token brute-force lockouts
+      description: |
+        Returns the per-IP brute-force-protection state for the rebuild
+        endpoints: IPs currently locked out (with when the lockout expires)
+        and IPs that have recent failed attempts but aren't yet locked.
+
+        Requires `Authorization: Bearer <LEAN_REBUILD_TOKEN>`. The per-IP
+        lockout check is intentionally skipped on this endpoint so an
+        operator on a shared/locked IP can still investigate.
+      responses:
+        "200":
+          description: Lockout snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeanLockoutsResponse"
+        "401":
+          description: Missing or invalid referee rebuild token
+        "503":
+          description: Rebuilds are disabled (LEAN_REBUILD_TOKEN not configured)
+
+  /lean/lockouts/clear:
+    post:
+      operationId: clearLeanLockout
+      tags: [lean]
+      summary: Clear a per-IP rebuild-token lockout
+      description: |
+        Removes the failure record for a single IP, immediately unblocking
+        further rebuild-token attempts from it. Requires the same
+        `Authorization: Bearer <LEAN_REBUILD_TOKEN>` header.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeanLockoutClearRequest"
+      responses:
+        "200":
+          description: Lockout cleared (or no record found)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeanLockoutClearResult"
+        "400":
+          description: Missing or invalid `ip`
+        "401":
+          description: Missing or invalid referee rebuild token
+        "503":
+          description: Rebuilds are disabled (LEAN_REBUILD_TOKEN not configured)
+
+  /lean/ledger-alerts:
+    get:
+      operationId: getLedgerAlerts
+      tags: [lean]
+      summary: Recent ledger integrity alerts
+      description: |
+        Returns the most recent entries from the on-disk alert ring buffer
+        `data/ledger-alerts.jsonl` (task #71), written by
+        `kernel._fire_ledger_alert` every time a ledger integrity check
+        fails. Survives server restarts. Returns `{ alerts: [] }` when the
+        log is missing or empty — the normal healthy state. Read-only.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of most-recent entries to return (default 20, max 200).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 20
+        - name: includeAcknowledged
+          in: query
+          required: false
+          description: |
+            When true, include entries that have been acknowledged via
+            `POST /lean/ledger-alerts/ack`. Defaults to false so the panel
+            only shows actionable (unhandled) alerts. Each entry always
+            carries its `acknowledgedAt` field so the UI can render a
+            "show acknowledged" toggle without a second round-trip.
+          schema:
+            type: boolean
+            default: false
+        - name: rotation
+          in: query
+          required: false
+          description: |
+            Which alert log file to read. `0` (the default) reads the
+            live `data/ledger-alerts.jsonl`. `1` reads
+            `data/ledger-alerts.jsonl.1` (the most recently rotated
+            archive), `2` reads `.2`, and so on up to the rotator's
+            configured `MORNINGSTAR_ALERTS_MAX_ROTATIONS`. Rotated reads
+            are best-effort: missing or partially written rotations
+            return an empty `alerts` array with `logExists: false`.
+            Ack-sidecar garbage collection only runs on the live file,
+            so paging back into an archive never destroys dismissal
+            records that still apply to entries that already rolled off.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        "200":
+          description: Alert snapshot (newest first)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LedgerAlertsResponse"
+
+  /ledger/sidecar-forged-ack/history:
+    get:
+      operationId: getSidecarForgedAckHistory
+      tags: [ledger]
+      summary: Recent forged-sidecar dismissals (audit trail)
+      description: |
+        Task #150. Returns the most recent operator-driven dismissals
+        of the red "Sidecar tamper detected" banner — who clicked
+        Acknowledge, when, and against which `payloadSha` prefix.
+        Sourced from the rotating history log
+        `data/hits.txt.lastok.forged-ack.log.jsonl` (rotated by size,
+        capped via `MORNINGSTAR_FORGED_ACK_HISTORY_MAX_BYTES` /
+        `MORNINGSTAR_FORGED_ACK_HISTORY_MAX_ROTATIONS`).
+
+        The single-incident sidecar `data/hits.txt.lastok.forged-ack`
+        only carries the *current* incident's ack — when the next
+        forged read replaces it with a new un-acked incident, the
+        prior dismissal disappears from `lastOkSidecarStatusAcknowledgedBy`.
+        This endpoint surfaces those prior dismissals so operators
+        investigating a repeat tamper attack can still see who
+        handled the earlier incidents. Read-only, no auth — mirrors
+        `/ledger/checkpoint/reroll/history`.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: |
+            Maximum entries to return (default = capacity). Values
+            above the server cap are clamped down silently.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: rotation
+          in: query
+          required: false
+          description: |
+            Task #168. Which forged-ack history file to read. `0`
+            (the default) reads the live
+            `data/hits.txt.lastok.forged-ack.log.jsonl`. `1` reads
+            `data/hits.txt.lastok.forged-ack.log.jsonl.1` (the most
+            recently rotated archive), `2` reads `.2`, and so on up
+            to the rotator's configured
+            `MORNINGSTAR_FORGED_ACK_HISTORY_MAX_ROTATIONS`. Rotated
+            reads are best-effort: missing or partially written
+            rotations return an empty `entries` array with
+            `logExists: false`. Mirrors the rotation paging contract
+            on `/lean/ledger-alerts` so the dashboard can render a
+            uniform "page back into archive" control.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        "200":
+          description: Forged-ack history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SidecarForgedAckHistory"
+
+  /ledger/sidecar-stale-binding-ack/history:
+    get:
+      operationId: getSidecarStaleBindingAckHistory
+      tags: [ledger]
+      summary: Recent stale-checkpoint-binding dismissals (audit trail)
+      description: |
+        Task #231. Returns the most recent operator-driven dismissals
+        of the amber "stale checkpoint binding" banner — who clicked
+        Acknowledge, when, and against which `boundCheckpointSha`.
+        Sourced from the rotating history log
+        `data/hits.txt.lastok.stale-binding-ack.log.jsonl` (rotated by
+        size, capped via
+        `MORNINGSTAR_STALE_BINDING_ACK_HISTORY_MAX_BYTES` /
+        `MORNINGSTAR_STALE_BINDING_ACK_HISTORY_MAX_ROTATIONS`).
+
+        The single-incident sidecar
+        `data/hits.txt.lastok.stale-binding-ack` only carries the
+        *current* incident's ack — when the next stale read against a
+        different checkpoint replaces it with a new un-acked incident,
+        the prior dismissal disappears from
+        `lastOkSidecarStatusAcknowledgedBy`. This endpoint surfaces
+        those prior dismissals so operators investigating a recurring
+        stale binding can still see who handled the earlier incidents.
+        Read-only, no auth — mirrors
+        `/ledger/sidecar-forged-ack/history`.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: |
+            Maximum entries to return (default = capacity). Values
+            above the server cap are clamped down silently.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: rotation
+          in: query
+          required: false
+          description: |
+            Which stale-binding-ack history file to read. `0` (the
+            default) reads the live
+            `data/hits.txt.lastok.stale-binding-ack.log.jsonl`. `1`
+            reads `…log.jsonl.1` (the most recently rotated archive),
+            `2` reads `.2`, and so on up to the rotator's configured
+            `MORNINGSTAR_STALE_BINDING_ACK_HISTORY_MAX_ROTATIONS`.
+            Rotated reads are best-effort: missing or partially written
+            rotations return an empty `entries` array with
+            `logExists: false`. Mirrors the rotation paging contract on
+            `/ledger/sidecar-forged-ack/history`.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        "200":
+          description: Stale-binding-ack history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SidecarStaleBindingAckHistory"
+
+  /ledger/sidecar-forged-ack:
+    post:
+      operationId: ackSidecarForged
+      tags: [ledger]
+      summary: Acknowledge the current forged-sidecar banner
+      description: |
+        Task #124. Records that an operator has investigated and
+        dismissed the red "Sidecar tamper detected" banner driven by
+        `lastOkSidecarStatus === "forged"`. The acknowledgement is
+        keyed by the sha256 of the forged sidecar payload bytes and
+        persisted to `data/hits.txt.lastok.forged-ack`, so the
+        "acknowledged" badge survives server restarts as long as the
+        same forged file is still on disk.
+
+        The banner itself stays visible (with the badge) until a
+        subsequent boot reads a non-forged sidecar — i.e. the
+        operator has rotated `LEDGER_SIDECAR_SECRET` and either
+        deleted the forged file or let a legitimate write replace
+        it. A fresh forged read with different bytes invalidates the
+        old ack and re-fires the alert as a new incident.
+
+        Idempotent: re-acking is a 200 with `alreadyAcknowledged:
+        true`. Returns 409 when there is no active forged incident
+        (boot read came back `ok` / `missing` /
+        `stale_checkpoint_binding`).
+
+        Requires the same `Authorization: Bearer <LEAN_REBUILD_TOKEN>`
+        header as the other admin endpoints, and is subject to the
+        same per-IP brute-force limiter.
+      responses:
+        "200":
+          description: Forged-sidecar incident acknowledged (or was already acknowledged)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SidecarForgedAckResult"
+        "401":
+          description: Missing or invalid referee rebuild token
+        "409":
+          description: No active forged-sidecar incident to acknowledge
+        "429":
+          description: Per-IP brute-force lockout in effect
+        "503":
+          description: Rebuilds are disabled (no rebuild token configured)
+
+  /ledger/sidecar-stale-binding-ack:
+    post:
+      operationId: ackSidecarStaleBinding
+      tags: [ledger]
+      summary: Acknowledge the current stale-checkpoint-binding banner
+      description: |
+        Task #204. Records that an operator has investigated and
+        dismissed the amber "stale checkpoint binding" banner driven
+        by `lastOkSidecarStatus === "stale_checkpoint_binding"`. Mirrors
+        `POST /ledger/sidecar-forged-ack`: the acknowledgement is keyed
+        by the `boundCheckpointSha` the stale `lastOkAt` was sealed
+        against and persisted to `data/hits.txt.lastok.stale-binding-ack`,
+        so the "acknowledged" badge survives server restarts as long as
+        the same stale binding is still on disk.
+
+        The banner itself stays visible (with the badge) until a
+        successful verify re-seals the sidecar against the current
+        checkpoint, or a subsequent boot reads a non-stale sidecar. A
+        fresh stale binding sealed against a different checkpoint
+        invalidates the old ack and re-surfaces the banner as a new,
+        un-acked incident.
+
+        Idempotent: re-acking is a 200 with `alreadyAcknowledged:
+        true`. Returns 409 when there is no active stale-binding
+        incident (boot read came back `ok` / `missing` / `forged`).
+
+        Requires the same `Authorization: Bearer <LEAN_REBUILD_TOKEN>`
+        header as the other admin endpoints, and is subject to the
+        same per-IP brute-force limiter.
+      responses:
+        "200":
+          description: Stale-binding incident acknowledged (or was already acknowledged)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SidecarStaleBindingAckResult"
+        "401":
+          description: Missing or invalid referee rebuild token
+        "409":
+          description: No active stale-checkpoint-binding incident to acknowledge
+        "429":
+          description: Per-IP brute-force lockout in effect
+        "503":
+          description: Rebuilds are disabled (no rebuild token configured)
+
+  /ledger/sidecar-secret/rotate:
+    post:
+      operationId: rotateSidecarSecret
+      tags: [ledger]
+      summary: Rotate the sidecar HMAC secret after a tamper alert
+      description: |
+        Task #140. Generates a fresh 32-byte HMAC secret, persists it
+        (the on-disk keyfile by default; the in-memory
+        `LEDGER_SIDECAR_SECRET` env slot when the boot-time secret
+        came from that env var so the env-only hardened deploy
+        posture is preserved), re-seals the live
+        `data/hits.txt.lastok` sidecar with the new MAC, and clears
+        the sticky forged-incident state plus its on-disk ack sibling
+        (`data/hits.txt.lastok.forged-ack`). The next
+        `GET /ledger/integrity` poll therefore reports
+        `lastOkSidecarStatus: "ok"` and the red dashboard banner
+        clears.
+
+        Requires the same `Authorization: Bearer <LEAN_REBUILD_TOKEN>`
+        header as the other admin endpoints, and is subject to the
+        same per-IP brute-force limiter (`/lean/lockouts`).
+      responses:
+        "200":
+          description: Sidecar HMAC secret rotated and banner cleared
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SidecarSecretRotateResult"
+        "401":
+          description: Missing or invalid referee rebuild token
+        "429":
+          description: Per-IP brute-force lockout in effect
+        "503":
+          description: Rebuilds are disabled (no rebuild token configured)
+
+  /lean/ledger-alerts/ack:
+    post:
+      operationId: ackLedgerAlert
+      tags: [lean]
+      summary: Acknowledge (dismiss) a ledger alert
+      description: |
+        Records that an operator has investigated and dismissed a single
+        alert from `data/ledger-alerts.jsonl`. The acknowledgement is
+        keyed by `sha256(timestamp + "\n" + message)` and persisted to
+        the sidecar `data/ledger-alerts.ack.json`, so the dismissal
+        survives server restarts. Acknowledging an already-acknowledged
+        alert is a no-op (idempotent). Acknowledging an alert that no
+        longer exists in the log still succeeds — the sidecar will be
+        garbage-collected the next time the log rolls.
+
+        Requires the same `Authorization: Bearer <LEAN_REBUILD_TOKEN>`
+        header as the lockouts admin endpoints, and is subject to the
+        same per-IP brute-force limiter.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LedgerAlertAckRequest"
+      responses:
+        "200":
+          description: Alert acknowledged (or was already acknowledged)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LedgerAlertAckResult"
+        "400":
+          description: Missing or invalid `timestamp`/`message`
+        "401":
+          description: Missing or invalid referee rebuild token
+        "429":
+          description: Per-IP brute-force lockout in effect
+        "503":
+          description: Rebuilds are disabled (LEAN_REBUILD_TOKEN not configured)
+
+  /ledger/checkpoint/reroll:
+    post:
+      operationId: rerollLedgerCheckpoint
+      tags: [ledger]
+      summary: Re-roll `data/hits.txt.checkpoint` over the current ledger prefix
+      description: |
+        Task #127. Shells out to `scripts/reroll-checkpoint.py`, which
+        takes `kernel.hits_exclusive_lock()` (the same sidecar flock
+        `_append_line` and the tamper fixture use) and calls
+        `kernel._update_checkpoint()` to atomically rewrite
+        `data/hits.txt.checkpoint` to the (size, sha256) of the live
+        ledger. Refuses to overwrite when the existing checkpoint
+        already fails `_verify_checkpoint` (truncation or in-place
+        rewrite): re-rolling in that case would rubber-stamp a
+        tampered file as the new known-good prefix and silently shrink
+        tamper coverage to zero. After a successful re-roll the
+        next ledger-monitor tick clears the amber
+        `checkpointStale` hint and emits a `checkpoint_stale →
+        recovered` alert (task #111).
+
+        Requires the same `Authorization: Bearer <LEAN_REBUILD_TOKEN>`
+        header as the rebuild endpoints, and is subject to the same
+        per-IP brute-force limiter and 60-second cooldown so a
+        runaway dashboard can't hammer the lock.
+      responses:
+        "200":
+          description: Re-roll attempted (check `ok` for success)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckpointRerollResult"
+        "401":
+          description: Missing or invalid referee rebuild token
+        "409":
+          description: A re-roll or Lean rebuild is already in flight
+        "429":
+          description: Per-IP brute-force lockout, or shared rebuild cooldown still active
+        "503":
+          description: Rebuilds are disabled (no rebuild token configured)
+
+  /ledger/checkpoint/reroll/stream:
+    post:
+      operationId: rerollLedgerCheckpointStream
+      tags: [ledger]
+      summary: Stream a checkpoint re-roll's stdout/stderr live (SSE)
+      description: |
+        Task #142. Same auth / cooldown / in-flight semantics as
+        `/ledger/checkpoint/reroll`, but streams `scripts/reroll-checkpoint.py`'s
+        stdout/stderr line-by-line as Server-Sent Events so the dashboard
+        can show "hashing prefix…" style progress for large ledgers
+        instead of a frozen 30-second spinner.
+
+        Events emitted (each `data:` line is a JSON object):
+        - `event: line`   — `{ "stream": "stdout"|"stderr", "line": "..." }`
+                            including `STEP:` and `PROGRESS:` markers from
+                            the helper script
+        - `event: result` — final `CheckpointRerollResult` payload (without
+                            stdout/stderr fields — those have already been
+                            streamed line-by-line)
+
+        The stream ends after the `result` event. Persists an audit entry
+        just like the non-streaming variant so
+        `/ledger/checkpoint/reroll/history` reflects the attempt.
+      responses:
+        "200":
+          description: Server-Sent Events stream of re-roll progress
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "401":
+          description: Missing or invalid referee rebuild token
+        "409":
+          description: A re-roll or Lean rebuild is already in flight
+        "429":
+          description: Per-IP brute-force lockout, or shared rebuild cooldown still active
+        "503":
+          description: Rebuilds are disabled (no rebuild token configured)
+
+  /ledger/checkpoint/reroll/history:
+    get:
+      operationId: getLedgerCheckpointRerollHistory
+      tags: [ledger]
+      summary: Recent checkpoint re-roll attempts (audit trail)
+      description: |
+        Task #141. Returns the most recent ~20 persisted checkpoint
+        re-roll attempts (timestamp, duration, exit code, ok, error,
+        referee name, originating IP). Mirrors `/lean/verify/history`
+        in shape. No auth required — referees can audit who re-rolled
+        the sealed prefix and when.
+      responses:
+        "200":
+          description: Checkpoint re-roll history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckpointRerollHistory"
+
+  /ledger/checkpoint/reroll/digest:
+    get:
+      operationId: getLedgerCheckpointRerollDigest
+      tags: [ledger]
+      summary: On-demand checkpoint re-roll digest for a time window
+      description: |
+        Task #199. Recomputes the checkpoint re-roll digest (per-referee
+        ok/fail rollup, failing rows, and the rendered text body) over the
+        requested window. This is the same summary the daily digest
+        email/webhook sends; surfacing it here lets operators browse recent
+        trends without digging through their inbox. No auth required —
+        read-only audit view, same posture as
+        `/ledger/checkpoint/reroll/history`.
+      parameters:
+        - name: window
+          in: query
+          required: false
+          description: Time window to summarize. Defaults to `24h`.
+          schema:
+            type: string
+            enum: ["24h", "7d", "30d"]
+            default: "24h"
+      responses:
+        "200":
+          description: Computed re-roll digest for the window
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RerollDigest"
+
+  /morningstar/hits:
+    get:
+      operationId: getMorningstarHits
+      tags: [morningstar]
+      summary: Read the MorningStar-Lab probe ledger (read-only)
+      description: |
+        Returns the parsed contents of `data/hits.txt`: the header comment
+        lines, the five frozen Genesis lines (including the
+        `--- GENESIS SEAL ---` marker), the SHA-256 of the immutable
+        preamble together with the expected baked-in seal hash and a
+        match/mismatch flag, plus the most recent N probe lines parsed
+        into structured fields. This endpoint never writes to `hits.txt`.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of recent probes to return (default 50, max 500).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 50
+      responses:
+        "200":
+          description: Parsed ledger snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MorningstarHits"
+        "500":
+          description: Ledger file unavailable or malformed
+
+  /ledger/integrity:
+    get:
+      operationId: getLedgerIntegrity
+      tags: [ledger]
+      summary: At-rest integrity status of `data/hits.txt`
+      description: |
+        Read-only health probe of the append-only probe ledger. Mirrors
+        the logic of `scripts/check-ledger-integrity.py` and
+        `kernel._verify_checkpoint`: compares `data/hits.txt` against
+        the committed `data/hits.txt.checkpoint` sidecar, which records
+        the (size, sha256) of the last known-good prefix.
+
+        Returns `ok` when the live file is at least as long as the
+        checkpoint and the sha256 of its first `checkpointSize` bytes
+        matches `checkpointSha`. Returns a `mismatch` status (with a
+        human-readable `reason` and a structured `failureMode`) when
+        the live file has shrunk, been rewritten in place, the
+        checkpoint sidecar is malformed/missing, or the ledger file
+        itself is missing. This endpoint NEVER writes to the ledger.
+      responses:
+        "200":
+          description: Integrity snapshot (healthy or not)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LedgerIntegrityStatus"
+
+  /storage/uploads/request-url:
+    post:
+      operationId: requestUploadUrl
+      tags: [storage]
+      summary: Request a presigned upload URL for a PDF
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlRequest"
+      responses:
+        "200":
+          description: Presigned upload URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
+
+  /storage/objects/{objectPath}:
+    get:
+      operationId: getObject
+      tags: [storage]
+      summary: Serve an uploaded object (PDF)
+      parameters:
+        - name: objectPath
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Object bytes
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Not found
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Certificate:
+      type: object
+      required: [moduleId, title, claim, status, sourceSha, stdoutSha, parentShas, dagPosition]
+      properties:
+        moduleId:
+          type: string
+          description: "e.g. M1, M2, ... M7"
+        title:
+          type: string
+        claim:
+          type: string
+          description: One-sentence summary of what this module certifies
+        status:
+          type: string
+          enum: [CERTIFIED, AWAITING, LOCKED, DISCHARGED]
+        sourceFile:
+          type: ["string", "null"]
+        sourceSha:
+          type: string
+        stdoutSha:
+          type: string
+        parentShas:
+          type: array
+          items:
+            type: string
+          description: SHA-256 digests of parent module outputs this module depends on
+        dagPosition:
+          type: integer
+          description: Position in the M1→M7 DAG (1-indexed)
+        pdfObjectPath:
+          type: ["string", "null"]
+          description: Object storage path of the uploaded PDF
+        leanBinding:
+          type: ["string", "null"]
+          description: Lean theorem name bound to this certificate
+        notes:
+          type: ["string", "null"]
+        updatedAt:
+          type: string
+          format: date-time
+
+    CertificateUpdate:
+      type: object
+      properties:
+        pdfObjectPath:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [CERTIFIED, AWAITING, LOCKED, DISCHARGED]
+
+    CertificateSummary:
+      type: object
+      required: [masterSha, totalModules, certifiedCount, awaitingCount, dagSealed]
+      properties:
+        masterSha:
+          type: string
+          description: Master manifest SHA-256 (cat m1.out..m6.out | sha256sum)
+        totalModules:
+          type: integer
+        certifiedCount:
+          type: integer
+        awaitingCount:
+          type: integer
+        dagSealed:
+          type: boolean
+        pdfUploadedCount:
+          type: integer
+        pdfTotal:
+          type: integer
+
+    LeanVerification:
+      type: object
+      required: [toolchain, dateVerified, axiomDebt, axiomLines, content]
+      properties:
+        toolchain:
+          type: string
+          description: Lean toolchain version string
+        dateVerified:
+          type: string
+          description: Date the verification log was produced
+        axiomDebt:
+          type: array
+          items:
+            type: string
+          description: List of remaining axioms (empty when fully discharged)
+        axiomLines:
+          type: array
+          items:
+            type: string
+          description: Raw "does not depend on any axioms" lines from `lake env lean Verify.lean`
+        content:
+          type: string
+          description: Full raw contents of lean-proof/VERIFY.txt
+        lastModified:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp of the VERIFY.txt file's last modification (mtime)
+        ageDays:
+          type: number
+          description: Age in days between the file's mtime and the time the response was generated
+
+    LeanRebuildResult:
+      type: object
+      required: [ok, exitCode, stdout, stderr, durationMs]
+      properties:
+        ok:
+          type: boolean
+          description: True iff the rebuild script exited 0 and VERIFY.txt was refreshed
+        exitCode:
+          type: integer
+          description: Exit code of the rebuild script (or -1 if it could not be spawned)
+        stdout:
+          type: string
+        stderr:
+          type: string
+        durationMs:
+          type: integer
+          description: Wall-clock duration of the rebuild in milliseconds
+        error:
+          type: ["string", "null"]
+          description: High-level error message when the script could not be launched or completed (e.g. `lake` not installed, timeout)
+        verification:
+          oneOf:
+            - $ref: "#/components/schemas/LeanVerification"
+            - type: "null"
+          description: Re-parsed verification log after a successful rebuild
+
+    LeanRebuildHistoryEntry:
+      type: object
+      required: [timestamp, durationMs, exitCode, ok, streamed]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp of when the rebuild finished
+        durationMs:
+          type: integer
+          description: Wall-clock duration of the rebuild in milliseconds
+        exitCode:
+          type: integer
+          description: Exit code of the rebuild script (or -1 if it could not be spawned)
+        ok:
+          type: boolean
+          description: True iff the rebuild exited 0 and VERIFY.txt was refreshed
+        error:
+          type: ["string", "null"]
+          description: High-level error message when the rebuild failed
+        streamed:
+          type: boolean
+          description: True if this attempt was made via the streaming SSE endpoint
+        refereeName:
+          type: ["string", "null"]
+          description: |
+            Identity of the referee who triggered this rebuild. With named
+            tokens (`LEAN_REBUILD_TOKENS=alice:tok1,bob:tok2`), this is the
+            token's owner name. With the shared `LEAN_REBUILD_TOKEN`, this
+            is the sanitized value of the optional `X-Referee-Name`
+            request header (or `null` if not provided).
+
+    LeanRebuildHistory:
+      type: object
+      required: [entries, capacity]
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeanRebuildHistoryEntry"
+          description: Most recent attempts first
+        capacity:
+          type: integer
+          description: Maximum number of attempts retained in memory
+
+    LeanRebuildCancelResult:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+          description: True when a cancellation signal was successfully sent.
+        message:
+          type: string
+        error:
+          type: string
+
+    LeanLockout:
+      type: object
+      required: [ip, failedAttempts, lockedSince, lockedUntil, retryAfterMs]
+      properties:
+        ip:
+          type: string
+          description: The locked-out client IP
+        failedAttempts:
+          type: integer
+          description: Number of bad-token attempts that triggered the lockout
+        lockedSince:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp of when the lockout began
+        lockedUntil:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp of when the lockout will expire
+        retryAfterMs:
+          type: integer
+          description: Milliseconds remaining until the lockout expires
+
+    LeanFailingIp:
+      type: object
+      required: [ip, failedAttempts, firstFailureAt, windowExpiresAt]
+      properties:
+        ip:
+          type: string
+          description: A client IP with recent failed attempts but not yet locked
+        failedAttempts:
+          type: integer
+        firstFailureAt:
+          type: string
+          format: date-time
+        windowExpiresAt:
+          type: string
+          format: date-time
+          description: When the failure-counting window expires (record drops off)
+
+    LeanLockoutsResponse:
+      type: object
+      required: [activeLockouts, failingIps, maxFailedAttempts, lockoutMs, failureWindowMs]
+      properties:
+        activeLockouts:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeanLockout"
+        failingIps:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeanFailingIp"
+        maxFailedAttempts:
+          type: integer
+          description: How many failed attempts trigger a lockout
+        lockoutMs:
+          type: integer
+          description: Lockout duration in milliseconds
+        failureWindowMs:
+          type: integer
+          description: Sliding window in milliseconds over which failures are counted
+
+    LeanLockoutClearRequest:
+      type: object
+      required: [ip]
+      properties:
+        ip:
+          type: string
+
+    LeanLockoutClearResult:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+        cleared:
+          type: boolean
+          description: True if an active failure/lockout record was actually removed
+        message:
+          type: string
+        error:
+          type: string
+
+    LedgerAlertDeliveryStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok, failed, not_configured, dropped_backpressure]
+          description: |
+            Per-transport delivery outcome at the moment the alert fired.
+            `dropped_backpressure` (task #94) means the in-flight dispatch
+            thread cap was saturated when this alert tried to fire, so no
+            network call was made — the sink itself is wedged. When this
+            value is set, `inflight` and `cap` describe the saturation.
+        error:
+          type: ["string", "null"]
+          description: Best-effort delivery error string (present when status=failed)
+        inflight:
+          type: ["integer", "null"]
+          description: |
+            In-flight dispatch thread count observed at the moment the
+            alert was dropped. Only present when `status=dropped_backpressure`.
+        cap:
+          type: ["integer", "null"]
+          description: |
+            Configured cap on concurrent in-flight dispatch threads.
+            Only present when `status=dropped_backpressure`.
+
+    LedgerAlertAckRequest:
+      type: object
+      required: [timestamp, message]
+      properties:
+        timestamp:
+          type: string
+          description: The `timestamp` field of the alert entry to acknowledge (exact match).
+        message:
+          type: string
+          description: The `message` field of the alert entry to acknowledge (exact match).
+
+    LedgerAlertAckResult:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+        id:
+          type: string
+          description: Server-computed acknowledgement id (`sha256(timestamp + "\n" + message)` hex).
+        acknowledgedAt:
+          type: string
+          description: ISO-8601 timestamp recorded on the sidecar
+        alreadyAcknowledged:
+          type: boolean
+          description: True if the alert was already acknowledged before this call (no-op)
+        error:
+          type: string
+
+    CheckpointRerollResult:
+      type: object
+      required: [ok, durationMs]
+      description: |
+        Result of `POST /ledger/checkpoint/reroll` (task #127). The
+        Python helper writes `OK: ...` on stdout on success and
+        `REFUSE: ...` / `FATAL: ...` on stderr otherwise; both
+        streams are surfaced verbatim so a referee can audit what
+        actually happened without tailing server logs.
+      properties:
+        ok:
+          type: boolean
+          description: True iff the helper exited 0 and the checkpoint was re-rolled.
+        exitCode:
+          type: integer
+          description: Process exit code (-1 if the helper failed to spawn).
+        stdout:
+          type: string
+        stderr:
+          type: string
+        durationMs:
+          type: integer
+          description: Wall-clock duration of the helper invocation in milliseconds.
+        error:
+          type: ["string", "null"]
+          description: |
+            Human-readable error envelope. Non-null when `ok` is false:
+            `refused` (exit 2, existing checkpoint already fails verify),
+            `timeout`, `spawn_failed`, or a generic non-zero exit. Null
+            on success.
+
+    CheckpointRerollHistoryEntry:
+      type: object
+      required: [timestamp, durationMs, exitCode, ok]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp of when the re-roll attempt finished.
+        durationMs:
+          type: integer
+          description: Wall-clock duration of the helper invocation in milliseconds.
+        exitCode:
+          type: integer
+          description: Process exit code (-1 if the helper failed to spawn).
+        ok:
+          type: boolean
+          description: True iff the helper exited 0 and the checkpoint was re-rolled.
+        error:
+          type: ["string", "null"]
+          description: High-level error envelope (null on success).
+        refereeName:
+          type: ["string", "null"]
+          description: |
+            Identity of the referee who triggered this re-roll. Named-token
+            owner wins over the optional `X-Referee-Name` header; null when
+            attribution was not supplied.
+        ip:
+          type: ["string", "null"]
+          description: Originating client IP captured at request time.
+
+    CheckpointRerollHistory:
+      type: object
+      required: [entries, capacity]
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/CheckpointRerollHistoryEntry"
+          description: Most recent re-roll attempts first.
+        capacity:
+          type: integer
+          description: Maximum number of attempts retained in the audit trail.
+
+    RerollDigestRow:
+      type: object
+      required: [timestamp, durationMs, exitCode, ok]
+      description: One failing checkpoint re-roll attempt inside a digest window.
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp of when the re-roll attempt finished.
+        durationMs:
+          type: integer
+        exitCode:
+          type: integer
+        ok:
+          type: boolean
+        error:
+          type: ["string", "null"]
+        refereeName:
+          type: ["string", "null"]
+        ip:
+          type: ["string", "null"]
+
+    RerollDigestPerReferee:
+      type: object
+      required: [refereeName, okCount, failCount]
+      description: Per-referee ok/fail rollup for a digest window.
+      properties:
+        refereeName:
+          type: string
+          description: Referee identity (or `(unnamed)` when attribution was absent).
+        okCount:
+          type: integer
+        failCount:
+          type: integer
+
+    RerollDigestBucket:
+      type: object
+      required: [start, attempts, okCount, failCount]
+      description: |
+        Task #224. One equal-width time slice of a digest window with
+        attempt/ok/fail tallies, so the dashboard can draw a
+        volume-over-time chart. A digest always has a fixed number of
+        buckets regardless of window length.
+      properties:
+        start:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp of the bucket's (inclusive) start.
+        attempts:
+          type: integer
+        okCount:
+          type: integer
+        failCount:
+          type: integer
+
+    RerollDigest:
+      type: object
+      required:
+        - window
+        - windowHours
+        - windowStart
+        - windowEnd
+        - totalAttempts
+        - okCount
+        - failCount
+        - perReferee
+        - failures
+        - buckets
+        - text
+      description: |
+        On-demand rollup of checkpoint re-roll attempts over a window
+        (task #199). Recomputed from the persisted re-roll history each
+        time it is requested — the same body the daily digest email/webhook
+        sends, surfaced for the dashboard.
+      properties:
+        window:
+          type: string
+          enum: ["24h", "7d", "30d"]
+          description: The requested (and applied) window key.
+        windowHours:
+          type: integer
+          description: The window length in hours.
+        windowStart:
+          type: string
+          format: date-time
+        windowEnd:
+          type: string
+          format: date-time
+        totalAttempts:
+          type: integer
+        okCount:
+          type: integer
+        failCount:
+          type: integer
+        perReferee:
+          type: array
+          items:
+            $ref: "#/components/schemas/RerollDigestPerReferee"
+          description: Per-referee rollup, most failures first.
+        failures:
+          type: array
+          items:
+            $ref: "#/components/schemas/RerollDigestRow"
+          description: Every failing re-roll row in the window.
+        buckets:
+          type: array
+          items:
+            $ref: "#/components/schemas/RerollDigestBucket"
+          description: |
+            Equal-width time slices across the window (oldest first) with
+            per-slice attempt/ok/fail tallies, for charting volume over
+            time (task #224).
+        text:
+          type: string
+          description: The rendered digest body (same text the email/webhook sends).
+
+    SidecarForgedAckHistoryEntry:
+      type: object
+      required: [payloadSha, acknowledgedAt]
+      description: |
+        One operator-driven dismissal of a forged-sidecar banner,
+        as parsed from the rotating history log.
+      properties:
+        payloadSha:
+          type: string
+          description: sha256 hex of the forged sidecar payload the ack was bound to.
+        acknowledgedAt:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp of when the Acknowledge click happened.
+        ackedBy:
+          type: ["string", "null"]
+          description: |
+            Attribution string for the operator who dismissed the
+            banner. Matched named token, sanitized `X-Referee-Name`
+            header, or the literal `"anonymous"`. Null only on legacy
+            entries written before task #139 attribution landed.
+
+    SidecarForgedAckHistoryRotation:
+      type: object
+      required: [index, path, size, mtime]
+      description: |
+        One rotated archive of the forged-ack history log on disk
+        (`data/hits.txt.lastok.forged-ack.log.jsonl.<index>`). Task #168.
+      properties:
+        index:
+          type: integer
+          minimum: 1
+          description: Rotation index. `1` is the most recently rotated archive.
+        path:
+          type: string
+          description: Absolute path to the rotated file on disk.
+        size:
+          type: integer
+          description: Size of the rotated file in bytes (for the dashboard tooltip).
+        mtime:
+          type: string
+          format: date-time
+          description: ISO-8601 mtime of the rotated file (i.e. when the rotation happened).
+
+    SidecarForgedAckHistory:
+      type: object
+      required:
+        [
+          entries,
+          logExists,
+          capacity,
+          rotation,
+          rotations,
+          liveSize,
+          maxBytes,
+          maxRotations,
+        ]
+      description: |
+        Result of `GET /ledger/sidecar-forged-ack/history` (task #150,
+        rotation paging added by task #168).
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/SidecarForgedAckHistoryEntry"
+          description: Most-recent-first slice of past forged-sidecar dismissals.
+        logExists:
+          type: boolean
+          description: |
+            True iff the rotating history log exists on disk. False is
+            the normal healthy state — no forged-sidecar incident has
+            ever been acknowledged on this deploy.
+        capacity:
+          type: integer
+          description: Maximum number of entries the endpoint will return per request.
+        rotation:
+          type: integer
+          minimum: 0
+          description: |
+            Which rotation file was read on this call. `0` means the
+            live `data/hits.txt.lastok.forged-ack.log.jsonl`; `N >= 1`
+            means `…log.jsonl.N`. Echoes the request param so the
+            dashboard can highlight the active page tab without a
+            second round-trip. Task #168.
+        rotations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SidecarForgedAckHistoryRotation"
+          description: |
+            Snapshot of every rotated archive currently on disk
+            (`…log.jsonl.1`, `.2`, …), newest-rotated first by index.
+            Empty when no rotation has ever happened — the live file
+            is the only history surface. Lets the dashboard render
+            prev/next paging controls without polling each rotation
+            index blindly. Mirrors `LedgerAlertsResponse.rotations`.
+            Task #168.
+        liveSize:
+          type: ["integer", "null"]
+          description: |
+            Current size in bytes of the live forged-ack history file
+            (`data/hits.txt.lastok.forged-ack.log.jsonl`), or null when
+            the live file does not exist yet. Paired with `maxBytes` this
+            drives the dashboard's "live: 84 KB / 256 KB" fullness hint
+            so operators can predict when the next rotation — and the
+            drop of the oldest archive under the rotation cap — is about
+            to happen. Task #207.
+        maxBytes:
+          type: integer
+          minimum: 1
+          description: |
+            Byte cap the live file is rotated at, resolved from
+            `MORNINGSTAR_FORGED_ACK_HISTORY_MAX_BYTES` (default 262144 =
+            256 KiB). The denominator of the fullness hint. Task #207.
+        maxRotations:
+          type: integer
+          minimum: 1
+          description: |
+            Rotation cap resolved from
+            `MORNINGSTAR_FORGED_ACK_HISTORY_MAX_ROTATIONS` (default 3).
+            The archive at this index is the next to be dropped on the
+            next rotation, so the dashboard can flag it as evidence at
+            risk. Task #207.
+
+    SidecarStaleBindingAckHistoryEntry:
+      type: object
+      required: [acknowledgedAt]
+      description: |
+        One operator-driven dismissal of a stale-checkpoint-binding
+        banner, as parsed from the rotating history log. Task #231.
+      properties:
+        boundCheckpointSha:
+          type: ["string", "null"]
+          description: |
+            sha256 hex of the checkpoint the stale `lastOkAt` was sealed
+            against, or null when the sidecar was sealed with no
+            checkpoint on disk at seal time.
+        acknowledgedAt:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp of when the Acknowledge click happened.
+        ackedBy:
+          type: ["string", "null"]
+          description: |
+            Attribution string for the operator who dismissed the
+            banner. Matched named token, sanitized `X-Referee-Name`
+            header, or the literal `"anonymous"`. Null only on legacy
+            entries written before attribution was captured.
+
+    SidecarStaleBindingAckHistoryRotation:
+      type: object
+      required: [index, path, size, mtime]
+      description: |
+        One rotated archive of the stale-binding-ack history log on disk
+        (`data/hits.txt.lastok.stale-binding-ack.log.jsonl.<index>`).
+        Task #231.
+      properties:
+        index:
+          type: integer
+          minimum: 1
+          description: Rotation index. `1` is the most recently rotated archive.
+        path:
+          type: string
+          description: Absolute path to the rotated file on disk.
+        size:
+          type: integer
+          description: Size of the rotated file in bytes (for the dashboard tooltip).
+        mtime:
+          type: string
+          format: date-time
+          description: ISO-8601 mtime of the rotated file (i.e. when the rotation happened).
+
+    SidecarStaleBindingAckHistory:
+      type: object
+      required: [entries, logExists, capacity, rotation, rotations]
+      description: |
+        Result of `GET /ledger/sidecar-stale-binding-ack/history`
+        (task #231). Mirrors `SidecarForgedAckHistory`.
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/SidecarStaleBindingAckHistoryEntry"
+          description: Most-recent-first slice of past stale-binding dismissals.
+        logExists:
+          type: boolean
+          description: |
+            True iff the rotating history log exists on disk. False is
+            the normal healthy state — no stale-checkpoint-binding
+            incident has ever been acknowledged on this deploy.
+        capacity:
+          type: integer
+          description: Maximum number of entries the endpoint will return per request.
+        rotation:
+          type: integer
+          minimum: 0
+          description: |
+            Which rotation file was read on this call. `0` means the
+            live `data/hits.txt.lastok.stale-binding-ack.log.jsonl`;
+            `N >= 1` means `…log.jsonl.N`. Echoes the request param so
+            the dashboard can highlight the active page tab without a
+            second round-trip.
+        rotations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SidecarStaleBindingAckHistoryRotation"
+          description: |
+            Snapshot of every rotated archive currently on disk
+            (`…log.jsonl.1`, `.2`, …), newest-rotated first by index.
+            Empty when no rotation has ever happened — the live file is
+            the only history surface. Lets the dashboard render prev/next
+            paging controls without polling each rotation index blindly.
+
+    SidecarForgedAckResult:
+      type: object
+      required: [ok]
+      description: |
+        Result of `POST /ledger/sidecar-forged-ack` (task #124). On
+        success, the dashboard banner driven by
+        `lastOkSidecarStatus === "forged"` gains an "acknowledged"
+        badge and the boot-time `sidecar_forged` one-shot alert is
+        suppressed for this incident, exactly the way
+        `isAcknowledged` already suppresses the integrity-mismatch
+        alert (task #98).
+      properties:
+        ok:
+          type: boolean
+        acknowledgedAt:
+          type: string
+          description: ISO-8601 timestamp recorded on the on-disk forged-ack sidecar
+        alreadyAcknowledged:
+          type: boolean
+          description: True if the same forged-sidecar incident was already acked (no-op)
+        payloadSha:
+          type: string
+          description: sha256 hex of the forged sidecar payload bytes the ack is bound to
+        ackedBy:
+          type: ["string", "null"]
+          description: |
+            Task #139. Attribution string for the operator that
+            dismissed the banner. A matched named token from
+            `LEDGER_REBUILD_TOKENS` wins; otherwise the sanitized
+            `X-Referee-Name` request header; otherwise the literal
+            string `"anonymous"`. Persisted on the on-disk
+            forged-ack sidecar so the value survives a restart and
+            shows up in `lastOkSidecarStatusAcknowledgedBy` on
+            subsequent `GET /ledger/integrity` responses. Null only
+            on legacy ack files written before task #139 landed.
+        error:
+          type: string
+
+    SidecarStaleBindingAckResult:
+      type: object
+      required: [ok]
+      description: |
+        Result of `POST /ledger/sidecar-stale-binding-ack` (task #204).
+        On success, the dashboard banner driven by
+        `lastOkSidecarStatus === "stale_checkpoint_binding"` gains an
+        "acknowledged" badge with the operator name and timestamp,
+        mirroring the forged-sidecar ack flow.
+      properties:
+        ok:
+          type: boolean
+        acknowledgedAt:
+          type: string
+          description: ISO-8601 timestamp recorded on the on-disk stale-binding-ack sidecar
+        alreadyAcknowledged:
+          type: boolean
+          description: True if the same stale-binding incident was already acked (no-op)
+        boundCheckpointSha:
+          type: ["string", "null"]
+          description: |
+            sha256 hex of the checkpoint the stale `lastOkAt` was
+            sealed against — the key the ack is bound to. Null when the
+            stale binding was sealed with no checkpoint on disk.
+        ackedBy:
+          type: ["string", "null"]
+          description: |
+            Task #204. Attribution string for the operator that
+            dismissed the banner. A matched named token from
+            `LEDGER_REBUILD_TOKENS` wins; otherwise the sanitized
+            `X-Referee-Name` request header; otherwise the literal
+            string `"anonymous"`. Persisted on the on-disk
+            stale-binding-ack sidecar so the value survives a restart
+            and shows up in `lastOkSidecarStatusAcknowledgedBy` on
+            subsequent `GET /ledger/integrity` responses.
+        error:
+          type: string
+
+    SidecarSecretRotateResult:
+      type: object
+      required: [ok, rotatedAt, persistedTo, secretPersisted, sidecarResealed, hadForgedIncident]
+      description: |
+        Result of `POST /ledger/sidecar-secret/rotate` (task #140). On
+        success, the live sidecar has been re-sealed with a fresh
+        HMAC secret and the sticky forged-incident state has been
+        cleared, so the next `GET /ledger/integrity` poll reports
+        `lastOkSidecarStatus: "ok"`.
+      properties:
+        ok:
+          type: boolean
+        rotatedAt:
+          type: string
+          description: ISO-8601 timestamp when the new HMAC secret was generated
+        rotatedBy:
+          type: ["string", "null"]
+          description: |
+            Attribution string for the operator that rotated the
+            secret. A matched named token from `LEDGER_REBUILD_TOKENS`
+            wins; otherwise the sanitized `X-Referee-Name` header;
+            otherwise the literal string `"anonymous"`.
+        persistedTo:
+          type: string
+          enum: [env, keyfile]
+          description: |
+            Where the new secret was persisted. `env` means the
+            in-memory `process.env.LEDGER_SIDECAR_SECRET` slot was
+            updated (the boot-time secret came from that env var, so
+            no on-disk keyfile is created to preserve the hardened
+            posture). `keyfile` means the on-disk secret file was
+            rewritten with `chmod 0600`.
+        keyfilePath:
+          type: ["string", "null"]
+          description: |
+            Resolved keyfile path when `persistedTo === "keyfile"`,
+            null when `persistedTo === "env"`.
+        secretPersisted:
+          type: boolean
+          description: |
+            True when the new secret was successfully persisted
+            (env slot updated, or keyfile written). False on a
+            best-effort keyfile write failure — the new secret stays
+            in memory and the next restart will regenerate yet
+            another key. Operators should investigate the
+            permissions on the keyfile directory.
+        sidecarResealed:
+          type: boolean
+          description: |
+            True when the live `data/hits.txt.lastok` was
+            successfully rewritten with a fresh MAC bound to the new
+            secret. False on a best-effort write failure; the next
+            integrity poll will rewrite it.
+        hadForgedIncident:
+          type: boolean
+          description: |
+            True when a sticky forged-sidecar incident was active at
+            the moment of rotation (i.e. the rotation cleared the
+            red banner). False when the operator rotated
+            preemptively with no active incident.
+        error:
+          type: string
+
+    LedgerAlertEntry:
+      type: object
+      required: [id, timestamp, workflow, message, subject, delivery]
+      description: |
+        One entry from the on-disk alert ring buffer
+        `data/ledger-alerts.jsonl`. Each field other than the four
+        required ones is best-effort: older entries (or
+        check-ledger-integrity.py hard FATALs) may omit any of them.
+      properties:
+        id:
+          type: string
+          description: |
+            Server-computed acknowledgement id
+            (`sha256(timestamp + "\n" + message)` hex). Stable across
+            requests; clients pass this back into
+            `POST /lean/ledger-alerts/ack` to dismiss the entry.
+        acknowledgedAt:
+          type: ["string", "null"]
+          description: |
+            ISO-8601 timestamp recorded when an operator dismissed this
+            alert via `POST /lean/ledger-alerts/ack`. Null when the alert
+            is still actionable. Persisted in
+            `data/ledger-alerts.ack.json`.
+        timestamp:
+          type: string
+          description: ISO-8601 timestamp of when the alert fired
+        workflow:
+          type: string
+          description: |
+            Friendly tag of the workflow that fired the alert
+            (e.g. `zeta-burst-101-10000`, `check-ledger-integrity.py`).
+            Falls back to `argv[0]` or hostname when
+            `MORNINGSTAR_WORKFLOW_NAME` is unset.
+        message:
+          type: string
+          description: Underlying integrity-error message
+        failureMode:
+          type: ["string", "null"]
+          description: |
+            Structured failure code (e.g. `hits_truncated`,
+            `hits_rewritten_in_place`, `integrity_check_failed`,
+            `monitor_stalled`, `recovered`). Null on legacy entries
+            that predate the field.
+        previousFailureMode:
+          type: ["string", "null"]
+          description: |
+            For `failureMode == "recovered"` rows, the failure code
+            that preceded the recovery (e.g. `monitor_stalled`,
+            `hits_truncated`). Lets the dashboard tell a monitor
+            recovery apart from a tamper recovery without parsing
+            free-text. Null on tamper / fire rows and on legacy
+            entries that predate task #144.
+        subject:
+          type: string
+          description: |
+            Human-readable subject line for the alert, matching the
+            email `Subject:` header and the `subject` field on the
+            webhook payload. Distinct lines for the watchdog-stalled,
+            monitor-recovered, integrity-recovered, and tamper cases
+            (task #144). Always present: the server derives a subject
+            for legacy entries that predate the field, so the
+            dashboard can render it as the row header without a null
+            check (task #161).
+        recovery:
+          type: ["string", "null"]
+          description: Human-readable pointer to recovery docs
+        hitsPath:
+          type: ["string", "null"]
+          description: Filesystem path of the ledger at the time of the alert
+        checkpointPath:
+          type: ["string", "null"]
+        expectedSize:
+          type: ["integer", "null"]
+        actualSize:
+          type: ["integer", "null"]
+        expectedSha:
+          type: ["string", "null"]
+        source:
+          type: ["string", "null"]
+          description: |
+            Origin of the alert (e.g. `scripts/check-ledger-integrity.py`).
+            Null when fired from inside kernel.probe.
+        delivery:
+          type: object
+          required: [webhook, email]
+          description: Per-transport delivery status at fire time
+          properties:
+            webhook:
+              $ref: "#/components/schemas/LedgerAlertDeliveryStatus"
+            email:
+              $ref: "#/components/schemas/LedgerAlertDeliveryStatus"
+
+    LedgerAlertsResponse:
+      type: object
+      required: [alerts, limit, totalReturned, logPath, logExists]
+      properties:
+        alerts:
+          type: array
+          items:
+            $ref: "#/components/schemas/LedgerAlertEntry"
+          description: Most-recent-first slice of alert entries
+        limit:
+          type: integer
+          description: Effective limit applied to the response
+        totalReturned:
+          type: integer
+        logPath:
+          type: string
+          description: Filesystem path of the alert log that was read
+        logExists:
+          type: boolean
+          description: |
+            True iff `data/ledger-alerts.jsonl` exists on disk. False is
+            the normal healthy state — no alert has ever fired.
+        ackGcDropped:
+          type: integer
+          description: |
+            Count of dismissed-alert records garbage-collected on this
+            call because the underlying alert has rolled off the log
+            (task #102 / #119). Always present; usually 0. Surfaced so
+            operators can confirm housekeeping is running and notice
+            if it ever runs away. Only the live read (`rotation=0`)
+            ever runs ack GC; reads of rotated archives always report
+            `0` here.
+        rotation:
+          type: integer
+          description: |
+            Which rotation index was read on this call. `0` means the
+            live `data/ledger-alerts.jsonl`; `N >= 1` means
+            `data/ledger-alerts.jsonl.N`. Echoes the request param so
+            the dashboard can keep its paging UI in sync (task #120).
+        availableRotations:
+          type: array
+          description: |
+            Snapshot of every rotated alert log file the server can see
+            on disk right now (`data/ledger-alerts.jsonl.1`,
+            `.2`, ...), newest-rotated first. Empty when no rotation
+            has happened yet. The dashboard uses this list to render
+            "page back into archive .N" controls without polling each
+            rotation index blindly (task #120).
+          items:
+            type: object
+            required: [index, path, size, mtime]
+            properties:
+              index:
+                type: integer
+                description: Rotation index (1 = most recently rotated)
+              path:
+                type: string
+                description: Filesystem path of the rotated archive
+              size:
+                type: integer
+                description: Byte size of the rotated archive
+              mtime:
+                type: string
+                description: ISO-8601 mtime of the rotated archive
+
+    MorningstarProbe:
+      type: object
+      required: [lineNumber, raw]
+      properties:
+        lineNumber:
+          type: integer
+          description: 1-indexed line number in `data/hits.txt`
+        raw:
+          type: string
+          description: The original line, verbatim
+        ts:
+          type: ["string", "null"]
+          description: Raw `ts=` value (nanoseconds since the Unix epoch, as recorded)
+        timestamp:
+          type: ["string", "null"]
+          format: date-time
+          description: ISO-8601 conversion of `ts` (UTC) when parseable
+        h:
+          type: ["integer", "null"]
+        n:
+          type: ["integer", "null"]
+        re:
+          type: ["number", "null"]
+        im:
+          type: ["number", "null"]
+        lNonvanish:
+          type: ["boolean", "null"]
+        rhOk:
+          type: ["boolean", "null"]
+        kmsBeta:
+          type: ["number", "null"]
+          description: |
+            Bost–Connes inverse-temperature β = 1/Re(s) at the probe
+            point. `null` when the ledger line predates the kms_beta
+            field or recorded `NA` (e.g. Re(s)=0).
+        tag:
+          type: ["string", "null"]
+          description: Backend tag (e.g. MPMATH_ZETA, MPMATH_DIRICHLET_TRIVIAL, NEEDS_SAGE)
+        lAbs:
+          type: ["string", "null"]
+          description: Raw `L_abs=` value when present (kept as a string to preserve precision and `NA`)
+        reason:
+          type: ["string", "null"]
+        sha:
+          type: ["string", "null"]
+          description: SHA-256 the kernel recorded for this probe line
+
+    MorningstarHits:
+      type: object
+      required:
+        - headerLines
+        - genesisLines
+        - sealSha
+        - expectedSealSha
+        - sealOk
+        - probes
+        - totalProbes
+        - returnedProbes
+        - limit
+        - ledgerPath
+        - lastModified
+      properties:
+        headerLines:
+          type: array
+          items:
+            type: string
+          description: Comment lines (typically lines 1–4) preceding the Genesis block
+        genesisLines:
+          type: array
+          items:
+            type: string
+          description: |
+            The five frozen Genesis lines through and including the
+            `--- GENESIS SEAL ---` marker (e.g. `437`, `1094`,
+            `axioms=[] 2026-05-24`, `M13_CERT_SHA256=...`,
+            `--- GENESIS SEAL ---`).
+        sealSha:
+          type: string
+          description: SHA-256 of the immutable preamble (header + Genesis lines through marker, each terminated by `\n`)
+        expectedSealSha:
+          type: string
+          description: Baked-in expected seal hash from `scripts/check-genesis-seal.py`
+        sealOk:
+          type: boolean
+          description: True iff `sealSha === expectedSealSha`
+        probes:
+          type: array
+          items:
+            $ref: "#/components/schemas/MorningstarProbe"
+          description: Most-recent-first slice of probe lines, length capped by `limit`
+        totalProbes:
+          type: integer
+          description: Total number of probe lines in the ledger (lines after the Genesis marker)
+        returnedProbes:
+          type: integer
+          description: Number of probes included in `probes`
+        limit:
+          type: integer
+          description: Effective limit applied to the response
+        ledgerPath:
+          type: string
+          description: Filesystem path to the ledger that was read (for operator clarity)
+        lastModified:
+          type: string
+          format: date-time
+          description: ISO-8601 mtime of the ledger file
+
+    LedgerIntegrityStatus:
+      type: object
+      required:
+        - status
+        - checkedAt
+        - ledgerPath
+        - checkpointPath
+      properties:
+        status:
+          type: string
+          enum: [ok, mismatch, missing]
+          description: |
+            `ok` when the live ledger's first `checkpointSize` bytes hash
+            to `checkpointSha`. `missing` when either `data/hits.txt` or
+            its checkpoint sidecar is absent — a distinct first-class
+            state so callers can distinguish "the file is gone" from
+            "the file has been tampered". `mismatch` when the live
+            file is shorter than the checkpoint, has been rewritten in
+            place, the checkpoint is malformed, or it cannot be read.
+        failureMode:
+          type: ["string", "null"]
+          description: |
+            Structured failure code. One of `hits_missing` /
+            `checkpoint_missing` (when `status` is `missing`), or
+            `checkpoint_malformed` / `hits_truncated` /
+            `hits_rewritten_in_place` / `checkpoint_unreadable`
+            (when `status` is `mismatch`). Null when healthy.
+        reason:
+          type: ["string", "null"]
+          description: Human-readable mismatch reason. Null when healthy.
+        checkpointSize:
+          type: ["integer", "null"]
+          description: Bytes recorded in `data/hits.txt.checkpoint`
+        checkpointSha:
+          type: ["string", "null"]
+          description: SHA-256 (hex) recorded in `data/hits.txt.checkpoint`
+        liveSize:
+          type: ["integer", "null"]
+          description: Current byte size of `data/hits.txt`
+        livePrefixSha:
+          type: ["string", "null"]
+          description: |
+            SHA-256 (hex) of the first `checkpointSize` bytes of the
+            live ledger. Equals `checkpointSha` when `status` is `ok`.
+        growthBytes:
+          type: ["integer", "null"]
+          description: |
+            `liveSize - checkpointSize` when both are known and positive
+            (legitimate appends since the last checkpoint update).
+        checkedAt:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp the check was performed (server time)
+        ledgerLastModified:
+          type: ["string", "null"]
+          format: date-time
+          description: ISO-8601 mtime of `data/hits.txt` (null if missing)
+        ledgerPath:
+          type: string
+          description: Filesystem path of the ledger that was checked
+        checkpointPath:
+          type: string
+          description: Filesystem path of the checkpoint sidecar
+        lastOkAt:
+          type: ["string", "null"]
+          format: date-time
+          description: |
+            ISO-8601 timestamp of the most recent `status: ok` integrity
+            check. Persisted to a `data/hits.txt.lastok` sidecar so the
+            value survives server restarts; on boot the server reads it
+            back so the dashboard immediately shows the real age
+            instead of "never". Null when no successful check has ever
+            been recorded. Sidecar writes are best-effort — a write
+            failure does not break the integrity endpoint.
+
+            **Tamper resistance (task #95).** The sidecar payload is
+            HMAC-SHA256-signed with a per-deploy secret kept in
+            `data/hits.txt.lastok.key` (auto-generated 32 random bytes,
+            chmod 600) AND bound to the current
+            `data/hits.txt.checkpoint` size+sha. On read, the server
+            verifies both: a missing/invalid mac, OR a checkpoint
+            binding that no longer matches the on-disk checkpoint,
+            causes `lastOkAt` to be discarded as null (the dashboard
+            falls back to "never verified" rather than trusting a
+            forged fresh timestamp). Hand-editing the sidecar JSON to
+            backdate or post-date `lastOkAt` does not propagate to
+            this field. Lets operators tell if a currently-amber /
+            unreachable panel has been stuck for seconds vs hours
+            without an attacker being able to lie about the answer.
+        lastOkAgeSeconds:
+          type: ["integer", "null"]
+          description: |
+            Server-computed age of `lastOkAt` at `checkedAt`, in whole
+            seconds. Null when `lastOkAt` is null (no successful check
+            recorded). The dashboard can show this directly without
+            needing trusted client-side wall-clock arithmetic.
+        lastCheckedAt:
+          type: ["string", "null"]
+          format: date-time
+          description: |
+            ISO-8601 timestamp of the most recent integrity check
+            attempt, regardless of outcome. Persisted to the same
+            `data/hits.txt.lastok` sidecar as `lastOkAt` so the value
+            survives server restarts; on boot the server reads it back
+            so the dashboard can immediately show when the verifier
+            last ran (vs `checkedAt`, which is just "now"). Null only
+            when no check has ever been recorded.
+        lastCheckedAgeSeconds:
+          type: ["integer", "null"]
+          description: |
+            Task #99. Server-computed age of `lastCheckedAt` at
+            `checkedAt`, in whole seconds. Null when `lastCheckedAt`
+            is null (no check has ever been recorded) or when either
+            timestamp is unparseable. Distinct from `lastOkAgeSeconds`
+            — this one tracks "how long since the verifier even
+            *attempted* a check", closing the blind spot where a
+            silently-stopped monitor would let `lastOkAt` drift
+            forever while `lastCheckedAt` (and so `lastOkAgeSeconds`)
+            quietly froze in the past.
+        checkedStaleThresholdSeconds:
+          type: integer
+          description: |
+            Task #99. Configured threshold in seconds beyond which
+            `lastCheckedAt` is treated as stale. Sourced from
+            `LEDGER_CHECKED_STALE_THRESHOLD_SECONDS` when set;
+            otherwise derived at request time as
+            `2 × monitor.intervalSeconds` (from the background timer
+            registered in this process), falling back to 600s (2×
+            the default 300s monitor interval) when no monitor is
+            registered. Distinct from `staleThresholdSeconds`, which
+            only governs `lastOkAt`.
+        checkedStale:
+          type: boolean
+          description: |
+            Task #99. True when `lastCheckedAt` is null OR
+            `lastCheckedAgeSeconds` exceeds
+            `checkedStaleThresholdSeconds`. Means the verifier itself
+            has stopped running — distinct from `stale` (last
+            *successful* check too old) and from
+            `status: mismatch` / `missing` (verifier ran and surfaced
+            a tamper). The dashboard surfaces this as a separate amber
+            badge so operators can tell "the monitor itself has gone
+            quiet" from "the monitor is running but keeps failing".
+        staleThresholdSeconds:
+          type: integer
+          description: |
+            Configured staleness threshold in seconds, from
+            `LEDGER_STALE_THRESHOLD_SECONDS` (default 3600). A
+            successful check older than this is treated as `stale`.
+        stale:
+          type: boolean
+          description: |
+            True when `lastOkAt` is null OR `lastOkAgeSeconds` exceeds
+            `staleThresholdSeconds`. Lets the dashboard flag amber
+            "haven't been verified in too long" without trusting the
+            client clock — distinct from `status: mismatch` / `missing`,
+            so the operator can tell "the verifier itself stopped
+            running" from "the verifier ran and the ledger is broken".
+        checkpointLastModified:
+          type: ["string", "null"]
+          format: date-time
+          description: |
+            ISO-8601 mtime of `data/hits.txt.checkpoint`. Null when the
+            checkpoint file is missing or unstatable.
+        checkpointAgeSeconds:
+          type: ["integer", "null"]
+          description: |
+            Server-computed age of the checkpoint sidecar (now minus
+            mtime), whole seconds. Null when the checkpoint is missing.
+        checkpointCoverageRatio:
+          type: ["number", "null"]
+          description: |
+            `checkpointSize / liveSize` clamped to [0,1]. The known-good
+            sealed prefix as a fraction of the live ledger. Shrinks as
+            appends accumulate without the committed checkpoint being
+            re-rolled. Null when either size is unknown or the live
+            ledger is empty.
+        checkpointStaleThresholdSeconds:
+          type: integer
+          description: |
+            Configured threshold in seconds beyond which the
+            checkpoint sidecar itself is considered stale (not
+            re-rolled in too long). Sourced from
+            `LEDGER_CHECKPOINT_STALE_THRESHOLD_SECONDS` (default
+            2,592,000 = 30 days). Distinct from `staleThresholdSeconds`,
+            which only flags the verifier loop.
+        checkpointStale:
+          type: boolean
+          description: |
+            Task #96. True when `checkpointAgeSeconds` is null
+            (checkpoint missing) OR exceeds
+            `checkpointStaleThresholdSeconds`. Means the committed
+            known-good prefix hasn't been re-rolled in too long, so
+            tamper coverage of the live ledger is shrinking. Distinct
+            from `stale` (which means the verifier itself hasn't run);
+            the dashboard surfaces them as two separate warnings so
+            operators don't confuse "nobody has verified the ledger
+            lately" with "the verifier ran fine but the sealed prefix
+            is far behind the live file".
+        lastOkSidecarStatus:
+          type: string
+          enum: [ok, missing, forged, stale_checkpoint_binding]
+          description: |
+            Task #110. Tamper-state of the persisted
+            `data/hits.txt.lastok` sidecar the last time the server
+            read or wrote it. `ok` = HMAC verified and the bound
+            checkpoint matches the on-disk checkpoint. `missing` = no
+            sidecar file (fresh deploy or wipe). `forged` = the file
+            existed but the HMAC was missing/malformed/wrong — i.e.
+            someone wrote it without the per-deploy secret. The
+            forged value is discarded (`lastOkAt` falls back to null),
+            and the dashboard surfaces a red banner so operators see
+            a tamper attempt distinctly from a fresh-boot empty
+            sidecar. `stale_checkpoint_binding` = HMAC verified but
+            `boundCheckpointSha`/`boundCheckpointSize` no longer
+            match the on-disk checkpoint, so the persisted
+            `lastOkAt` refers to a different sealed prefix. The
+            value sticks at `forged` after a boot tamper-read until
+            the next legitimate write by this process replaces the
+            on-disk payload with a fresh HMAC'd one. On boot, a
+            `forged` detection also fires a one-shot alert through
+            the configured ledger-alerts sink (webhook / SMTP), same
+            path as the integrity-mismatch alerts.
+        sidecarSecretStrictMode:
+          type: boolean
+          description: |
+            Task #137. True when the API server was booted with
+            `LEDGER_SIDECAR_SECRET_STRICT_MODE` set to a truthy value
+            (`1` / `true` / `yes` / `on`, case-insensitive), in which
+            case a group/world-readable on-disk sidecar keyfile would
+            have prevented boot (`SidecarSecretLooseModeError`). False
+            in the default lenient posture, where a loose keyfile only
+            emits a startup `WARN`. Sourced from the same env parsing
+            helper (`isSidecarSecretStrictMode`) used at boot, so this
+            value cannot drift from the runtime posture. Surfaced on
+            the Ledger Integrity dashboard card as a small badge
+            ("Strict keyfile mode: ON" / "OFF") so operators can
+            confirm a hardened deploy at a glance without grepping
+            startup logs or inspecting env vars.
+        lastOkSidecarStatusAcknowledgedAt:
+          type: ["string", "null"]
+          description: |
+            Task #124 / #204. ISO-8601 timestamp when an operator
+            dismissed the current sidecar incident. For
+            `lastOkSidecarStatus === "forged"` this is the
+            `POST /ledger/sidecar-forged-ack` time (keyed by the
+            sha256 of the forged payload bytes, persisted to
+            `data/hits.txt.lastok.forged-ack`). For
+            `lastOkSidecarStatus === "stale_checkpoint_binding"` this
+            is the `POST /ledger/sidecar-stale-binding-ack` time
+            (keyed by the bound checkpoint sha, persisted to
+            `data/hits.txt.lastok.stale-binding-ack`). Null when the
+            incident is still unacknowledged (or when
+            `lastOkSidecarStatus` is `ok` / `missing`). Each ack
+            survives restarts as long as the same incident is still
+            on disk; a fresh incident sealed against different bytes /
+            a different checkpoint invalidates it. The dashboard keeps
+            the banner visible (with an "acknowledged" badge) until a
+            subsequent boot reads a clean sidecar.
+        lastOkSidecarStatusAcknowledgedBy:
+          type: ["string", "null"]
+          description: |
+            Task #139 / #204. Attribution string for the operator
+            that dismissed the current sidecar incident (either the
+            `forged` banner via `POST /ledger/sidecar-forged-ack` or
+            the `stale_checkpoint_binding` banner via
+            `POST /ledger/sidecar-stale-binding-ack`). A matched
+            named token from `LEDGER_REBUILD_TOKENS` wins; otherwise
+            the sanitized `X-Referee-Name` request header recorded
+            on the ack call; otherwise the literal string
+            `"anonymous"` (shared-token deploys with no header). Null
+            while the banner is still un-acked, when
+            `lastOkSidecarStatus` is `ok` / `missing`, or on legacy
+            forged-ack files written before task #139 landed.
+            Persisted next to the sidecar so the value survives a
+            restart and is shown as a tooltip on the dashboard
+            "acknowledged" badge.
+        forgedAckHistoryDroppedArchivesTotal:
+          type: integer
+          description: |
+            Task #234. Cumulative count of forged-ack dismissal-history
+            archives that have aged out (been dropped past the rotation
+            cap, `MORNINGSTAR_FORGED_ACK_HISTORY_MAX_ROTATIONS`) since
+            this process booted. Unlike the one-shot archive-full alert
+            from #206 — which fires exactly once per boot then stays
+            silent to keep alert noise low — this counter keeps
+            incrementing on EVERY rotation drop, so a long-running
+            server that rotates many times can still tell operators the
+            cumulative volume of dismissal records lost over time.
+            In-memory and boot-scoped: resets to 0 on restart.
+        forgedAckHistoryDroppedEntriesTotal:
+          type: integer
+          description: |
+            Task #234. Cumulative count of individual dismissal entries
+            contained in the archives counted by
+            `forgedAckHistoryDroppedArchivesTotal`. Summed from each
+            dropped archive's entry count at the moment it was deleted.
+            Lets the dashboard render "N dismissals aged out since boot"
+            without re-spamming the one-shot #206 alert. In-memory and
+            boot-scoped: resets to 0 on restart.
+        monitor:
+          type: object
+          description: |
+            Task #97. Observability surface for the server-side
+            ledger-integrity monitor (the background timer added in
+            task #85). Lets the dashboard show operators that the
+            auto-check is actually running and when it last ticked,
+            so a stalled or never-started monitor surfaces visibly
+            instead of silently missing tampers.
+          required:
+            - enabled
+            - intervalSeconds
+            - lastTickAt
+            - lastAlertedFailureMode
+            - lastAcknowledgedAlertId
+            - watchdogState
+            - watchdogLastFiredAt
+          properties:
+            enabled:
+              type: boolean
+              description: |
+                True when the background monitor is running in this
+                process. False when
+                `LEDGER_INTEGRITY_CHECK_INTERVAL_SECONDS` was set to
+                `off` / `0` / etc., so the timer was never started.
+            intervalSeconds:
+              type: ["integer", "null"]
+              description: |
+                Configured tick cadence in whole seconds. Null when the
+                monitor is disabled.
+            lastTickAt:
+              type: ["string", "null"]
+              format: date-time
+              description: |
+                ISO-8601 timestamp of the most recently COMPLETED
+                monitor tick (set after the tick finishes, regardless
+                of outcome). Null until the first tick completes, or
+                while the monitor is disabled. The dashboard treats a
+                `lastTickAt` older than 2× `intervalSeconds` as
+                "monitor stalled".
+            lastAlertedFailureMode:
+              type: ["string", "null"]
+              description: |
+                The `failureMode` of the currently in-flight alert
+                (i.e. the monitor has fired an alert and has not yet
+                seen the ledger recover). Null while healthy or
+                disabled. Lets the dashboard tell operators which
+                failure mode is being de-duped.
+            lastAcknowledgedAlertId:
+              type: ["string", "null"]
+              description: |
+                Task #98. When non-null, the operator has dismissed
+                the most-recent monitor-fired alert via
+                `POST /lean/ledger-alerts/ack` and the monitor is
+                holding fire on subsequent non-ok ticks — even on
+                failure_mode transition — until a recovery alert
+                clears the state. The value is the sha256 alert id
+                (matches `LedgerAlertEntry.id`). Lets the dashboard
+                show "alerts suppressed: acknowledged" instead of
+                misleading operators into thinking the monitor is
+                still spamming on every tick.
+            watchdogState:
+              type: ["string", "null"]
+              enum: ["ok", "stalled", null]
+              description: |
+                Task #128. Current state of the in-process watchdog
+                (task #113). `ok` while the monitor's integrity ticks
+                are landing within 2× the configured interval;
+                `stalled` once the watchdog has fired a
+                `monitor_stalled` alert and not yet seen a recovery.
+                `null` when the monitor is disabled. Distinct from
+                `checkedStale` on the surrounding integrity payload —
+                that one is derived from the persisted sidecar's
+                `lastCheckedAt` and so survives restarts, whereas
+                `watchdogState` is purely in-memory and goes back to
+                `ok` whenever the api-server reboots. The dashboard
+                renders a distinct red badge on the Ledger Integrity
+                card when this is `stalled`, separate from the amber
+                "verifier not running" badge.
+            watchdogLastFiredAt:
+              type: ["string", "null"]
+              format: date-time
+              description: |
+                Task #128. ISO-8601 timestamp of the most recent
+                `monitor_stalled` watchdog fire, or null when the
+                watchdog has never fired in this process lifetime.
+                Sticky across watchdog recoveries so operators can
+                still see when the stall happened after the monitor
+                has gone back to OK.
+        rerollDigest:
+          type: object
+          description: |
+            Task #223. Effective state of the daily checkpoint
+            re-roll digest scheduler. Task #198 made the digest
+            short-circuit when no alert sink is configured, logging a
+            line operators can't see from the dashboard. This surface
+            makes the three possible states distinguishable so a
+            misconfigured deployment (interval live but no sink) no
+            longer looks identical to a healthy quiet one or a
+            deliberate opt-out.
+          required:
+            - state
+            - intervalSeconds
+            - windowHours
+          properties:
+            state:
+              type: string
+              enum: ["enabled", "disabled_interval_off", "disabled_no_sink"]
+              description: |
+                `enabled`: the digest timer is running;
+                `intervalSeconds`/`windowHours` describe its cadence.
+                `disabled_interval_off`: an operator set
+                `MORNINGSTAR_REROLL_DIGEST_INTERVAL_SECONDS` to
+                `off`/`0`/`none` — a deliberate opt-out, nothing to
+                fix. `disabled_no_sink`: the interval is live but
+                neither `MORNINGSTAR_ALERT_WEBHOOK_URL` nor
+                `MORNINGSTAR_ALERT_EMAIL_TO` is set, so the scheduler
+                short-circuits (task #198) — a likely misconfiguration
+                an operator can fix by setting an alert sink.
+            intervalSeconds:
+              type: ["integer", "null"]
+              description: |
+                Configured digest cadence in whole seconds when
+                `state` is `enabled`; null for both disabled states.
+            windowHours:
+              type: ["integer", "null"]
+              description: |
+                Digest look-back window in whole hours when `state` is
+                `enabled` (tracks the cadence, 1h floor); null for both
+                disabled states.
+
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name:
+          type: string
+        size:
+          type: integer
+        contentType:
+          type: string
+
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL:
+          type: string
+        objectPath:
+          type: string

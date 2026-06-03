@@ -1,0 +1,38 @@
+MorningStar-Lab v1.0 — M13 Certificate
+=======================================
+M13_CERT_SHA256: d99b0df4b6e3a5817a90e7f8da44b20261d3b670d31309779a776efbf1bcc668
+parent_checkpoint: SHA-256 of lean-proof/VERIFY.txt (the project's
+                   "last checkpoint"; axiom debt = [] for main_theorem)
+date: 2026-05-24
+seed: 437, 1094, axioms=[]
+
+Append-only contract for ../data/hits.txt:
+  - Lines 1-4 are header comments ("# ...").
+  - Lines 5-9 are the five frozen Genesis lines:
+      5: 437
+      6: 1094
+      7: axioms=[] 2026-05-24
+      8: M13_CERT_SHA256=<hash above>
+      9: --- GENESIS SEAL ---
+  - The whole preamble (lines 1-9) is sealed by
+    scripts/check-genesis-seal.py via a baked-in SHA-256.
+  - Line 10+ are probe outputs; never rewritten, only appended.
+  - kernel.probe refuses to append if the Genesis seal hash is altered.
+
+Honest scope:
+  - hit_437 / hit_1094 emitted by lean_bridge.py are `True := trivial`.
+    Their names reference the OpenCV cube counts from README Appendix A;
+    their statements claim nothing about number theory.
+
+L-function backend (kernel.probe):
+  - Backend: mpmath (pure-Python arbitrary precision), workdps=50.
+  - h=1, N=1: Riemann zeta ζ(s). Ledger tag MPMATH_ZETA. L_nonvanish
+    reflects |ζ(s)| > 1e-10 against a real evaluation.
+  - h=1, N>1: principal Dirichlet character χ₀ mod N, computed as
+    ζ(s) · ∏_{p|N}(1 - p^{-s}). Ledger tag MPMATH_DIRICHLET_TRIVIAL.
+  - h>=2: out of scope for mpmath; ledger line keeps NEEDS_SAGE and
+    L_nonvanish stays a stub (True). The tag is the contract that says
+    "do not trust this number".
+  - Backend failures (overflow, mpmath exception) also fall back to
+    NEEDS_SAGE with a `reason=` field. The ledger never silently lies
+    about a backend result.

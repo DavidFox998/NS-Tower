@@ -1,0 +1,26 @@
+=== lean-proof-towers/Towers/YM/ClusteringCore.lean (clusters_zero) ===
+  (no file-level axiom/constant declarations)
+=== lean-proof-towers/Towers/YM/MassGapStandin.lean (massGap_standin_example) ===
+  7:constant `C` such that the (trivial) tail bound holds against a
+=== lean-proof-towers/Towers/YM/SpectralGapCore.lean (hasMassGap_zero) ===
+  29:  axiom (which involves the energy-momentum spectrum, not a single CLM).
+=== lean-proof-towers/Towers/YM/TransferOperatorBound.lean (transfer_gap_zero) ===
+  (no file-level axiom/constant declarations)
+=== lean-proof-towers/Towers/YM/TwoPointDecay.lean (clustering_zero_from_transfer) ===
+  (no file-level axiom/constant declarations)
+=== lean-proof-towers/Towers/YM/MassGapFromDecay.lean (mass_gap_from_clustering_zero) ===
+  (no file-level axiom/constant declarations)
+=== lean-proof-towers/Towers/YM/IntegratedTailReal.lean (integrated_tail_le_exp) ===
+  (no file-level axiom/constant declarations)
+=== lean-proof-towers/Towers/YM/TransferGapReal.lean (transfer_gap_real) ===
+  (no file-level axiom/constant declarations)
+=== lean-proof-towers/Towers/YM/MassGapReal.lean (mass_gap_from_transfer) ===
+  (no file-level axiom/constant declarations)
+=== lean-proof-towers/Towers/YM/ClusteringImpliesGap.lean (clustering_implies_gap) ===
+  (no file-level axiom/constant declarations)
+=== lean-proof-towers/Towers/YM/TransferImpliesClustering.lean (transfer_implies_clustering) ===
+  (no file-level axiom/constant declarations)
+=== lean-proof-towers/Towers/YM/TailImpliesTransfer.lean (tail_implies_transfer) ===
+  (no file-level axiom/constant declarations)
+=== lean-proof-towers/Towers/YM/GapToDecay.lean (gap_to_decay) ===
+  (no file-level axiom/constant declarations)

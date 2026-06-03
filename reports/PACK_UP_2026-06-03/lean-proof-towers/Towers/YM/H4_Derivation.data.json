@@ -1,0 +1,29 @@
+{
+  "module": "D_Derivation",
+  "task": 327,
+  "author": "D. Fox",
+  "orcid": "0009-0008-1290-6105",
+  "engine": "Towers.YM.H4Core",
+  "theorem_name": "C13_law",
+  "theorem_statement": "forall p, p.Prime -> digit_len p >= 13 -> symOf p = 1",
+  "status": "CONJECTURE",
+  "classification": "CONJECTURE (named open Prop C13_Law_Open; no theorem discharges it)",
+  "C13_val": "PROVEN",
+  "C13_Law_Open": "UNPROVEN",
+  "empirical_support": "6/6 13-digit samples",
+  "proved": false,
+  "lean_file_hash_sha256": "e21ae1ba9990fdb560fd851c56964b4439aefeeab217f5c5fc48ddd50a2ee2b2",
+  "named_open_prop": "C13_Law_Open",
+  "sample_check": {
+    "predicate": "digit_len p >= 13 && symOf p == 1",
+    "witnesses": [1000000001119, 1000000001357, 1000000001511, 1000000001723, 1000000001831, 1000000002111],
+    "boundary_proven_on_sample": true,
+    "n": 6
+  },
+  "why_not_proven": [
+    "Infinite/undecidable: the statement ranges over all primes; no finite computation settles it, and no general structural theorem (decode avoids every nontrivial W(H4) fixed locus) is established (and may be false for some large prime).",
+    "symOf is not kernel-checkable: kernel `decide` overflows maxRecDepth on a single symOf 191, so symOf p = 1 is unprovable by decide/rfl even for one prime; Modules A/B/C report symOf via #eval (compiled).",
+    "p.Prime and Nat.log10 require mathlib, which the mathlib-free direct-compile H4 line does not have (bringing in lake/mathlib is the documented destructive operation)."
+  ],
+  "honest_note": "C13_law is recorded as a NAMED OPEN conjecture (C13_Law_Open), NOT proven. boundary_proven is a Bool sample check over the explicit list, NOT a proof of the universal law. No sorry/admit/sorryAx/axiom used."
+}

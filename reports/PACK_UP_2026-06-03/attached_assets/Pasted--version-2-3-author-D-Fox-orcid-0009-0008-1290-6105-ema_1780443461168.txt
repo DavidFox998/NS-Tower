@@ -1,0 +1,99 @@
+{
+  "version": "2.3",
+  "author": "D. Fox",
+  "orcid": "0009-0008-1290-6105",
+  "email": "contact@entangledtechnologies.net",
+  "url": "www.entangledtechnologies.net",
+  "protocol": "Formal + Empirical",
+  "axioms": 0,
+  "sorry": 0,
+  "mathlib_deps": [],
+  
+  "gates": {
+    "gematria": "OFF",
+    "abjad": "OFF", 
+    "religious": "OFF",
+    "provenance": "ON",
+    "ai_attribution": "OFF"
+  },
+
+  "modules": {
+    "A_H4Core": {
+      "task": 324,
+      "file": "H4Core.lean",
+      "sha256": "48536d9de40d89dd598534c044fefa517057f736a376f784c8beae38575ba997",
+      "status": "PROVEN",
+      "desc": "Z[tau]/Quat engine + 960-int vflat table + exact W(H4) action",
+      "symOf_values": {
+        "2": 120,
+        "3": 20, 
+        "19": 2,
+        "191": 2,
+        "1000000001119": 1
+      }
+    },
+
+    "A1_H4Boundary": {
+      "task": 325,
+      "file": "H4Boundary.lean",
+      "depends": ["H4Core.lean"],
+      "status": "EMPIRICAL",
+      "C13": 13,
+      "P5_13digit": 1000000001119,
+      "law": "digit_len p >= 13 → Sym p = 1",
+      "boundary_test": true,
+      "samples_tested": 9,
+      "counterexamples": 0
+    },
+
+    "E_TimeBound": {
+      "task": 326,
+      "file": "H4TimeBound.lean",
+      "depends": ["H4Core.lean"],
+      "status": "EMPIRICAL",
+      "N40": 40,
+      "TimeHorizon": "12157665459056928801",
+      "C13_digit_min": "1000000000000",
+      "conclusion": "3^40 over-conservative by 7 orders of magnitude",
+      "min_lt_horizon": true
+    },
+
+    "D_Derivation": {
+      "task": 327,
+      "file": "H4Derivation.lean",
+      "depends": ["H4Core.lean"],
+      "sha256": "e21ae1ba9990fdb560fd851c56964b4439aefeeab217f5c5fc48ddd50a2ee2b2",
+      "status": "CONJECTURE",
+      "C13_val": "PROVEN",
+      "C13_Law_Open": "UNPROVEN",
+      "boundary_proven": true,
+      "theorem": "∀ p, p.Prime → digit_len p ≥ 13 → Sym p = 1",
+      "empirical_support": "6/6 13-digit samples",
+      "axioms": 0,
+      "sorry": 0
+    }
+  },
+
+  "core_laws": {
+    "primary": "C13 := 13. digit_len p ≥ 13 → Sym p = 1 [CONJECTURE]",
+    "secondary": "3^40 := TimeHorizon. DEMOTED. Not causal.",
+    "N40_derivation": "40 = 1419/35.475. Not fundamental."
+  },
+
+  "forbidden_terms": ["island", "wilderness", "messiah", "musa", "claude", "muse", "ai"],
+  "output_requirements": {
+    "pdf_author": "D. Fox",
+    "colophon": "COLOPHON.md only",
+    "data_file": "data.json",
+    "no_forbidden_terms_in_lean": true
+  },
+
+  "claude_instructions": {
+    "step1": "Verify H4Core.lean SHA 48536d9d...ba997 compiles. #eval [2,3,19,191,1000000001119].map symOf = [120,20,2,2,1]",
+    "step2": "Verify H4Boundary.lean. Confirm C13=13. Confirm P5=1000000001119 has digit_len=13, Sym=1",
+    "step3": "Verify H4TimeBound.lean. Confirm 10^12 < 3^40. Confirm all 13-digit samples Sym=1",
+    "step4": "Verify H4Derivation.lean SHA e21ae1ba...e2b2. Confirm C13_Law_Open status: UNPROVEN, empirical: true",
+    "step5": "STOP. Do not assert ∀ law. Do not use sorry. Report only computed results.",
+    "step6": "Update replit.md with BUILD_MANIFEST.json v2.3 status table."
+  }
+}

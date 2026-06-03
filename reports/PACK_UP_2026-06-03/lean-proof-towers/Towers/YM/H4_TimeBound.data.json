@@ -1,0 +1,31 @@
+{
+  "module": "E_TimeBound",
+  "task": 326,
+  "author": "D. Fox",
+  "orcid": "0009-0008-1290-6105",
+  "status": "EMPIRICAL",
+  "engine": "Towers.YM.H4Core",
+  "decode": "natAbs-euclidean-remainder",
+  "source": "computed by H4Core.symOf and (toString p).length; NOT hardcoded",
+  "N40": 40,
+  "TimeHorizon_3_40": 12157665459056928801,
+  "C13_digit_min_10_12": 1000000000000,
+  "witnesses": [
+    { "id": "P5_13", "p": 1000000001119, "digit_len": 13, "sym": 1, "below_3_40": true },
+    { "id": "P6",    "p": 1000000001357, "digit_len": 13, "sym": 1, "below_3_40": true },
+    { "id": "P7",    "p": 1000000001511, "digit_len": 13, "sym": 1, "below_3_40": true },
+    { "id": "P8",    "p": 1000000001723, "digit_len": 13, "sym": 1, "below_3_40": true },
+    { "id": "P9",    "p": 1000000001831, "digit_len": 13, "sym": 1, "below_3_40": true },
+    { "id": "P10",   "p": 1000000002111, "digit_len": 13, "sym": 1, "below_3_40": true }
+  ],
+  "time_bound_test_all": true,
+  "empirical_sample_check": {
+    "p_gt_1e12_implies_sym_eq_1": { "holds_on_sample": true, "n": 6 }
+  },
+  "honest_findings": [
+    "On this 6-point 13-digit sample, symOf = 1 for every p > 10^12, and every p is far below 3^40 (~1.216e19).",
+    "10^12 < 3^40 by ~7 orders of magnitude; as a collapse horizon, 3^40 sits far above where the sample collapse is first seen.",
+    "SAMPLE observation only: NOT a proof that every p > 10^12 has Sym = 1, and NOT a proof that 10^12 is a universal boundary.",
+    "'TimeHorizon'/3^40 carries no dynamical or temporal meaning here; it is just an integer the witnesses are compared against."
+  ]
+}

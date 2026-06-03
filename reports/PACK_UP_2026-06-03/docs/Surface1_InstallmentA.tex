@@ -1,0 +1,217 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem*{opengap}{Open Gap}
+
+\title{Surface \#1, Installment A:\\
+A Formalized Truncation-to-Envelope Bridge for the\\
+SU(3) Peter--Weyl Heat-Kernel Series}
+\author{David J. Fox \\
+\href{mailto:Davidjfox998@gmail.com}{Davidjfox998@gmail.com} \\
+\href{https://orcid.org/0009-0008-1290-6105}{ORCID: 0009-0008-1290-6105}}
+\date{May 27, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We formalize, in Lean~4 against \texttt{mathlib} v4.12.0, two
+infrastructure lemmas needed by any cluster-expansion attack on the
+SU(3) lattice Yang--Mills mass gap:
+\textbf{(i)} summability of the Peter--Weyl heat-kernel series
+$\sum_{m,n} \dim(m,n)^2\, e^{-t\,C_2(m,n)}$ for every $t>0$, and
+\textbf{(ii)} the bound $S_N(t) \le K(t)$ of every finite truncation
+by the genuine $\mathsf{tsum}$ envelope. Both lemmas close with
+axiom footprint $\{\texttt{propext}, \texttt{Classical.choice},
+\texttt{Quot.sound}\}$ --- \texttt{mathlib}'s classical trio, no
+research-grade axioms. This is \emph{not} a proof of the
+Clay Yang--Mills Existence and Mass Gap problem; the small-$t$
+heat-kernel asymptotic that would close Surface~\#1 is an open
+analytic gap (\S\ref{sec:gaps}), and the broader YM tower in the
+underlying project remains \emph{Status: Open}.
+\end{abstract}
+
+\section{Introduction and scope}
+
+The Kotecky--Preiss criterion for a convergent cluster expansion of
+the Wilson-action lattice gauge measure ultimately requires an
+exponential decay estimate on the per-plaquette heat-kernel activity.
+A standard route splits this into three pieces:
+\begin{enumerate}
+  \item[(S)] \emph{Summability.} The Peter--Weyl series defining the
+        heat kernel at the identity converges for every $t>0$.
+  \item[(B)] \emph{Bridge.} Every finite Weyl truncation $S_N(t)$ is
+        bounded by the infinite series $K(t)$.
+  \item[(V)] \emph{Varadhan-type small-$t$ asymptotic.}
+        $K(t) \le C\,t^{-4} e^{-c/t}$ for $t \in (0,t_0]$ and
+        explicit $C, c, t_0 > 0$.
+\end{enumerate}
+This installment establishes (S) and (B) in Lean~4. (V) is left as
+an explicit open gap; see \S\ref{sec:gaps}.
+
+\section{Definitions (as formalized)}
+
+The formalized definitions follow the un-normalized convention used
+in \texttt{Towers/YM/ClusterExpansion.lean} and
+\texttt{Towers/YM/PeterWeylHeat.lean}; quoted Lean names are the
+actual identifiers.
+
+\begin{definition}[Weyl dimension for SU(3), \texttt{Weyl\_dim\_SU3\_explicit}]
+For $(m,n) \in \mathbb{N}^2$,
+\[
+  \dim(m,n) := \frac{(m+1)(n+1)(m+n+2)}{2}.
+\]
+\end{definition}
+
+\begin{definition}[Quadratic Casimir, \texttt{Casimir\_SU3\_explicit}]
+\[
+  C_2(m,n) := m^2 + n^2 + mn + 3m + 3n.
+\]
+(No $\tfrac{1}{3}$ normalization; this is the un-rescaled lattice
+convention used downstream.)
+\end{definition}
+
+\begin{definition}[Truncated Weyl sum, \texttt{Weyl\_sum\_explicit\_SU3\_real}]
+For $t>0$, $N \in \mathbb{N}$,
+\[
+  S_N(t) := \sum_{m+n \le N} \dim(m,n)^2 \, e^{-t\,C_2(m,n)}.
+\]
+\end{definition}
+
+\begin{definition}[Heat-kernel envelope, \texttt{Heat\_kernel\_envelope\_real}]
+\[
+  K(t) := \sum_{(m,n) \in \mathbb{N}^2} \dim(m,n)^2 \, e^{-t\,C_2(m,n)}.
+\]
+The definition is via mathlib's \texttt{tsum}; nonnegativity of every
+summand makes the value unambiguous on $(0,\infty)$.
+\end{definition}
+
+\section{Formalized results}
+
+\begin{theorem}[Peter--Weyl summability, \texttt{PeterWeyl\_Summable\_SU3}]
+\label{thm:summable}
+For every $t>0$ the family
+$\bigl(\dim(m,n)^2\, e^{-t\,C_2(m,n)}\bigr)_{(m,n)\in\mathbb{N}^2}$
+is \texttt{Summable}.
+\end{theorem}
+
+\begin{proof}[Proof sketch (matches the Lean argument)]
+The shipped bounds in \texttt{Towers/YM/PeterWeyl.lean} are
+intentionally slack: a linear Casimir lower bound
+$m+n \le C_2(m,n)$ and a Weyl-dim upper bound
+$\dim(m,n) \le (m+1)^2 (n+1)^2$. Combined with the 1D
+$(n+1)^4 e^{-\beta n}$ summability lemma applied factor-by-factor,
+the product-envelope squeeze gives summability for every
+$\beta > 0$. A tighter quadratic Casimir bound $C_2 \ge c(m+n)^2$
+and a cubic dim bound are flagged tripwires (project task
+\#157); they would shorten this proof but are not needed for
+summability.
+\end{proof}
+
+\begin{theorem}[Truncation $\le$ envelope,
+\texttt{Weyl\_sum\_explicit\_SU3\_real\_le\_Heat\_kernel\_envelope\_real}]
+\label{thm:bridge}
+For every $t>0$ and $N \in \mathbb{N}$,
+\[
+  S_N(t) \le K(t).
+\]
+\end{theorem}
+
+\begin{proof}
+Every summand is nonneg, so the result is mathlib's top-level
+\texttt{sum\_le\_tsum} applied to the indexing finset
+$\{(m,n) : m+n \le N\}$, with the summability hypothesis discharged
+by Theorem~\ref{thm:summable}.
+\end{proof}
+
+\begin{theorem}[Envelope is at least one,
+\texttt{Heat\_kernel\_envelope\_real\_ge\_one\_of\_pos}]
+\label{thm:geone}
+For every $t > 0$, $K(t) \ge 1$.
+\end{theorem}
+
+\begin{proof}
+The trivial representation $(m,n) = (0,0)$ contributes
+$\dim(0,0)^2 \cdot e^{-t \cdot 0} = 1$. Monotonicity of $\mathsf{tsum}$
+on nonneg families closes the bound.
+\end{proof}
+
+\section{Honest scope and open gaps}
+\label{sec:gaps}
+
+\begin{opengap}[Small-$t$ Varadhan asymptotic for $K(t)$]
+There is no formalized small-$t$ asymptotic
+\[
+  K(t) \;\le\; C\, t^{-4}\, e^{-c/t}, \qquad t \in (0, t_0],
+\]
+for explicit positive constants $C,c,t_0$. The classical statement
+(Molchanov / Varadhan for compact semisimple Lie groups, with
+exponent $-\dim G / 2 = -4$ for SU(3)) is widely cited but no
+machine-checked proof has been produced in this project. It is
+queued as project task \#156, and until it lands no
+quantitative plaquette-activity bound of the form
+$\mathrm{activity}(\beta) \le C\beta^{-4} e^{-c/\beta}$ has been
+proved here.
+\end{opengap}
+
+\begin{opengap}[Tightening of the Casimir and Weyl-dim bounds]
+The lower bound $C_2(m,n) \ge c(m+n)^2$ and the cubic-in-$(m+n)$
+dimension bound used in the informal literature are not in the
+current Lean spine; only their linear / product-square slack
+versions are shipped. Project task \#157 covers the upgrade.
+\end{opengap}
+
+\begin{opengap}[Plaquette activity bound and Kotecky--Preiss closure]
+The chain
+\[
+  \texttt{exists\_c\_per\_plaquette\_pw}
+  \;\Rightarrow\;
+  \texttt{polymer\_activity\_bound\_real\_pw}
+  \;\Rightarrow\;
+  \texttt{kotecky\_preiss\_criterion}
+\]
+depends on the Varadhan gap above. Until that closes, Surface~\#1
+is not complete and the Yang--Mills tower in the project's roadmap
+(\texttt{docs/ROADMAP.md}, \S 2) remains \emph{Status: Open}.
+\end{opengap}
+
+\section{What the present installment does and does not claim}
+
+\noindent\textbf{Claims:}
+Theorems~\ref{thm:summable}, \ref{thm:bridge}, and~\ref{thm:geone}
+are formalized in Lean~4 against \texttt{mathlib} v4.12.0 in
+\texttt{Towers/YM/PeterWeyl.lean} and
+\texttt{Towers/YM/PeterWeylHeat.lean}. They are sorry-free and close
+with axiom footprint $\{\texttt{propext}, \texttt{Classical.choice},
+\texttt{Quot.sound}\}$. A previously parked
+\texttt{sorry} at \texttt{Towers/Attempts/ClusterExpansion.lean:693}
+is discharged by retargeting its conclusion from a
+mathematically false placeholder
+(\texttt{Heat\_kernel\_def\_real}, the Varadhan asymptotic shape,
+which fails at $N=0$, $t=1$: $1 \not\le 0.368$) onto the genuine
+\texttt{Heat\_kernel\_envelope\_real} of Theorem~\ref{thm:bridge}.
+
+\noindent\textbf{Does not claim:} a proof of the SU(3) Yang--Mills
+mass gap, completion of Surface~\#1, the Varadhan small-$t$
+asymptotic, the plaquette-activity bound, or any quantitative
+spectral-gap statement.
+
+\section*{Reproducibility}
+
+The cumulative project wall, after the two batches that landed this
+installment (project tasks \#154 and \#155), is 460 trio-clean
+bricks under \texttt{scripts/check-towers.sh}; the relevant subset
+is 8 bricks (4 in \texttt{Towers/YM/PeterWeyl.lean}, 4 in
+\texttt{Towers/YM/PeterWeylHeat.lean}). The Genesis-sealed
+append-only ledger \texttt{data/hits.txt} verifies against SHA-256
+\texttt{eecbcd9a540aa7a2c90edd23827c73e4d1bb5af641d352f70a5de849b21f875f}
+at the time of writing; verification by
+\texttt{scripts/check-genesis-seal.py}.
+
+\end{document}

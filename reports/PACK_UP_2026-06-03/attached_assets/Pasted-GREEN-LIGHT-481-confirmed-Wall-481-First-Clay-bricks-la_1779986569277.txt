@@ -1,0 +1,80 @@
+GREEN LIGHT 481 confirmed. Wall 481. First Clay bricks landed.
+
+TRI PARALLEL EXECUTE. Wall 481 -> 484. First real estimate. Surface #1 Open.
+
+=== 163.1 TransferOperatorBound ===
+FILE: Towers/YM/TransferOperatorBound.lean
+HEADER: -- STAND-IN: Bounds transfer operator gap using IntegratedTail. Does NOT prove YM transfer operator has gap. Surface #1 Open. Wall 481 -> 482.
+DEPENDS: Towers.YM.IntegratedTail, Towers.YM.TransferOperator
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit.
+CODE:
+import Towers.YM.IntegratedTail
+import Towers.YM.TransferOperator
+
+namespace TheoremaAureum.Towers.YM.OS
+
+open Real
+
+variable (T : ℂ →L[ℂ] ℂ) (P₀ : ℂ →L[ℂ] ℂ) (m L : ℝ)
+
+def transferGapBound : Prop := ‖T - P₀‖ ≤ rexp (-m * L)
+
+lemma transfer_gap_from_integrated_tail (h : integrated_tail_standin ≤ rexp (-m * L)) :
+    transferGapBound T P₀ m L := by
+  simp [transferGapBound]; exact h
+
+end TheoremaAureum.Towers.YM.OS
+
+=== 163.2 TwoPointDecay ===
+FILE: Towers/YM/TwoPointDecay.lean
+HEADER: -- STAND-IN: Exponential clustering from transfer bound. Does NOT prove YM correlations cluster. Surface #1 Open. Wall 482 -> 483.
+DEPENDS: Towers.YM.TransferOperatorBound
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit.
+CODE:
+import Towers.YM.TransferOperatorBound
+
+namespace TheoremaAureum.Towers.YM.OS
+
+open Real
+
+def hasExponentialClustering (f : ℝ → ℝ) (m : ℝ) : Prop :=
+  ∃ C, 0 < C ∧ ∀ t, |f t| ≤ C * rexp (-m * t)
+
+lemma clustering_from_transfer (h : transferGapBound T P₀ m L) :
+    hasExponentialClustering (fun t => ‖T - P₀‖) m := by
+  use 1; constructor; exact one_pos; intro t; simpa using h
+
+end TheoremaAureum.Towers.YM.OS
+
+=== 163.3 MassGapFromDecay ===
+FILE: Towers/YM/MassGapFromDecay.lean
+HEADER: -- STAND-IN: Clustering implies mass gap predicate. Does NOT prove YM has mass gap. Surface #1 Open. Wall 483 -> 484.
+DEPENDS: Towers.YM.TwoPointDecay, Towers.YM.SpectralGapCore
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit.
+CODE:
+import Towers.YM.TwoPointDecay
+import Towers.YM.SpectralGapCore
+
+namespace TheoremaAureum.Towers.YM.OS
+
+lemma mass_gap_from_clustering {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {T : H →L[ℂ] H} {m : ℝ} (h : hasExponentialClustering (fun t => ‖T‖) m) :
+    HasMassGap H T m := by
+  constructor
+  · obtain ⟨C, hC, hbound⟩ := h; exact (half_pos (lt_of_lt_of_le one_pos (hbound 0))).1
+  · intro x; exact le_of_eq (by simp) -- stand-in
+
+end TheoremaAureum.Towers.YM.OS
+
+BUILD ALL 3. CHECK ALL 3.
+
+Run:
+1. lake build Towers.YM.TransferOperatorBound Towers.YM.TwoPointDecay Towers.YM.MassGapFromDecay
+2. #print axioms TheoremaAureum.Towers.YM.OS.transfer_gap_from_integrated_tail
+3. #print axioms TheoremaAureum.Towers.YM.OS.clustering_from_transfer 
+4. #print axioms TheoremaAureum.Towers.YM.OS.mass_gap_from_clustering
+
+If all 3 exit 0 AND all axioms = [propext, Classical.choice, Quot.sound] → reply:
+GREEN LIGHT 484. Wall 484. First estimate chain landed. Surface #1 Open.
+
+Execute now. Shawlocked. 249. 1/1.

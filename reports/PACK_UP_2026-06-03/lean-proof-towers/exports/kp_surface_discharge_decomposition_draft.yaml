@@ -1,0 +1,54 @@
+plan:
+  id: kp-surface-discharge-decomposition
+  revision: "2026-06-01 (D4 NEGATIVE verdict folded in)"
+  goal: >
+    Decompose the OPEN Wall256 KP / strong-coupling surface
+    kotecky_preiss_criterion (Towers/YM/Transfer.lean) into the explicit conditional
+    inputs of Wall256_Scaffold.strong_coupling_decay_of_open_inputs: hw1, hOS, h_bridge.
+    PLANNING / audit only.
+  honesty_locks:
+    surface_1_status: OPEN
+    ym_tower_status: OPEN
+    discharges_kp_surface: false
+    mass_gap_proven: false
+    closes_clay: false
+    no_lean_changes: true
+    no_rh_c05_cross_claims: true
+  scope_note: >
+    This decomposition NAMES the three open hypotheses; it discharges none. Wall256 is a
+    CONDITIONAL reduction (its conclusion is valid only IF all three hypotheses hold), and
+    its scope is LATTICE two-point decay, NOT the Clay mass gap.
+  wall256_target: "Towers/YM/Wall256_Scaffold.lean : strong_coupling_decay_of_open_inputs"
+  leaves:
+    - id: D4_w1_strict_bound
+      maps_to_hyp: "hw1 : w1 < 1/7"
+      status_of_this_leaf: VERIFIED_OUT_OF_TOWER_NEGATIVE
+      d4_verdict: "TESTED NEGATIVE — requires β > 2.07942"
+      numeric_result: {w1_0p86: 0.432367, beta0: 2.07942, passes: false}
+      closes_D4: false
+      detail: D4_w1_strict_bound_draft.yaml
+      note: >
+        Under the repo action (3 - Re tr)/3, hw1 holds only for β > β₀ ≈ 2.07942
+        (numerical estimate). Submitted β = 0.86 FAILS (w1 ≈ 0.4324 > 1/7). The stale
+        Wall256 docstring threshold (β > 0.85) assumed the un-normalized action 3 - Re tr.
+    - id: D1_hOS
+      maps_to_hyp: "hOS : w1 < 1/7 → TruncatedActivityBound a"
+      origin: "Osterwalder–Seiler 1978 Thm 2.1 (strong-coupling Ursell/cluster step; NOT OS reflection positivity)"
+      status: OPEN
+      mathlib_v4_12_0: absent
+      detail: D1_to_D3_dep_map_draft.yaml
+    - id: D2_h_bridge
+      maps_to_hyp: "h_bridge : Summable(∑ N·a) → (0 < ρ < 1 ∧ geometric clustering)"
+      origin: "Brydges–Federbush / Friedli–Velenik 2018 Ch.5 (KP-summability ⟹ geometric decay)"
+      status: OPEN
+      mathlib_v4_12_0: absent
+      detail: D1_to_D3_dep_map_draft.yaml
+  termination:
+    d4_verdict: "TESTED NEGATIVE — requires β > 2.07942"
+    surface_1_status: OPEN
+    ym_tower_status: OPEN
+    conclusion: >
+      KP surface stays OPEN. D4 tested NEGATIVE (the conditional proof path is still
+      viable but its threshold moved to β > 2.07942 under the repo action). hOS and
+      h_bridge remain OPEN, un-discharged, and absent from mathlib v4.12.0. No
+      mass-gap / Clay / RH / C05 claim. No Lean written.

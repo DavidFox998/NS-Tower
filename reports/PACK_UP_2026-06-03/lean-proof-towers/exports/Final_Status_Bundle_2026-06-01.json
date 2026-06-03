@@ -1,0 +1,56 @@
+{
+  "bundle_id": "Final_Status_Bundle_2026-06-01",
+  "generated": "2026-06-01",
+  "mode": "TERMINATE",
+  "scope": "Lock Wall256_Scaffold post-β₀ wiring. No mass-gap / μ>0 / Clay / RH claims. M7/GRH/C05 tower stays SEPARATE from YM.",
+  "certs": [
+    {
+      "id": "D4_w1_NEGATIVE",
+      "artifact": "lean-proof-towers/exports/D4_w1_NEGATIVE_Certificate_2026-06-01.pdf",
+      "sha": "9a794ccf0c707812e6fa3db2095a350f2d5b61a011fcc77e453c548716ac8764",
+      "status": "VERIFIED_OUT_OF_TOWER_NEGATIVE",
+      "note": "w1(0.86)=0.432367 > 1/7; D4 FAILS. The template-supplied sha 9a00f110… was the Big_Day_Status_2026-06-01.md digest, NOT this PDF; corrected to the actual D4 certificate digest."
+    },
+    {
+      "id": "CERT_Arb_beta0",
+      "artifact": "lean-proof-towers/exports/CERT_Arb_beta0.pdf",
+      "sha": "b5a9f0a7666a91f283a7d4531ae99dff2097c2cedef10424b77833b7bbc840d3",
+      "status": "VERIFIED_OUT_OF_TOWER",
+      "note": "β₀ ∈ [2.079416880123, 2.079416880124]; mpmath.iv N=36, tail ≤ 4.46e-32. Discharges ZERO Lean obligations."
+    },
+    {
+      "id": "D1_to_D3_Plan",
+      "artifact": "lean-proof-towers/exports/D1_to_D3_Plan.md",
+      "sha": "a40422fe7595ebc2c3c7d8d4b80a2c5645431ac1a52f3699c732562d4574b553",
+      "status": "EXECUTED_IN_TOWER_DOCS_ONLY",
+      "note": "bare proof-term sorry count = 0; open Props hw1/hOS/h_bridge/YM_mass_gap_Surface."
+    }
+  ],
+  "related_status_doc": {
+    "id": "Big_Day_Status",
+    "artifact": "lean-proof-towers/exports/Big_Day_Status_2026-06-01.md",
+    "sha": "9a00f1106bf93da155d8366521579eeec17bcacd2f4aea62fbcd0159dedfc7d1"
+  },
+  "lean_commit": "ac241de37a86e53298d80071c2b43cd0243a1f53",
+  "lean_file": "lean-proof-towers/Towers/YM/Wall256_Scaffold.lean",
+  "lean_verification": {
+    "compiles": true,
+    "method": "direct-lean bypass (v4.12.0 tag unresolved, lake env avoided)",
+    "exit_code": 0,
+    "hw1_signature": "(w1 : ℝ → ℝ) (b : ℝ) (hb : Beta0Certified b) (hsurf : Hw1_Surface w1 b) : ∀ β, β > b → w1 β < 1/7 := hsurf hb",
+    "beta0_certified": "Beta0Certified (b:ℝ) := (beta0_lo:ℝ) ≤ b ∧ b ≤ (beta0_hi:ℝ); beta0_lo=2079416880123/10^12, beta0_hi=2079416880124/10^12 (exact rationals from CERT_Arb)",
+    "no_sorry": true,
+    "no_axiom": true,
+    "axiom_footprint": ["propext", "Classical.choice", "Quot.sound"]
+  },
+  "honesty_locks": {
+    "closes_surface_1": false,
+    "surface_1_status": "OPEN",
+    "ym_tower_status": "OPEN",
+    "no_rh_claims_in_ym_certs": true,
+    "m_gt_0_claimed": false,
+    "mass_gap_proven": false,
+    "m7_grh_c05_tower": "SEPARATE_FROM_YM"
+  },
+  "next_work": ["hOS", "h_bridge", "formalize Beta0Certified→hw1 bridge"]
+}

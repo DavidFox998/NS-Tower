@@ -1,0 +1,31 @@
+{
+  "module": "A_H4Core",
+  "task": 324,
+  "author": "D. Fox",
+  "orcid": "0009-0008-1290-6105",
+  "engine_file": "Towers/YM/H4Core.lean",
+  "leaf_file": "Towers/YM/H4_Strata_Ztau.lean",
+  "status": "PROVEN",
+  "desc": "Z[tau]/Quat engine + 960-int vflat table + exact W(H4) action (order 14400)",
+  "lean_file_hash_sha256": {
+    "H4Core.lean": "aa8c118048652b2aec592ee287479ca01098ec233738fb9b20fdb06b22b1a6ce",
+    "H4_Strata_Ztau.lean": "69bdcd6cebe725aa50b68ef3926489563c81fc8842989f5e0a209c9a3d76ca34"
+  },
+  "manifest_record_sha_note": "BUILD_MANIFEST v2.3 lists A SHA 48536d9d...ba997; that is the prose milestone RECORD hash, NOT a file hash. Actual file hashes are recorded above.",
+  "symOf_values": {
+    "2": 120,
+    "3": 20,
+    "19": 2,
+    "191": 2,
+    "1000000001119": 1
+  },
+  "axiom_free_kernel_facts": ["tau_sq (tau^2 = tau + 1)", "vflat_card (vflat.length = 960)"],
+  "axioms": 0,
+  "sorry": 0,
+  "honest_findings": [
+    "symOf [2,3,19,191,1000000001119] = [120,20,2,2,1] (computed by the real W(H4) action; NOT hardcoded).",
+    "symOf 19 = 2, NOT 20 (David's conjectured [120,20,20,2,1] came from a different signed decode).",
+    "Sym(origin) = 14400, Sym(vertex) = 120.",
+    "Pure finite geometry: proves NO YM/NS/RH/Bost/BSD result and makes NO mass-gap/Surface-#1 claim."
+  ]
+}

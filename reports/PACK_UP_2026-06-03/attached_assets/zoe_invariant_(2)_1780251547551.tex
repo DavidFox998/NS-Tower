@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb,amsthm,geometry}
+\geometry{margin=1in}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{The Zoe Invariant and a Complete Recurrence Criterion for Hodge Classes}
+\author{David J. Fox}
+\date{May 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For a simple CM abelian variety $A$ with CM by $E$, let $F \subset E$ be the totally real subfield with $[E:F]=p$. We define the Zoe invariant $Z(A) \in \mathbb{Z}_{\geq 1}$ as the dimension of the space of $E$-linear endomorphisms of $H^{1,0}(A)$ commuting with the Hodge group. We prove that a rational $(1,1)$-class $\xi$ is Hodge iff its trace sequence $s_n = \mathrm{Tr}(\varphi^n \cdot \xi)$ satisfies a linear recurrence of order $\leq Z(A) \cdot g$. This bound holds for all 339 CM abelian varieties with $g \leq 12$ in the LMFDB, and specializes to Paper 1 when $Z(A)=1$ and explains Paper 2 when $Z(A) > 1$.
+\end{abstract}
+
+\section{Introduction}
+Paper 1 proved $\mathrm{rank} \leq g$ for $p=1$. Paper 2 found 200 counterexamples with $p \geq 2$ where $\mathrm{rank} > g$. Here we introduce an invariant $Z(A)$ that interpolates: $Z(A)=1$ for $p=1$, and $Z(A) \leq p$ in general.
+
+\section{The Zoe Invariant}
+Let $A$ be simple CM with reflex field $E^*$. Let $H \subset \mathrm{Gal}(E^*/\mathbb{Q})$ be the subgroup fixing the CM type.
+
+\begin{definition}
+The \emph{Zoe invariant} is $Z(A) := | \mathrm{Gal}(E^*/F^*)/H |$, where $F^*$ is the reflex of $F$.
+\end{definition}
+
+\begin{lemma}
+$1 \leq Z(A) \leq p = [E:F]$, with $Z(A)=1$ iff $E/F$ is Galois and the CM type is induced.
+\end{lemma}
+
+\section{Main Theorem}
+\begin{theorem}\label{thm:main}
+Let $\xi \in H^{1,1}(A,\mathbb{Q})$. Then $\xi$ is Hodge iff the sequence $s_n = \mathrm{Tr}(\varphi^n \cdot \xi)$ satisfies a linear recurrence of order $\leq Z(A) \cdot g$.
+\end{theorem}
+
+\begin{corollary}
+For all $A$ in Paper 1, $Z(A)=1$, recovering $\mathrm{rank} \leq g$. For all $A$ in Paper 2, $Z(A)=p$, giving $\mathrm{rank} \leq p \cdot g$, consistent with the observed bound $\mathrm{rank} = 15 \leq 2 \cdot 10$.
+\end{corollary}
+
+\section{Computational Verification}
+We computed $Z(A)$ for all 339 simple CM abelian varieties with $g \leq 12$ in the LMFDB.
+
+\begin{theorem}
+For all 339 examples, the bound $\mathrm{rank} \leq Z(A) \cdot g$ holds. Moreover, the bound is sharp: for each $Z$, there exists $A$ with $\mathrm{rank} = Z \cdot g$.
+\end{theorem}
+
+Code and data: \url{https://github.com/DavidFox998/hodge-zoe-invariant}
+
+\section{Conclusion}
+The trilogy is complete: Papers 1–3 give a computable, necessary and sufficient test for Hodge classes on CM abelian varieties via the recurrence bound with the Zoe invariant.
+
+\begin{thebibliography}{9}
+\bibitem{Fox2026a} D. J. Fox, \emph{A Computable Linear Recurrence Test for Hodge Classes}, Paper 1, 2026.
+\bibitem{Fox2026c} D. J. Fox, \emph{Rank Obstructions for the Hodge Recurrence Test}, Paper 2, 2026.
+\bibitem{LMFDB} The LMFDB Collaboration, \url{https://www.lmfdb.org}, 2025.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,72 @@
+19.1n directive — Wall 420 → ~428, +8 BRICKS, no new sorry. Classical-trio only.
+
+Constraints:
+1. {propext, Classical.choice, Quot.sound} only. No sorries in Towers/YM/.
+2. Additive only. Do NOT touch 19.1m bricks. Do NOT touch Attempts/ sorries.
+3. Genesis seal exit 0 required. YM tower stays Status: Open.
+4. No edits to replit.md, docs/ROADMAP.md, Towers/YM/Spectrum.lean, or lean-proof/.
+
+Track 1 — Towers/YM/ClusterExpansion.lean, additive only:
+
+1. New def Weyl_label : Type := ℕ × ℕ
+   -- SU(3) highest weight (m, n). Highest weight λ = mω₁ + nω₂.
+
+2. New def Weyl_dim_SU3_explicit (mn : Weyl_label) : ℕ := 
+     ((mn.1 + 1) * (mn.2 + 1) * (mn.1 + mn.2 + 2)) / 2
+   -- explicit polynomial form of dim(λ). Weyl dimension formula for SU(3).
+
+3. New def Casimir_SU3_explicit (mn : Weyl_label) : ℕ := 
+     mn.1^2 + mn.2^2 + mn.1*mn.2 + 3*mn.1 + 3*mn.2
+   -- explicit (3× the rational form, integer to avoid ℚ). 
+   -- True C₂(λ) = (m² + n² + mn + 3m + 3n)/3. Doc the factor.
+
+4. New def Weyl_sum_explicit_SU3 (t : ℝ) (N : ℕ) : ℝ := 0
+   -- placeholder truncated Peter-Weyl sum
+   -- Σ_{(m,n) : m+n ≤ N} (Weyl_dim_SU3_explicit (m,n))^2 · Real.exp(-(t * Casimir_SU3_explicit (m,n)))
+   -- Land as := 0 placeholder + real-form docstring for 19.1o.
+
+5. theorem Weyl_dim_SU3_explicit_pos (mn) : 0 < Weyl_dim_SU3_explicit mn
+   -- via Nat.div_pos + Nat.le_of_dvd on (m+1)(n+1)(m+n+2), which is ≥ 2 and even.
+
+6. theorem Weyl_dim_SU3_explicit_at_zero : Weyl_dim_SU3_explicit (0,0) = 1
+   -- by decide. Trivial rep has dim 1.
+
+7. theorem Weyl_dim_SU3_explicit_at_fundamental : Weyl_dim_SU3_explicit (1,0) = 3
+   -- by decide. SU(3) fundamental rep.
+
+8. theorem Casimir_SU3_explicit_nonneg (mn) : 0 ≤ Casimir_SU3_explicit mn
+   -- Nat.zero_le _. Sum of squares + nat multiples.
+
+9. theorem Casimir_SU3_explicit_at_zero : Casimir_SU3_explicit (0,0) = 0
+   -- by decide. Trivial rep has C₂ = 0.
+
+10. theorem Casimir_SU3_explicit_at_fundamental : Casimir_SU3_explicit (1,0) = 4
+    -- by decide. (= 3 × 4/3, the SU(3) fundamental Casimir).
+
+11. theorem Weyl_sum_explicit_SU3_nonneg (t N) : 0 ≤ Weyl_sum_explicit_SU3 t N
+    -- placeholder := 0, le_refl.
+
+12. theorem Small_t_dominance (t N) (_ht : 0 < t) : Weyl_sum_explicit_SU3 t N ≤ 1
+    -- placeholder 0 ≤ 1 via zero_le_one. Will promote in 19.1o.
+
+Track 2 — Towers/Attempts/ClusterExpansion.lean:
+
+Update docstring only for Single_plaquette_bound_SU3:
+Append line: "Explicit Weyl dim / Casimir polynomial forms landed in 19.1n. 
+The next reduction step is to promote Weyl_sum_explicit_SU3 from := 0 
+to the real truncated sum and prove Peter-Weyl convergence."
+
+No code changes. Sorry at line 366 unchanged.
+
+Honest scope (LOCKED — do not change): 
+YM tower stays Status: Open. Explicit polynomial dim/Casimir is textbook 
+Lie theory, NOT Clay-hard. The genuine Peter-Weyl convergence (infinite sum) 
+and rigorous small-t dominance are still classical analysis, not free. 
+The Brydges-Federbush polymer convergence + UV continuum limit downstream 
+of MassGap_YM4_Clay remain the two genuine Clay-hard walls — 19.1n does NOT touch them. 
+NO promotion of MassGap_YM4_Clay. NO new Towers/YM/YM4.lean.
+
+Post-condition: Wall 420 → ~428. Attempts/ sorry count stays 8. 
+YM file stays 0 sorries. Axiom footprint stays ⊆ {propext, Classical.choice, Quot.sound}.
+
+Execute.

@@ -1,0 +1,52 @@
+from mpmath import mp, zetazero, zeta
+from kernel import probe as _probe  # existing kernel.probe
+
+# === MODE 1: ZETA SNIPER === 
+# Uses mpmath.zetazero. Only hunts Riemann ζ. axioms=[] guaranteed.
+def zeta_sniper(n):
+    """Hit the nth Riemann zero exactly. No sweep, no guess."""
+    z = zetazero(n)  # mpmath's Odlyzko-Schönhage implementation
+    result = _probe(h=1, N=1, re_s=0.5, im_s=float(z.imag))
+    print(f"ZETA ZERO {n}: t={z.imag:.12f} |L|={result['L_abs']:.2e} sha={result['sha'][:16]}")
+    return result
+
+def zeta_burst(n_start, n_end):
+    """Log zeros n_start → n_end. This is hunt_zeros but renamed for clarity."""
+    for n in range(n_start, n_end + 1):
+        zeta_sniper(n)
+    return f"Logged {n_end-n_start+1} Riemann zeros. Genesis intact."
+
+# === MODE 2: DIRICHLET RADAR ===
+# (h,N) = (class_number, conductor). Only h=1 works on mpmath.
+def dirichlet_probe(N, re_s, im_s, char=0):
+    """Probe L(χ, s) for Dirichlet character mod N. char=0 = principal."""
+    if char != 0:
+        return {"tag": "NEEDS_SAGE", "reason": "non-principal chars require Sage"}
+    result = _probe(h=1, N=N, re_s=re_s, im_s=im_s)
+    if result['tag'] == 'MPMATH_DIRICHLET_TRIVIAL':
+        print(f"DIRICHLET N={N}: s={re_s}+{im_s}i |L|={result['L_abs']:.4f} sha={result['sha'][:16]}")
+    return result
+
+# === MODE 3: ELLIPTIC STUB ===
+# Reserves the namespace. Does NOT compute. Logs the intent.
+def elliptic_probe(label, re_s, im_s):
+    """Stub for L(E,s). label='37a1'. Returns NEEDS_SAGE receipt."""
+    # When Sage wired: from sage.all import EllipticCurve
+    # E = EllipticCurve(label); L = E.lseries(); return L(re_s + im_s*I)
+    result = {
+        "h": "EC", "N": label, "re": re_s, "im": im_s,
+        "tag": "NEEDS_SAGE", "reason": "elliptic_L_requires_sage",
+        "axioms": [], "RH_ok": None, "kms_beta": None
+    }
+    # Manually append to ledger with special tag
+    _append_line(result, "ELLIPTIC_STUB")
+    print(f"EC_STUB {label}: s={re_s}+{im_s}i logged NEEDS_SAGE sha={result['sha'][:16]}")
+    return result
+
+# === PROOF OF WORK ===
+def bracket_riemann_zero(n, eps=1e-6):
+    """Show |ζ| dips at zero n. Proves the gunsight isn't lying."""
+    z = zetazero(n)
+    t0 = float(z.imag)
+    scan_line(1, t0-eps, t0+eps, eps/5, 1)  # uses existing scan_line
+    print(f"Bracketed zero {n}: t={t0}. Check ledger for L_abs dip to ~1e-15")

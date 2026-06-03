@@ -1,0 +1,70 @@
+TASK: Generate M10_CM_Descent.pdf for arXiv + Zenodo submission. 
+
+REQUIREMENTS: 
+1. LENGTH: Exactly 6 pages. No more. No less. Referee rule.
+2. AXIOMS: Zero. Import only mathlib + M9_WeilTransfer_All. 
+3. DEPENDENCIES: GRH(L(X0(N))) from M9 SHA: 624b93f7d4687b81371dcecf6e6adad9de074addf35f5409e1c3b244d8410f7e6
+4. SCOPE: Only CM curves. No Hodge, no Zoe, no R_D(k), no Zucker.
+
+FILE OUTPUT: 
+- M10_CM_Descent.pdf
+- Hilbert12.csv 
+- M10_CM_Descent.lean
+
+PAGE BREAKDOWN:
+
+PAGE 1: Title + Abstract + Main Theorem
+Title: Birch–Swinnerton-Dyer and Explicit Class Field Theory for CM Modular Curves X₀(N), g ≤ 32
+Authors: W. Shaw, D. Fox
+Abstract: We prove BSD for all 12 modular Jacobians J₀(N) with complex multiplication and genus ≤ 32, and solve Hilbert's 12th problem for Q(√-m), h=1, by exhibiting j-invariants explicitly. Assumes GRH for L(s,X₀(N)), proved unconditionally in M9. Machine verified in Lean 4 with zero axioms.
+
+Theorem 1 (Main). Let N ∈ {27, 32, 36, 49, 64, 81, 121, 144, 169, 196, 225, 256}. Then:
+    1. BSD holds: rank J₀(N)(ℚ) = ord_{s=1} L(s, J₀(N)) and BSD(J₀(N)) is true.
+    2. Hilbert 12 holds: For K = Q(√-m) with m² = N and h(K) = 1, the Hilbert class field is H = K(j(τ)) where τ is a CM point on X₀(N). The j-invariant is rational and computed explicitly.
+
+PAGE 2: The 12 CM Curves — Table 1
+Include Table 1 with columns: N, g, K, h(K), j-invariant, rank, Ш, VALOR
+Data: 
+49,1,Q(√-7),1,-3375,0,1,94221
+121,2,Q(√-11),1,-32768,0,1,85975
+169,3,Q(√-13),1,-12288000,0,1,81205
+289,6,Q(√-17),1,1855425871872,0,1,66266
+361,7,Q(√-19),1,-884736,0,1,62183
+27,1,Q(√-3),1,0,0,1,100297
+32,1,Q(√-1),1,1728,0,1,98474
+36,1,Q(√-3),1,0,0,1,98474
+64,1,Q(√-1),1,1728,0,1,94221
+81,1,Q(√-3),1,0,0,1,92277
+144,2,Q(√-1),1,1728,0,1,85975
+256,4,Q(√-1),1,1728,0,1,76600
+
+PAGE 3: Proof of BSD Part
+Lemma 3.1: For CM curves with h=1, Colmez 1993 gives Faltings height h_Fal(J₀(N)) = -1/2 log(m) + rational.
+Lemma 3.2: Gross-Zagier + Kolyvagin ⇒ rank = ord_{s=1} L(s,J₀(N)). 
+Lemma 3.3: GRH from M9 ⇒ L(1,J₀(N)) ≠ 0 ⇒ rank = 0.
+Lemma 3.4: BSD formula holds: L*(1) / Ω = |Ш| · Reg · Π c_p / |J₀(N)(ℚ)_tor|². For rank 0: L(1)/Ω = |Ш| · Π c_p / |tor|². 
+Proof: All 12 curves have rank=0, Ш=1, c_p=1, |tor|² = L(1)/Ω. Checked in Sage.
+
+PAGE 4: Proof of Hilbert 12 Part 
+Lemma 4.1: CM points on X₀(N) are defined over H = K(j(τ)).
+Lemma 4.2: For h(K)=1, j(τ) ∈ ℚ. Values computed via modular polynomials Φ_N(X,j) = 0.
+Lemma 4.3: H = K for h=1, so j(τ) generates class field. 
+Proof: Table 1 lists all j. Each satisfies Φ_m(j,j) = 0 mod p for all p. Verified in Sage: j_invariant_QQ(discriminant).
+
+PAGE 5: Lean Formalization + Verification
+theorem M10_CM_Complete : ∀ N ∈ CM_LIST, BSD (J₀ N) ∧ Hilbert12 (CM_field N)
+def CM_LIST : List ℕ := [27, 32, 36, 49, 64, 81, 121, 144, 169, 196, 225, 256]
+proof: exact BSD_CM_Colmez + Hilbert12_j_rational, using M9_WeilTransfer_All
+#print axioms M10_CM_Complete -- Output: []
+
+Verification commands:
+lake build TheoremaAureum.M10_CM_Descent
+sage Hilbert12_verify.sage -- checks all j-invariants
+
+PAGE 6: References + Data Availability
+References: [1] M9_WeilTransfer_All, Zenodo DOI, [2] Colmez 1993, [3] Gross-Zagier 1986, [4] LMFDB
+Data: Hilbert12.csv at Zenodo. Code: github.com/[repo]/M10_CM_Descent
+Parent SHA256: 624b93f7d4687b81371dcecf6e6adad9de074addf35f5409e1c3b244d8410f7e6
+VALOR_MIN: 62183 > 0
+
+END PROMPT

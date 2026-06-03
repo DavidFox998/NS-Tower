@@ -1,0 +1,79 @@
+plan:
+  id: D4-w1-strict-bound-draft
+  parent_plan: kp-surface-discharge-decomposition
+  parent_leaf: D4_w1_strict_bound
+  revision: "2026-06-01 (repo-normalization results folded in)"
+  numerics_computed: true
+  numeric_result:
+    w1_0p86: 0.432367
+    beta0: 2.07942
+    passes: false
+    threshold: 0.142857142857
+    margin_at_0p86: "w1(0.86)/(1/7) ≈ 3.03 (FAILS, large margin)"
+  honesty_locks:
+    status_of_this_leaf: VERIFIED_OUT_OF_TOWER_NEGATIVE
+    closes_D4: false
+    closes_mass_gap: false
+    discharges_surface: false
+    mass_gap_proven: false
+    m_gt_0_claimed: false
+    surface_1_status: OPEN
+    ym_tower_status: OPEN
+    replit_invariants_modified: false
+    note: >
+      D4 was TESTED, not closed. Under the repo's own action the submitted bound
+      w1(0.86) < 1/7 is FALSE (w1(0.86) ≈ 0.4324, ≈3x over 1/7). The NEGATIVE verdict
+      is numerically robust (large margin). beta0 ≈ 2.07942 is a numerical estimate
+      (Weyl quadrature + MC), NOT a rigorous Arb/MPFI interval certificate. Nothing
+      here is a Lean object or trio-clean; no surface discharged; no mass gap.
+  computation:
+    method: "deterministic Weyl integration over SU(3) maximal torus + Monte-Carlo validation"
+    action_normalization:
+      formula: "S(U) = plaquetteEnergy(U) = (3 - Re tr U)/3 = 1 - (Re tr U)/3"
+      source: "Towers/YM/WilsonPositivity.lean:27 ; Towers/YM/WilsonAction.lean:134"
+    grid: "n = 2400 (self-normalized)"
+    mc_validation: "2e6 Haar-SU(3) draws; MC w1(0.86) ≈ 0.4324 agrees with quadrature 0.432367"
+    normalization_check: "w1(0) = 1.000000"
+    independent_test_2026_06_01:
+      w1_0: 1.000000
+      w1_0p86: 0.432367
+      beta0: 2.07942
+      w1_beta0: 0.142857
+      w1_beta0_plus_0p01: 0.141626   # numpy n=2400; user-appended mpmath value 0.141663 (4th-decimal method diff)
+      all_pass: true
+    table:
+      - {beta: 0.86,    w1: 0.432367, lt_1_7: false}
+      - {beta: 1.00,    w1: 0.378821, lt_1_7: false}
+      - {beta: 1.50,    w1: 0.238739, lt_1_7: false}
+      - {beta: 2.00,    w1: 0.153058, lt_1_7: false}
+      - {beta: 2.07942, w1: 0.142857, lt_1_7: "boundary (= 1/7)"}
+      - {beta: 2.50,    w1: 0.099908, lt_1_7: true}
+      - {beta: 3.00,    w1: 0.066441, lt_1_7: true}
+  source_corrections:
+    beta0_value: {previously_drafted: 0.85, corrected: 2.07942,
+      reason: "0.85 was for the UN-normalized action (3 - Re tr); repo uses /3-normalized S, so threshold ~3x: w1_unnorm(b)=w1_repo(3b)."}
+    submitted_value_0p0540459: {verdict: "reproduced by NO tested normalization; withdrawn"}
+  ym_tower_incorporation:
+    ym_tower_status: OPEN   # UNCHANGED — this is a NEGATIVE out-of-tower result
+    parent_kp_surface: OPEN
+    new_constraint:
+      target: "Wall256 open hypothesis hw1 : w1 < 1/7"
+      old_doc_threshold: "β > 0.85 (Wall256_Scaffold.lean:27-31) — STALE, assumes un-normalized action"
+      corrected_threshold: "β > β₀ ≈ 2.07942 under repo S = (3 - Re tr)/3"
+      lean_file_touched: false   # 'No Lean changes' — Wall256 docstring NOT edited; constraint logged here only
+      note: "hw1 stays an OPEN named hypothesis; this constraint does not discharge it."
+  termination:
+    closes_leaf_D4: false
+    d4_verdict: TESTED_NEGATIVE_CERTIFIED
+    d4_verdict_prose: "TESTED NEGATIVE (CERTIFIED) — submitted bound false at β=0.86 under repo action; w1(0.86)>1/7 rigorously enclosed by CERT_Arb (mpmath.iv N=36, tail ≤ 4.46e-32)."
+    minimal_beta0_repo_action: 2.07941688   # lower-bound-style rounded planning shorthand only; NOT a safe strict bound
+    safe_constraint: "β > 2.079416880124 (upper endpoint — conservative formal requirement)"
+    beta0_certified_interval: [2.079416880123, 2.079416880124]
+    cert_arb_ref: "CERT_Arb_beta0.pdf / CERT_Arb_beta0_2026-06-01.yaml (status: VERIFIED_OUT_OF_TOWER)"
+    conclusion: >
+      D4 not closed. The submitted positive claim fails at β=0.86 under the repo
+      action; the negative verdict is now CERTIFIED by the CERT_Arb rigorous
+      interval enclosure (not just MC/quadrature). The bound w1 < 1/7 would
+      require β > β₀, with β₀ certified in [2.079416880123, 2.079416880124]
+      (minimal repo-action threshold ≈ 2.07941688). Parent KP surface, Surface
+      #1, and the YM tower stay OPEN; no mass-gap / m>0 / Clay / RH claim.

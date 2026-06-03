@@ -1,0 +1,101 @@
+import Mathlib.Data.Zsqrtd.Basic
+import Mathlib.GroupTheory.Subgroup.Basic
+import Mathlib.Data.Finset.Basic
+import Mathlib.Tactic
+
+open Zsqrtd
+
+abbrev Ztau := Zsqrtd (-5)
+notation "τ" => ⟨0,1⟩
+
+def LAW_43 : Nat := 129
+def PI_SCALE : Nat := 143
+def MORNINGSTAR : Nat := 1419
+def TWO_ROOT_13_SCALED : Nat := 721110255
+
+def qmk (p : Nat) : Nat × Nat × Nat :=
+  let m := Nat.log 3 p
+  let q := p / 3^m
+  let k := (q * 3^m - p).natAbs / PI_SCALE
+  (q, m, k)
+
+def bridge_error (p : Nat) : Nat :=
+  let (q,m,k) := qmk p
+  Int.natAbs (q * 3^m - p - k*PI_SCALE) % MORNINGSTAR
+
+def to_Ztau4 (p : Nat) : Ztau × Ztau × Ztau × Ztau :=
+  let (q,m,k) := qmk p
+  let r := bridge_error p
+  (q, m * τ, k, r * τ)
+
+def norm_sq_Ztau4 (v : Ztau × Ztau × Ztau × Ztau) : Ztau :=
+  let ⟨a,b,c,d⟩ := v
+  a*a + b*b + c*c + d*d
+
+def squared_dist_to_origin (v : Ztau × Ztau × Ztau × Ztau) : Ztau :=
+  norm_sq_Ztau4 v
+
+inductive Stratum where
+  | origin | vertex | face_centroid | mirror_interior | generic
+deriving DecidableEq, Repr
+
+def stratum_stab_order : Stratum → Nat
+  | .origin => 14400
+  | .vertex => 120
+  | .face_centroid => 12
+  | .mirror_interior => 2
+  | .generic => 1
+
+def proj_stratum (p : Nat) : Stratum :=
+  let v := to_Ztau4 p
+  let d2 := squared_dist_to_origin v
+  let s := MORNINGSTAR * MORNINGSTAR
+  if d2 = 0 then .origin
+  else if d2 < s / 10^12 then .vertex
+  else if d2 < s then .face_centroid
+  else if d2 < 721110255^2 / 10^16 * s then .mirror_interior
+  else .generic
+
+def Sym (p : Nat) : Nat := stratum_stab_order (proj_stratum p)
+
+theorem P1_CLASSICAL : Sym 2 = 14400 := by decide
+theorem P2_CLASSICAL : Sym 3 = 14400 := by decide
+theorem P3_CLASSICAL : Sym 19 = 14400 := by decide
+theorem P4_DESERT : Sym 191 = 120 := by decide
+
+def p5 : Nat := 1000000000247
+theorem P5_ISLAND : Sym p5 = 12 := by decide
+
+def p6 : Nat := 1000000000039
+def p7 : Nat := 1000000000061
+def p8 : Nat := 1000000000099
+def p9 : Nat := 1000000000141
+
+theorem P6_ACTIVE : Sym p6 = 2 := by decide
+theorem P7_ACTIVE : Sym p7 = 2 := by decide
+theorem P8_ACTIVE : Sym p8 = 2 := by decide
+theorem P9_ACTIVE : Sym p9 = 2 := by decide
+
+theorem STRATUM_FROM_ERROR (p : Nat) : 
+  Sym p = 
+    if bridge_error p = 0 then 14400
+    else if bridge_error p < 1 then 120
+    else if bridge_error p < 10^6 then 12
+    else if bridge_error p < 721110255 then 2
+    else 1 := by sorry
+
+#eval (2*3*19*191) % MORNINGSTAR
+#eval p5 % MORNINGSTAR
+#eval p5 % PI_SCALE
+#eval bridge_error p5
+#eval Sym p5
+
+#eval Sym 2
+#eval Sym 3
+#eval Sym 19
+#eval Sym 191
+#eval Sym p5
+#eval Sym p6
+#eval Sym p7
+#eval Sym p8
+#eval Sym p9

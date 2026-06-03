@@ -1,0 +1,156 @@
+\documentclass[11pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+
+% The Exceptional-Prime Desert Map  --  alpha_0 = 299 + pi/10
+% Rule:  p is exceptional  <=>  r = p * || p * pi/10 || < 1
+% Data is computed / verifiable only.  No new mathematics is claimed.
+% Certified source: data/desert_map.csv
+%   sha256 = e0ea8b28cb2a3172e55a1880debb0ed40c1bfdd13a94a8be7a1135dbc2291cbb
+
+\newcommand{\dt}{\ldots}
+
+\begin{document}
+
+\begin{center}
+{\large\bfseries The Exceptional-Prime Desert Map}\\[2pt]
+$\alpha_0 = 299 + \pi/10$ \qquad rule:\; $p$ exceptional $\iff r = p\,\lVert p\,\pi/10\rVert < 1$
+\end{center}
+
+\section*{Key constants}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Quantity & Value \\
+\midrule
+$\kappa = \varphi c / 108$ (15 digits) & $4.84330141945946$ \\
+Bost bound $2\sqrt{13}$ & $7.21110255$ \\
+Single-axis budget & $0.600925$ \\
+Classical set $S_4$ & $\{2,\,3,\,19,\,191\}$ \\
+$C_{\text{unwt}}(S_4) = C_{\text{unwt}}(S_{20})$ & $1.433676813\ (<2\sqrt{13})$ \\
+$C_{\text{wt}}(S_4)$ & $11.42214869$ \\
+$C_{\text{wt}}(S_5)$ (at the bridge) & $40.43789948$ \\
+$C_{\text{wt}}(S_{20})$ & $40793.25685$ \\
+$\kappa$-axis share at $P_5$ & $2.534298\times 10^{9}$ \\
+Number of exceptional primes $<10^{4000}$ & $20$ \\
+\bottomrule
+\end{tabular}
+
+\section*{H4 classical invariants ($I_k = \log p_k / (p_k-1)$)}
+The four real Weyl-axis shares of the 600-cell reading (other eight axes are zero).
+\begin{tabular}{@{}clll@{}}
+\toprule
+Axis & Prime $p$ & $I_k$ & \\
+\midrule
+1 & $2$   & $0.693147$  & \\
+2 & $3$   & $0.549306$  & \\
+3 & $19$  & $0.163580$  & \\
+4 & $191$ & $0.0276435$ & \\
+\midrule
+\multicolumn{2}{@{}l}{Sum $\sum I_k$} & $1.43368$ & $(<7.21110255)$ \\
+\bottomrule
+\end{tabular}
+
+\section*{The bridge at $P_5$ (the one giant verifiable by hand)}
+\[
+P_5 = 3{,}993{,}746{,}143{,}633,\qquad q = 191\,(\in S_4),\quad m = 16,\quad k = 4302500806252,
+\]
+\[
+\bigl|\,q\,\kappa^{m} - P_5 - k\pi\,\bigr| \;=\; 0.0382906 \;\pm\; 0.029 \;<\; 1,
+\qquad \text{error ratio} = 9.588\times 10^{-15}.
+\]
+For $P_1$--$P_4$ the relation is $0$ exactly ($q=p,\ m=0,\ k=0$).
+For $P_6$--$P_{20}$ it is \emph{beyond tolerance} (propagated $\kappa$-uncertainty
+$10^{1.9}\dots10^{3537}$): marked \textbf{indeterminate}, never a pass.
+
+\section*{Table 1 --- The twenty exceptional primes}
+$D_k$ = number of digits; $w_k$ = desert width (run of consecutive
+non-exceptional integers ending just below $p_k$); $r_k = p_k\lVert p_k\pi/10\rVert$.
+Giants shown head$\dt$tail.
+
+\footnotesize
+\begin{longtable}{@{}r r l l r l@{}}
+\toprule
+$k$ & $D_k$ & Prime $p_k$ & Desert width $w_k$ & $r_k$ & Regime \\
+\midrule
+\endfirsthead
+\toprule
+$k$ & $D_k$ & Prime $p_k$ & Desert width $w_k$ & $r_k$ & Regime \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+1  & 1    & \texttt{2}                              & \texttt{0}                              & $0.7433629$ & Classical-Z \\
+2  & 1    & \texttt{3}                              & \texttt{0}                              & $0.1725666$ & Classical-Z \\
+3  & 2    & \texttt{19}                             & \texttt{15}                             & $0.5885052$ & Classical-Z \\
+4  & 3    & \texttt{191}                            & \texttt{171}                            & $0.8441596$ & Classical-Z \\
+5  & 13   & \texttt{3993746143633}                  & \texttt{3993746143441}                  & $0.1523629$ & \textbf{Bridge} \\
+6  & 16   & \texttt{3224057731518397}              & \texttt{3220063985374763}              & $0.7749508$ & Desert \\
+7  & 24   & \texttt{631474305334326148720631}      & \texttt{631474302110268417202233}      & $0.1441999$ & Desert \\
+8  & 35   & \texttt{10531012662744699702276055940873441} & \texttt{10531012662113225396941729792152809} & $0.3570549$ & Desert \\
+9  & 76   & \texttt{76365550274329238633\dt274704893143} & \texttt{76365550274329\dt64019701}      & $0.4366733$ & Desert \\
+10 & 95   & \texttt{87822897782612089843\dt462065410669} & \texttt{87822897782612\dt60517525}      & $0.8334696$ & Desert \\
+11 & 111  & \texttt{48983077336683228790\dt692784889819} & \texttt{48983077336683\dt19479149}      & $0.5405288$ & Desert \\
+12 & 372  & \texttt{19462609931099711093\dt516236611721} & \texttt{19462609931099\dt51721901}      & $0.5248112$ & Desert \\
+13 & 859  & \texttt{88321609940533775518\dt058013286951} & \texttt{88321609940533\dt76675229}      & $0.5359789$ & Desert \\
+14 & 1025 & \texttt{19681903024283226243\dt591371595031} & \texttt{19681903024283\dt58308079}      & $0.0147607$ & Desert \\
+15 & 1592 & \texttt{52943490324271006099\dt752677909607} & \texttt{52943490324271\dt06314575}      & $0.9803959$ & Desert \\
+16 & 1863 & \texttt{17494378896143817560\dt864658557771} & \texttt{17494378896143\dt80648163}      & $0.0504900$ & Desert \\
+17 & 2272 & \texttt{91511748796834962231\dt086060269167} & \texttt{91511748796834\dt01711395}      & $0.5457596$ & Desert \\
+18 & 2389 & \texttt{20716339208351233251\dt013122521601} & \texttt{20716339208351\dt62252433}      & $0.6931474$ & Desert \\
+19 & 3428 & \texttt{99469874438421417033\dt698029440779} & \texttt{99469874438421\dt06919177}      & $0.5105710$ & Desert \\
+20 & 3548 & \texttt{12737470687711639675\dt504644341493} & \texttt{12737470687711\dt14900713}      & $0.0276853$ & Desert \\
+\end{longtable}
+\normalsize
+
+\section*{Table 2 --- Weighted energy and bridge status}
+$C_{\text{wt}}$ is cumulative; H4 = active symmetry axes; $\log_{10}\tau$ is the
+$\kappa$-tolerance (digits of $\kappa$ needed to test the bridge).
+
+\footnotesize
+\begin{longtable}{@{}r r r l l r@{}}
+\toprule
+$k$ & $C_{\text{wt}}$ (cum.) & H4 & BDP status & error & $\log_{10}\tau$ \\
+\midrule
+\endfirsthead
+\toprule
+$k$ & $C_{\text{wt}}$ (cum.) & H4 & BDP status & error & $\log_{10}\tau$ \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+1  & $1.386294$    & 12 & EXACT             & $0$         & --- \\
+2  & $3.034213$    & 12 & EXACT             & $0$         & --- \\
+3  & $6.142232$    & 12 & EXACT             & $0$         & --- \\
+4  & $11.42215$    & 12 & EXACT             & $0$         & --- \\
+5  & $40.43790$    & 1  & \textbf{VERIFIED} & $0.0382906$ & $-1.54$ \\
+6  & $76.14732$    & 1  & BEYOND\_TOLERANCE & ---         & $1.6$ \\
+7  & $130.9497$    & 1  & BEYOND\_TOLERANCE & ---         & $10.0$ \\
+8  & $209.2893$    & 1  & BEYOND\_TOLERANCE & ---         & $20.4$ \\
+9  & $384.0161$    & 1  & BEYOND\_TOLERANCE & ---         & $62.6$ \\
+10 & $602.6319$    & 1  & BEYOND\_TOLERANCE & ---         & $81.8$ \\
+11 & $857.5051$    & 1  & BEYOND\_TOLERANCE & ---         & $97.6$ \\
+12 & $1712.430$    & 1  & BEYOND\_TOLERANCE & ---         & $358.7$ \\
+13 & $3690.226$    & 1  & BEYOND\_TOLERANCE & ---         & $846.7$ \\
+14 & $6048.751$    & 1  & BEYOND\_TOLERANCE & ---         & $1012.2$ \\
+15 & $9713.830$    & 1  & BEYOND\_TOLERANCE & ---         & $1579.8$ \\
+16 & $14001.80$    & 1  & BEYOND\_TOLERANCE & ---         & $1850.4$ \\
+17 & $19233.19$    & 1  & BEYOND\_TOLERANCE & ---         & $2260.2$ \\
+18 & $24732.49$    & 1  & BEYOND\_TOLERANCE & ---         & $2376.6$ \\
+19 & $32625.75$    & 1  & BEYOND\_TOLERANCE & ---         & $3416.4$ \\
+20 & $40793.26$    & 1  & BEYOND\_TOLERANCE & ---         & $3535.5$ \\
+\end{longtable}
+\normalsize
+
+\paragraph{Honesty note.}
+Desert widths and weighted energies are computed; the ``bridge'' is a numerical
+observation verifiable only at $P_5$ (and trivially $P_1$--$P_4$); the 12-curve
+H4 reading is an \emph{interpretation}, not a theorem. The ``error rate'' (a
+measurement) and the ``self-symmetry'' (the $12\to1$ Coxeter reading) are
+distinct. No Hodge / BSD / mass-gap claim is made and no new mathematics is
+asserted. Certified data file \texttt{data/desert\_map.csv} is byte-identical
+(sha256 \texttt{e0ea8b28\dt2291cbb}).
+
+\end{document}

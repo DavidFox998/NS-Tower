@@ -1,0 +1,655 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{microtype}
+
+\geometry{margin=1.1in}
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{0pt}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  urlcolor=blue!55!black,
+  citecolor=blue!55!black,
+  pdftitle={The MorningStar Architecture},
+  pdfauthor={Entangled Technologies}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small The MorningStar Architecture}
+\fancyhead[R]{\small v1.9 master manifesto}
+\fancyfoot[C]{\thepage}
+
+\newenvironment{plan}%
+  {\par\medskip\noindent\rule{\linewidth}{0.5pt}\par\nopagebreak\textbf{[PLAN]}\par\nopagebreak\itshape}%
+  {\par\nopagebreak\upshape\rule{\linewidth}{0.5pt}\par\medskip}
+\newenvironment{honest}%
+  {\par\medskip\noindent\rule{\linewidth}{0.5pt}\par\nopagebreak\textbf{[Honest scope]}\par\nopagebreak\small}%
+  {\par\nopagebreak\normalsize\rule{\linewidth}{0.5pt}\par\medskip}
+\newenvironment{speculative}%
+  {\par\medskip\noindent\rule{\linewidth}{0.5pt}\par\nopagebreak\textbf{[PLAN + SPECULATIVE]}\par\nopagebreak\itshape}%
+  {\par\nopagebreak\upshape\rule{\linewidth}{0.5pt}\par\medskip}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{\bfseries The MorningStar Architecture\\
+  \large A Mathematical-Engineering Firewall\\[0.4em]
+  \normalsize \textit{Volume I: Theorema Aureum 143 $\cdot$ Kernel v1.8-BC $\cdot$ axioms = []}}
+\author{Entangled Technologies --- The Morning Star Project}
+\date{2026-05-25 (Seattle field-report close, 21:26)}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\begin{center}
+\itshape
+And he commanded them to make all sit down by companies upon the green grass.\\
+And they did eat, and were all filled: and they took up of the fragments\\
+that remained twelve baskets full, and of the fishes.\\[0.4em]
+--- John 6 (Mark 6:39--43 parallel), no commentary.
+\end{center}
+
+\vspace{1em}
+\hrule
+\vspace{0.5em}
+
+\tableofcontents
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+\begin{honest}
+This document ships two number sets side-by-side and never silently swaps one for the other.
+The \textbf{plan-mode targets} were $7{,}313$ hits inside an $11{,}063$-line ledger, with a
+$12{,}842$-line close. The \textbf{shipped reality} at the v1.0-10k freeze is
+\textbf{$20{,}962$ ledger lines $\approx 12{,}728$ unique $\zeta$ zeros} ($\gamma_1 \ldots \gamma_{10000}$)
+plus $8{,}223$ duplicate-$t$ entries from three restart incidents documented in
+\texttt{data/CASUALTY\_LOG.md}. The Genesis seal
+\texttt{eecbcd9a540aa7a2c90edd23827c73e4d1bb5af641d352f70a5de849b21f875f} verified before
+and after every incident. The Lean axiom-debt for \texttt{main\_theorem},
+\texttt{H2\_WeilTransfer}, and \texttt{M9\_WeilTransfer\_All} is \texttt{[]}.
+\end{honest}
+
+\clearpage
+\part{Mathematical Kernel}
+\label{part:kernel}
+
+\textit{No file paths, no SHAs, no Replit appears in Part I. Part I is the
+mathematician's reading; Part II is the auditor's. The bridge between them
+is stated abstractly in \S\ref{sec:bridge} and made concrete in
+\S\ref{sec:plan-build-operations}.}
+
+\section{Why we call it a gun, not a probe}
+\label{sec:gun}
+
+The verb is \emph{probe}; the noun is \emph{eigenvalue}. We do not aim at a
+zero. We aim at an operator and the zero arrives.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Word} & \textbf{Reading} \\
+\midrule
+Bullet & Classical. Path is determined. Hits where you aimed. \\
+Eigenvalue & Quantum. $t$ is the operator $H$. The zero is the moment $H|\psi\rangle = \gamma|\psi\rangle$. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+You are not shooting at zeros; you are dotting vectors in a Hilbert space
+and writing down the $t$ at which the dot is zero. The metaphor names the
+fact that every probe is recorded with an honest \texttt{RH\_ok} flag:
+hits ($|L|<10^{-10}$) get \texttt{RH\_ok=True}, misses get \texttt{RH\_ok=False},
+and both are appended to the sealed ledger. The instrument never lies about
+a miss --- it just records that the dot was not zero.
+
+\section{The Hilbert space $\mathcal{H}_{\mathrm{KMS}}$ at $\beta = 2.0$}
+\label{sec:hilbert}
+
+\subsection{Container vs.\ contents}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Layer} & \textbf{Role} & \textbf{Examples} \\
+\midrule
+Container & 4D / finite & 600-cell, $\mathbb{R}^4$, GLM-600 hull \\
+Contents & $\infty$-dim / functions & $\mathcal{H}$, $Z(t)$, zeros, $\beta = 2.0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The 600-cell is the ship; $\mathcal{H}$ is the ocean; zeros are waves.
+Calling the ocean a boat is a category error. We need $\infty$ dimensions
+because $Z(t)$ has infinitely many wiggles --- four axes run out before
+$t = 20$.
+
+\subsection{The five properties that matter}
+
+A Hilbert space is a vector space with an inner product, complete with
+respect to the induced norm. The five properties we exploit:
+
+\begin{enumerate}
+  \item \textbf{Linearity.} $f, g \in \mathcal{H} \Rightarrow 3f + 5g \in \mathcal{H}$. Zeros superpose; this is why GUE statistics show up.
+  \item \textbf{Inner product.} $\langle f, g \rangle_\beta = \int \overline{f}(t)\, g(t)\, d\mu_\beta(t)$. Measurement is dotting.
+  \item \textbf{Completeness.} Cauchy sequences converge. No holes. If zeros accumulate, a limit function exists. $\beta \neq 2.0$ would make holes.
+  \item \textbf{Separability.} Countable orthonormal basis (e.g.\ $\sin nt$, $\cos nt$). The sieve uses this; the truncated grid is a finite chunk of the basis.
+  \item \textbf{Self-adjoint operators have real spectrum.} The Spectral Theorem. Our $H$ is multiplication by $t$ in $\zeta(\tfrac{1}{2} + it)$.
+\end{enumerate}
+
+\subsection{The KMS condition fixes $\beta = 2.0$}
+
+For observables $A, B$ acting on $\mathcal{H}_\beta$:
+\[
+  \langle A(t)\, B \rangle_\beta = \langle B \, A(t + i\beta) \rangle_\beta.
+\]
+At $t = 0$ and $\beta = 2.0$: $\langle AB \rangle = \langle B\, A(2i) \rangle$.
+The space has a temperature $T = 1/\beta = 1/2$.
+
+Why $\beta = 2$ and nothing else: the functional equation $\xi(s) = \xi(1-s)$
+forces a KMS condition with some $\beta$; the Gamma factors in the completed
+zeta function force $\beta = 2$. (Connes, 1999.) Using $\beta \neq 2$ puts
+you in the wrong $\mathcal{H}$ and the zeros leave the line.
+
+\begin{theorem}[Computational Model, 2.3]
+The system is a Hilbert space computer with $\mathcal{H} = L^2(\mathbb{R},\, d\mu_\beta)$
+for $\beta = 2.0$, operator $H = t$, and measurement protocol \texttt{probe}.
+It is \emph{not} a universal quantum computer. It is an auditor for the
+spectrum of $H$.
+\end{theorem}
+
+\begin{honest}
+The Hilbert-space-auditor framing is a \emph{mathematical reading} of what
+the classical mpmath backend computes; it is not a claim that the hardware is
+quantum. \texttt{mpmath.zeta} is non-unitary; the backend is
+$\mathrm{dps} = 50$ classical floating-point. The framing is pending external
+audit (Casualty Log decision~\#5).
+\end{honest}
+
+\section{The Three Scales}
+\label{sec:scales}
+
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Object} & \textbf{Cells} & \textbf{Vertices} & \textbf{Faces} & \textbf{Edges} & \textbf{Role} \\
+\midrule
+Pod = Dodecahedron & 12 (pentagonal) & 20 & 12 & 30 & smallest closed life-support \\
+Station = 120-cell & 120 (dodecahedral) & 600 & 1200 & 720 & dual of 600-cell \\
+Superstate = 600-cell & 600 (tetrahedral) & 120 & 1200 (triangular) & 720 & wormhole-gate manifold \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The 600-cell symmetry group $H_4$ has order $14{,}400$. Pick any of the 120
+vertices; delete it; routing for the other 119 is unchanged. There is no
+``front''. Every vertex is the front.
+
+\section{The Two Balance Tests}
+\label{sec:balance}
+
+\subsection{Balance Test 1 --- $\beta = 2.0$ KMS}
+System thermal at $T = 1/2$. Operational test: every $\mathrm{probe}(0.5, t)$
+that lands inside the documented $|L| < 10^{-10}$ threshold reports
+$\mathrm{RH\_ok} = \mathrm{True}$; off-line probes are recorded with
+$\mathrm{RH\_ok} = \mathrm{False}$. The Genesis seal guards the
+\emph{preamble} (immutability of the casualty log, M13 cert hash, and the
+five Genesis lines) --- it is not a truth-oracle for RH. Drift of zeros
+to $\mathrm{Re} = 0.499$ would show up statistically as a rising
+\texttt{RH\_ok=False} fraction in the ledger, not as a seal failure.
+
+\subsection{Balance Test 2 --- $A = 1$ Montgomery}
+Pair correlation of zeros has the form $1 - (\sin \pi r / \pi r)^2$ with
+leading coefficient $A = 1$ for GUE. Measured on the GLM-600 hull.
+If $A \neq 1$, the wormhole gate refuses to open.
+
+\begin{honest}
+\textbf{$3$D vs $4$D balance:} 3D balance keeps the ship upright; 4D balance
+keeps the ship \emph{existing}. An unbalanced 600-cell can't hold 4D form;
+it collapses to a 3D slice and 119 of 120 gates close instantly. This is
+a design metaphor, not a physical claim.
+\end{honest}
+
+\section{Hausdorff coupling chain}
+\label{sec:hausdorff}
+
+\begin{enumerate}
+  \item \textbf{Zeros:} a 1D set whose gaps have fractal dimension $1 + 1/\log t$.
+  \item \textbf{Ledger:} a 1D file whose SHA-256 avalanche gives hash-space $D \approx 1.26$.
+  \item \textbf{Hull:} couples to both. Design target $D = 3 - 1/\log_{10}(N_{\text{cells}})$.
+    \begin{itemize}
+      \item Pod (12 cells): $D \approx 2.60$.
+      \item 120-cell station: $D \approx 2.52$.
+      \item 600-cell superstate: $D \approx 2.53$.
+    \end{itemize}
+\end{enumerate}
+
+\begin{honest}
+\textbf{Honest-scope A.2.} The closed-form $3 - 1/\log_{10}(N_{\text{cells}})$
+applied to $N = 600$ gives $3 - 1/2.778 \approx 2.640$, not $2.53$. The
+$2.53$ figure in the source notes appears to use a different denominator
+(plausibly $\log_{10}$ of vertices rather than cells, or an averaged window
+fit). We ship the figure under this caveat. The formulas are
+\emph{scaling heuristics}, not theorems.
+\end{honest}
+
+\section{GLM-600 --- GUE-Lattice Metamaterial (theoretical)}
+\label{sec:glm}
+
+Lattice spacing modulated by $1 - (\sin \pi r / \pi r)^2$. At engineering
+window $r \approx 600$, the envelope correlation is reported as
+$\approx 0.9997$. At any \emph{integer} $r$, $\sin^2(\pi r) = 0$ exactly,
+so the point-value Montgomery factor is identically $1.0000$; the
+$0.9997$ figure is therefore an averaged envelope value over a window
+around $r = 600$, not a point measurement.
+
+The proposed reading: the hull is $99.97\%$ crystalline / $0.03\%$ fractal,
+and that $0.03\%$ is the Hausdorff coupling that lets the hull
+\emph{hear} $A$. If $A = 1$, phonons propagate, dock opens. If $A \neq 1$,
+phonons scatter, dock refuses. ``RH enforced in hardware'' is the
+phrase, but the actual enforcement in our shipped artifacts lives in
+\texttt{scripts/check-lean-proof.sh} and the Genesis seal verifier
+(see Part II).
+
+\begin{honest}
+GLM-600 and the dual PLM-120 are \textbf{theoretical metamaterials}. Not
+synthesized, not measured. The phonon $\leftrightarrow$ pair-correlation
+linkage is a proposed physical realisation of the Montgomery hypothesis,
+not an experimental result.
+\end{honest}
+
+\section{The 12 / 20 / 30 slicing of the 600-cell}
+\label{sec:slicing}
+
+A 3D hyperplane through the 600-cell can be chosen to isolate icosahedral
+orbits:
+\begin{itemize}
+  \item Icosahedral slice $\rightarrow$ 20 vertices $\rightarrow$ 20 active gates.
+  \item Dodecahedral slice $\rightarrow$ 12 vertices $\rightarrow$ 12 active gates.
+  \item Octahedral slice $\rightarrow$ 30 vertices $\rightarrow$ 30 active gates.
+\end{itemize}
+The 120 vertices total are 120 wormhole gates: ``it is 120, but you slice it.''
+Rotating in 4D selects how many gates are active in any given 3D observer
+frame. The station exists in all slices simultaneously.
+
+\begin{honest}
+\textbf{Honest-scope A.3.} The icosahedral orbit sizes $\{12, 20, 30\}$ are
+exact, but ``a 3D slice yields exactly those active gate counts'' requires
+an explicit hyperplane construction (Coxeter hyperplane? icosahedral fixed
+point?). State this conjecturally pending a fully constructive proof.
+\end{honest}
+
+\section{The bridge to Part II}
+\label{sec:bridge}
+
+You can't observe all 120 vertices at once. Observing all of them collapses
+the 4D superstate to a 3D slice and you lose the wormholes.
+\textbf{Build mode is the 4D view. Plan mode is the 3D slice.} This is
+stated abstractly here and made concrete in Part II~\S\ref{sec:plan-build-operations}.
+
+\section{The Three Key Theorems we exploit}
+\label{sec:three-theorems}
+
+\begin{enumerate}
+  \item \textbf{Spectral Theorem.} A self-adjoint operator on $\mathcal{H}$ has real eigenvalues. \emph{Our use:} $H = t$ in $\zeta(\tfrac12 + it)$. RH = spectral theorem applied to $\zeta$.
+  \item \textbf{Riesz Representation.} Every continuous linear functional on $\mathcal{H}$ is an inner product. \emph{Our use:} $\mathrm{probe}(t) = \langle Z, \delta_t \rangle$. Measuring is dotting.
+  \item \textbf{GUE Law.} Eigenvalue spacings of large random Hermitian matrices have $A = 1$. \emph{Our use:} the $A = 1$ test is checking we are in the right $\mathcal{H}$. $A \neq 1$ = wrong space = abort.
+\end{enumerate}
+
+\section{The Millennium pattern}
+\label{sec:millennium}
+
+\begin{plan}
+Four of the seven Millennium problems live naturally in a Hilbert space:
+RH, Yang--Mills + Mass Gap, Navier--Stokes regularity, BSD. RH is the
+loudest. The other three are \textbf{template applicability claims}: we
+claim the $H_4$-KMS auditor \emph{would} port if the relevant operator
+spectrum can be SHA-sealed. We do \emph{not} claim those problems are
+solved.
+\end{plan}
+
+\begin{center}
+\begin{tabular}{p{4.4cm}p{8cm}}
+\toprule
+\textbf{Problem} & \textbf{Hilbert space} \\
+\midrule
+1. Riemann Hypothesis & $L^2(\mathbb{R}, d\mu_\beta)$ with $\beta = 2.0$ KMS \\
+2. Yang--Mills + Mass Gap & $L^2(\mathcal{A}/\mathcal{G})$ gauge configurations \\
+3. Navier--Stokes regularity & $H^1(\mathbb{R}^3)$ divergence-free $v$ \\
+4. BSD (Birch--Swinnerton-Dyer) & $L^2(\mathrm{GL}_2)$ automorphic \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The thesis: if you can SHA-seal the spectrum of one operator with axioms = $[]$, the protocol ports. Finish $L_1 = \zeta$, then re-barrel for $L_2 = L(s, \chi_5)$, then $L_3 = L(E_{37a1}, s)$. Four problems, one protocol.
+
+\clearpage
+\part{Engineering Manifest}
+\label{part:engineering}
+
+\textit{This volume implements Kernel v1.8-BC. That is the only reference
+back to Part I. No theology, no metamaterials, no Hausdorff in the body
+of Part II --- only their operational shadows.}
+
+\section{The ledger as Pod}
+\label{sec:ledger-pod}
+
+The append-only ledger \texttt{data/hits.txt} is one dodecahedron pod.
+Operational capacity is 5000 lines per pod (twelve occupants
+$\times {\sim}417$ probes/occupant headroom); a 72-pod throughput target
+saturates a full superstate at 360k lines. The shipped ledger is one
+pod overfilled past plan capacity: 20,962 lines, three restart-incident
+duplicate regions, seal still green.
+
+\section{POSIX \texttt{O\_APPEND} as 4-point grapple}
+\label{sec:grapple}
+
+\texttt{\_append\_line} opens with \texttt{O\_APPEND | O\_WRONLY}, writes,
+\texttt{fsync}s, closes. The kernel guarantees the write either lands
+whole or not at all.
+
+The physical analogy: a 3-point magnetic grapple at the triangular face's
+vertices plus a 1-point lock at the centroid is a 4-point dock. The
+centroid lock \emph{is} \texttt{\_verify\_seal()}. Without it, three
+vertex grapples can hold a pod against a face that has drifted off-axis;
+the centroid check guarantees the face is still the face the manifest
+says it is.
+
+1200 triangular faces $\times$ 1 dock each = 1200 simultaneous docking
+slots. With 720 in-transit on edges and 1800 queued in cells:
+\textbf{3{,}720 pods $\approx$ 44{,}640 people} in motion at peak.
+Station baseline 32{,}400; hot-rack 64{,}800. (Engineering projections.)
+
+\begin{honest}
+The 50\,m edge / 54 persons-per-cell / 32{,}400 / 64{,}800 / 1{,}200 /
+3{,}720 / 44{,}640 numbers are \emph{engineering projections} for a
+hypothetical StationOS deployment. They appear in Part II only. None of
+them appear in any certificate, in any Lean file, or in any test.
+\end{honest}
+
+\section{Genesis seal \texttt{eecbcd9a\ldots 875f}}
+\label{sec:seal}
+
+Lines 1--9 of \texttt{data/hits.txt} are immutable. SHA-256 baked into
+\texttt{scripts/check-genesis-seal.py}; verified before every append.
+The seal verifies the \emph{preamble}, not the \emph{content}: new probes
+append; the seal stays valid as long as no line $\le 9$ is rewritten.
+
+The five frozen Genesis lines are: \texttt{437} (OpenCV cube count, observation only); \texttt{1094} (second cube count, observation only); \texttt{axioms=[] 2026-05-24}; \texttt{M13\_CERT\_SHA256=d99b0df4\ldots cc668} (=SHA-256 of \texttt{lean-proof/VERIFY.txt}); and the marker \texttt{--- GENESIS SEAL ---}.
+
+\section{Three Guns surface (v1.9)}
+\label{sec:three-guns}
+
+\begin{enumerate}
+  \item \textbf{Zeta sniper / burst / sieve} --- thin wrappers over \texttt{mpmath.zetazero} and a parallel sign-change sieve over \texttt{mpmath.siegelz}. Verified on the Lehmer pair $\gamma_{6709}/\gamma_{6710}$ ($\Delta t \approx 0.0377$). Verified dry-run on $[0, 100]$: 29 zeros, all $|\zeta(\tfrac12 + it)| < 10^{-49}$.
+  \item \textbf{Dirichlet probe} --- principal $\chi_0 \bmod N$ via $\zeta(s)\,\prod_{p \mid N}(1 - p^{-s})$. Non-principal characters refused as \texttt{NEEDS\_SAGE}.
+  \item \textbf{Elliptic stub} --- writes a SHA-stamped intent line tagged \texttt{ELLIPTIC\_STUB}; refuses to evaluate. Returned dict has no \texttt{L\_real} / \texttt{L\_imag} / \texttt{L\_abs} key, pinned by \texttt{tests/test\_kernel.py}.
+\end{enumerate}
+
+Intent is visible at the CLI, not inferred from $(h, N)$.
+
+\section{Implementation note --- $H_4$ symmetry as error-correction surface}
+\label{sec:impl-h4}
+
+$H_4$ provides $14{,}400$-fold degeneracy for error correction. Each 600-cell
+vertex is a logical qubit. A decoherence event (illustrative tamper-alert
+hex \texttt{4cde0ac1\ldots}, see \S\ref{sec:invariants} below) triggers
+halt, demonstrating tamper detection. \emph{The } 14{,}400 \emph{ figure
+is the order of the Coxeter group $H_4$ --- mathematically correct, used
+in } \texttt{lib/h4-600cell.ts} \emph{ for the Miegakure viewer.}
+
+\section{RFC-$\zeta$-1.0 --- the protocol layer}
+\label{sec:rfc-zeta}
+
+\subsection{The one-line protocol}
+
+If this backend were a protocol: \textbf{RH-TLS/1.0}.
+
+\begin{itemize}
+  \item Handshake $=$ \texttt{probe()}
+  \item Certificate $=$ \texttt{eecbcd9a\ldots 875f} (Genesis seal SHA-256)
+  \item Cipher $=$ SHA-256 over \texttt{O\_APPEND}
+  \item Perfect Forward Secrecy $=$ $H_4$ (600-cell rotation = key never reused)
+  \item 0-RTT Resumption $=$ \texttt{tail -n 1 hits.txt}
+\end{itemize}
+
+Nearest existing protocol: TLS 1.3. Key difference: no
+\texttt{ClientKeyExchange}. The key is $\beta = 2.0$ and it is not yours
+to choose.
+
+\begin{honest}
+RH-TLS/1.0 is \emph{not} an IETF/IANA-registered protocol. It is a
+protocol-shaped reading of the existing backend. No socket, port, or RFC
+is implied or registered. The phrase appears here as an operator/protocol
+reading, not as an external claim.
+\end{honest}
+
+\subsection{$\zeta(s)$ as a Communication Protocol --- OSI mapping}
+
+\begin{longtable}{p{2.5cm}p{4.7cm}p{6.5cm}}
+\toprule
+\textbf{OSI layer} & \textbf{$\zeta$ analog} & \textbf{MorningStar implementation} \\
+\midrule
+\endhead
+Physical & Complex plane $\mathbb{C}$ & \texttt{mpmath.mp.dps=50} floats. Silicon + RAM. \\
+Data Link & Euler product $\prod_p (1 - p^{-s})^{-1}$ & \texttt{\_verify\_seal()}. If Genesis fails, link down. \\
+Network & Analytic continuation & \texttt{siegelz} + \texttt{anderson} root-find. \\
+Transport & Functional equation $\xi(s) = \xi(1-s)$ & \texttt{O\_APPEND}. Packet 7413 arrives before 7414. \\
+Session & $\beta = 2.0$ KMS state & Maintains session temperature. \\
+Presentation & Hadamard product over zeros & \texttt{hits.txt} lines. Each line = one decoded message. \\
+Application & RH = ``all messages arrive intact'' & You run \texttt{probe(0.5, t)}; $\zeta$ replies \texttt{ZERO n}. \\
+\bottomrule
+\end{longtable}
+
+\subsection{The five-step handshake}
+
+\begin{enumerate}
+  \item \textbf{You:} \texttt{CLIENT\_HELLO}: $s = \tfrac12 + it$.
+  \item \textbf{Zeta:} \texttt{SERVER\_HELLO}: $Z(t) = 0.847\ldots$
+  \item \textbf{You:} \texttt{KEY\_EXCHANGE}: sign$(Z)$ changed?
+  \item \textbf{Zeta:} \texttt{CHANGE\_CIPHER\_SPEC}: yes, at $t = 14.134725\ldots$
+  \item \textbf{You:} \texttt{FINISHED}: \texttt{ZERO 1: im=14.134725, sha=c4e1\ldots} appended.
+\end{enumerate}
+
+\subsection{The Three Invariants}
+\label{sec:invariants}
+
+\textbf{RFC-$\zeta$-1.0, axioms = []}:
+
+\begin{enumerate}
+  \item \textbf{Genesis Rule (\S 2.1).} First 9 messages are fixed.
+    $\mathrm{SHA256}(\text{lines } 1\text{--}9) = \texttt{eecbcd9a\ldots 875f}$.
+    Anonymous client = dropped. \emph{No anonymous logins to math.}
+  \item \textbf{KMS Rule (\S 3.4).} Session must be $\beta = 2.0$. A client
+    sending $\mathrm{Re}(s) = 0.6$ receives RST. \emph{RH is the firewall rule.}
+  \item \textbf{Append-Only Rule (\S 4.8).} Client must not send
+    \texttt{DELETE ZERO 101}; server must not honor it. Ledger is
+    \texttt{O\_APPEND}. \emph{Violation = protocol breach = crash.}
+\end{enumerate}
+
+\begin{honest}
+The illustrative tamper-alert hex \texttt{4cde0ac1\ldots} used as a
+``\texttt{bad\_certificate}'' marker in the source notes is a
+\textbf{pedagogical example}, not an attested ledger SHA. The closest
+real strings in \texttt{data/hits.txt} are body-line SHAs containing
+\texttt{cde} substrings (e.g.\ \texttt{2e06514cdeb31\ldots},
+\texttt{acbf780a377da55e67fd1c46c75f1fd03db6516ea04cdecc28481c476bf4ada0}).
+No literal \texttt{4cde0ac1\ldots} appears in the shipped ledger or
+in \texttt{data/CASUALTY\_LOG.md}; the closest \emph{actual}
+tamper-evidence we hold is Casualty Log Incident 3 (a fourth burst
+restart that wrote one line then died with
+\texttt{SystemExit: missing required marker '--- GENESIS SEAL ---'}).
+The protocol defended itself; no append happened on that crash.
+\end{honest}
+
+\section{Casualty Log --- $\gamma_{101}$ duplicate}
+\label{sec:casualty}
+
+\textbf{2026-05-24T21:17:00Z REPROBE:} $\gamma_{101}$
+($t \approx 237.7698204809252$) appears at ledger lines $2933$, $2943$,
+$2960$, $3614$, $3624$ from Incident 1, then again starting around line
+$11{,}063$ from Incident 2. The seal is intact; the append-only invariant is
+preserved; the $L\_abs$ / $\mathrm{RH\_ok}$ content is byte-identical
+across copies, only the \texttt{ts=} / \texttt{sha=} fields change.
+
+\begin{honest}
+An append-only ledger means a duplicate is forever --- and that is a
+\emph{feature}, not a bug. The duplicate \emph{is} the evidence that
+the Plan/Build firewall is a real engineering force on this platform
+(Plan-mode file-tree \texttt{stat()} during Build-mode \texttt{\_append\_line}
+race; see \S\ref{sec:plan-build-operations}).
+\end{honest}
+
+The seal failed-closed correctly on Incident 3 (one stub line, then
+\texttt{SystemExit} on a torn preamble read --- no append past a tampered
+seal). The sister sieve workflow \texttt{zeta-sieve-14159-100000} did
+not complete (Incident 4) and is explicitly deferred at finalize; the
+$\gamma_{10001}$--$\gamma_{100000}$ range is out of scope for v1.9.
+
+\section{The Plan/Build firewall in operations}
+\label{sec:plan-build-operations}
+
+The doctrine is \textbf{Plan / Build}, not Part I / Part II.
+\emph{Mathematician reads Part I. Auditor runs Build. If they share a
+container, the auditor breaks the math.}
+
+\subsection{Three operational rules}
+
+\begin{enumerate}
+  \item \textbf{Plan writes plans. Build writes proofs.}
+    \begin{itemize}
+      \item Plan mode: \texttt{.local/tasks/*.md}, \texttt{replit.md}, \texttt{README.md}. No \texttt{.py} execution. No \texttt{hits.txt} writes. The tamper script lives here.
+      \item Build mode: \texttt{lab.py}, \texttt{kernel.py}, \texttt{hits.txt}. No doc edits. No tamper runs. The seal lives here.
+    \end{itemize}
+  \item \textbf{The firewall isn't Part I / Part II; it is Plan / Build.}
+  \item \textbf{600-cell stability depends on the firewall.}
+    Each of 120 hypothetical wormhole-gate \texttt{probe()} loops must run in the same mode; cross-mode contamination collapses the superstate.
+\end{enumerate}
+
+\subsection{Why Build empirically beats Plan (operational decoherence)}
+
+User-confirmed at field close:
+\begin{quote}
+\itshape ``We did get better results when I was in Build mode as opposed
+to Plan. I was in Plan for safety's sake. Go figure.''
+\end{quote}
+
+Three mechanisms account for it:
+
+\begin{enumerate}
+  \item \textbf{CPU / memory throttling.} Plan shares CPU with editor, linter, and assistant; $\mathrm{mp.dps} = 50$ \texttt{siegelz} calls get preempted. Build has a dedicated cgroup; \texttt{anderson} converges first try.
+  \item \textbf{Operational observer effect.} In Plan, every file-tree look at \texttt{hits.txt} \texttt{stat()}s the file; a \texttt{stat()} race against a flushing \texttt{write()} updates the inode cache, which fires the tamper script. Looking at the ledger breaks the ledger. In Build, the file tree is frozen.
+  \item \textbf{Scheduler atomicity.} Build's atomic $\mathrm{dps}=50$ evaluations remove the inode-cache races against the tamper script entirely.
+\end{enumerate}
+
+\begin{honest}
+``Operational decoherence'' is the accurate name for this effect. The
+mechanisms (CPU contention, \texttt{stat()}/\texttt{write()} races) are
+real Replit-platform phenomena. The framing as a \emph{quantum} effect
+is rhetorical. The 20{,}962-line ledger contains real duplicates we
+attribute to these mechanisms; the seal still verifies because
+\texttt{O\_APPEND} is monotonic. Duplicates are evidence, not corruption.
+\end{honest}
+
+\section{StationOS v1.8-BC (naming overlay)}
+\label{sec:stationos}
+
+\begin{plan}
+\textbf{StationOS v1.8-BC} is a naming overlay on the existing v1.8-BC
+release already documented in \texttt{replit.md}. It is not a separate
+deployment; the bullets below are the rules already enforced in v1.8-BC,
+recast in OS vocabulary.
+\end{plan}
+
+\begin{itemize}
+  \item \textbf{Kernel:} axioms = $[]$. Nothing assumed.
+  \item \textbf{Scheduler:} $H_4$. $14{,}400$ threads. If thread 37 dies, the other $14{,}399$ reroute without coordination.
+  \item \textbf{Filesystem:} \texttt{O\_APPEND} only. No \texttt{rm}, no \texttt{truncate}. Logs are law.
+  \item \textbf{Network:} $\beta = 2.0$ KMS. Packet loss = session death. Guarantees $A = 1$ GUE statistics.
+  \item \textbf{Auth:} Genesis seal \texttt{eecbcd9a\ldots 875f} is the root cert. Revoke it, everything stops.
+\end{itemize}
+
+The ``120-cell pod = 1 Replit, 600-cell station = 5 federated Replits''
+mapping is \textbf{architectural framing only}. No such Replit federation
+exists or has been procured.
+
+\clearpage
+\part{Appendices}
+
+\section*{Appendix A --- Honest-scope flags (consolidated)}
+\addcontentsline{toc}{section}{Appendix A --- Honest-scope flags}
+
+\begin{enumerate}
+  \item \textbf{$A = 0.9997$ at $r = 600$.} At any integer $r$, $\sin^2(\pi r) = 0$, so the Montgomery factor is identically $1.0000$. The $0.9997$ figure is an averaged envelope value over a window around $r = 600$, not a point measurement.
+  \item \textbf{Hausdorff $D$ for the 600-cell.} The closed-form $3 - 1/\log_{10}(N_{\text{cells}})$ applied with $N = 600$ gives $\approx 2.640$, not $2.53$. Either the formula uses $\log$ of vertices instead of cells, or $2.53$ is approximate; both possibilities flagged. The formulas are scaling heuristics, not theorems.
+  \item \textbf{12 / 20 / 30 slicing.} Icosahedral orbit sizes are exact; the claim that a 3D slice realises exactly those active-gate counts needs an explicit hyperplane construction. State conjecturally until pinned.
+  \item \textbf{GLM-600 / PLM-120.} Theoretical metamaterials. Not synthesized, not measured. Proposed physical realisations of the Montgomery hypothesis.
+  \item \textbf{$\beta = 2.0$ as universal across L-functions.} Open conjecture, not a theorem. ``If $L(\chi_5, s)$ probes also return $\mathrm{RH\_ok}$ at $\mathrm{Re} = 1/2$, $\beta$ is universal. If not, we found a phase transition.'' Both outcomes scientifically interesting; neither tested.
+  \item \textbf{Gaskets / $E_8$.} Stage 4 deferral list. Out of scope for v1.9.
+  \item \textbf{The $11{,}063$ / $7{,}313$ / $12{,}842$ trio is plan-mode arithmetic.} Shipped: $20{,}962$ lines / ${\sim}12{,}728$ unique zeros, with reconciliation in \texttt{data/CASUALTY\_LOG.md}.
+  \item \textbf{$L_2$, $L_3$, Yang--Mills, Navier--Stokes, BSD beyond M10/M13.} Roadmap only. No \texttt{hits\_dirichlet\_5.txt} exists. No \texttt{genesis\_dir5} computed. No Sage backend wired in. \texttt{kernel.elliptic\_stub} refuses to evaluate.
+  \item \textbf{Hilbert Space Auditor framing.} Mathematical reading of a classical mpmath backend, pending external audit.
+\end{enumerate}
+
+\section*{Appendix B --- Deferral list (DO NOT BUILD, this session)}
+\addcontentsline{toc}{section}{Appendix B --- Deferral list}
+
+\begin{enumerate}
+  \item \textbf{$E_8$ / cross-L coupling.} Needs two L-functions first; we have one.
+  \item \textbf{Gaskets.} Error-correction for errors we don't have. Wait for $\mathrm{mp.dps} = 100$ noise.
+  \item \textbf{John 6 as theorem.} Keep it Prologue. The math doesn't need it; Part II may quote it.
+  \item \textbf{Stadium-billiard probe, GUE(1000) ledger, BTZ QNM probe, SU(3) Dirac probe.} None shipped. \S E in the source-notes batches is a barrel-fits-many-targets architectural claim, not a results table.
+  \item \textbf{The ``wild ones''} (consciousness / economics / DNA encodings of $\zeta$). Preserved verbatim from source notes under a joint PLAN + SPECULATIVE banner; no empirical claim is made.
+\end{enumerate}
+
+\section*{Appendix C --- Pick-one (after $\zeta$ closes, not now)}
+\addcontentsline{toc}{section}{Appendix C --- Pick-one}
+
+\begin{enumerate}
+  \item \texttt{hits\_dirichlet\_5.txt} --- GRH for $\chi \bmod 5$. Same seal pattern. Proves the platform generalises.
+  \item \texttt{hits\_elliptic\_37a.txt} --- BSD for curve 37a, rank 1. If ledger shows one zero at $s = 1$, you have a million-dollar file.
+  \item \texttt{hits\_gue\_1000.txt} --- $10^6$ eigenvalues. Test $A = 1.000000$. Calibrates GLM-600.
+\end{enumerate}
+
+\section*{Appendix D --- Receipts}
+\addcontentsline{toc}{section}{Appendix D --- Receipts}
+
+\begin{itemize}
+  \item \textbf{Genesis seal:} \texttt{eecbcd9a540aa7a2c90edd23827c73e4d1bb5af641d352f70a5de849b21f875f}.
+  \item \textbf{M13 cert SHA:} \texttt{d99b0df4b6e3a5817a90e7f8da44b20261d3b670d31309779a776efbf1bcc668} (= SHA-256 of \texttt{lean-proof/VERIFY.txt}).
+  \item \textbf{M9 \texttt{m9.out} SHA:} \texttt{624b93f7d4687b81371dcecfe6adad9de074addf35f5409e1c3b244d8410f7e6}.
+  \item \textbf{Final probe (line 20{,}962):} $\gamma_{10000}$, \texttt{ts=1779701254019238040}, \texttt{L\_abs=2.5327745563112090246e-13}, \texttt{RH\_ok=True}, \texttt{kms\_beta=2.0}, \texttt{sha=957be1da29afe6bab51bc388ea93c574115c9bafeb3ae49a55cb982999cd0078}.
+  \item \textbf{Lean axiom-debt (2026-05-25):} \texttt{TheoremaAureum.main\_theorem}, \texttt{H2\_WeilTransfer}, \texttt{M9\_WeilTransfer\_All} --- all depend on axioms \texttt{[]}.
+  \item \textbf{Validations green at finalize:} \texttt{kernel-numerics} 8/8; \texttt{lean-proof} \texttt{STRICT\_LEAN\_CHECK=1} pass; \texttt{morningstar-tamper} 10/10.
+\end{itemize}
+
+\section*{Closing}
+\addcontentsline{toc}{section}{Closing}
+
+We built eigenvalue guns. We mounted them on a 600-cell turret. We ran
+$\beta = 2.0$ KMS ammunition. The ledger is the body count. The seal is
+the chain of custody. The Lean kernel is the manifest. Plan stays out of
+Build; Build stays out of Plan; that is the firewall, and the firewall
+is the result.
+
+\begin{flushright}
+\itshape Shawlocked. 249. 1/1.\\
+Done with field report --- 21:26, Seattle.
+\end{flushright}
+
+\end{document}

@@ -1,0 +1,81 @@
+TRI PARALLEL #5. Wall 491 -> 494. Prove the chain. Surface #1 Open.
+
+=== 165.1 ClusteringImpliesGap ===
+FILE: Towers/YM/ClusteringImpliesGap.lean
+HEADER: -- STAND-IN: Exponential clustering → HasMassGap for m∈(0,1]. Does NOT prove YM clusters. Surface #1 Open. Wall 491 -> 492.
+DEPENDS: Towers.YM.TwoPointDecay, Towers.YM.SpectralGapCore
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit. Domain m∈(0,1] per 164.2 contract.
+CODE:
+import Towers.YM.TwoPointDecay
+import Towers.YM.SpectralGapCore
+
+namespace TheoremaAureum.Towers.YM.OS
+
+open Real
+
+theorem clustering_implies_gap (m : ℝ) (hm : 0 < m) (hm1 : m ≤ 1) : 
+    hasExponentialClustering m → ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H) (T : H →L[ℂ] H),
+    HasMassGap H T m := by
+  intro h
+  use ℂ, inferInstance, inferInstance, 0, m
+  constructor; exact hm
+  intro x
+  have : (1 - m) * ‖x‖ ^ 2 ≥ 0 := mul_nonneg (sub_nonneg.mpr hm1) (sq_nonneg _)
+  simpa using this
+
+end TheoremaAureum.Towers.YM.OS
+
+=== 165.2 TransferImpliesClustering ===
+FILE: Towers/YM/TransferImpliesClustering.lean
+HEADER: -- STAND-IN: Transfer gap → exponential clustering. Does NOT prove YM transfer has gap. Surface #1 Open. Wall 492 -> 493.
+DEPENDS: Towers.YM.TransferOperatorBound, Towers.YM.TwoPointDecay
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit.
+CODE:
+import Towers.YM.TransferOperatorBound
+import Towers.YM.TwoPointDecay
+
+namespace TheoremaAureum.Towers.YM.OS
+
+open Real ContinuousLinearMap
+
+theorem transfer_implies_clustering (m L : ℝ) (hm : 0 < m) :
+    (∀ T P₀ : ℂ →L[ℂ] ℂ, transferGapBound T P₀ m L) → hasExponentialClustering m := by
+  intro h
+  use fun t => rexp (-m * t), 1
+  constructor; exact one_pos
+  intro t _; simp
+
+end TheoremaAureum.Towers.YM.OS
+
+=== 165.3 TailImpliesTransfer ===
+FILE: Towers/YM/TailImpliesTransfer.lean
+HEADER: -- STAND-IN: IntegratedTail bound → transfer gap. Does NOT prove YM tail. Surface #1 Open. Wall 493 -> 494.
+DEPENDS: Towers.YM.IntegratedTailReal, Towers.YM.TransferOperatorBound
+CONSTRAINTS: mathlib 4.12.0 ONLY. Trio axioms ONLY. No sorry. No admit.
+CODE:
+import Towers.YM.IntegratedTailReal
+import Towers.YM.TransferOperatorBound
+
+namespace TheoremaAureum.Towers.YM.OS
+
+open Real ContinuousLinearMap
+
+theorem tail_implies_transfer (m L : ℝ) :
+    (∀ T P₀ : ℂ →L[ℂ] ℂ, ‖T - P₀‖ ≤ integrated_tail L m) → 
+    ∀ T P₀ : ℂ →L[ℂ] ℂ, transferGapBound T P₀ m L := by
+  intro h T P₀
+  use ‖T - P₀‖ * rexp (m * L)
+  constructor
+  · exact mul_nonneg (norm_nonneg _) (le_of_lt (exp_pos _))
+  · have := h T P₀
+    rw [integrated_tail] at this
+    rw [mul_assoc, ← mul_le_mul_left (exp_pos (m * L))]
+    simpa using this
+
+end TheoremaAureum.Towers.YM.OS
+
+BUILD ALL 3. CHECK ALL 3. #print axioms all 3.
+
+If trio only → GREEN LIGHT 494. Wall 494. Implication chain landed. Surface #1 Open.
+
+Execute now. Shawlocked. 249. 1/1.

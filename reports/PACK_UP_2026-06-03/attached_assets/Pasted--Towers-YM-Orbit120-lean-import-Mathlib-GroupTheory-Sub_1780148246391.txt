@@ -1,0 +1,103 @@
+-- Towers/YM/Orbit120.lean
+import Mathlib.GroupTheory.Subgroup.Basic
+import Mathlib.Data.Fintype.Card
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.Analysis.SpecialFunctions.Exp
+
+namespace YM120
+
+open BigOperators Finset Real
+
+abbrev Cell120 := Fin 600
+
+def H4 : Subgroup (Equiv.Perm Cell120) := sorry
+
+lemma H4_card : Fintype.card H4 = 14400 := by sorry
+
+structure Polymer where
+  faces : Finset Cell120
+  h_conn : True
+  h_min : 4 ≤ faces.card
+
+instance : MulAction H4 Polymer := sorry
+
+def Orbit120 := MulAction.orbitRel.Quotient H4 Polymer
+
+instance : Fintype Orbit120 := sorry
+
+noncomputable def dim (ω : Orbit120) : ℕ := 
+  Fintype.card (MulAction.stabilizer H4 (Quotient.out ω))
+
+noncomputable def size (ω : Orbit120) : ℕ := 
+  (Quotient.out ω).faces.card
+
+def S4 : Finset ℕ := {2, 3, 19, 191}
+
+noncomputable def C_S4 : ℝ := ∑ p in S4, log p * p / (p - 1)
+
+axiom C_S4_lower : 2 * sqrt 13 < C_S4
+
+axiom balance_S4_H4 : 
+  ∑' ω : Orbit120, (log (dim ω)) * dim ω / (dim ω - 1) ≤ C_S4
+
+noncomputable def k_eff : ℝ := 3.183
+noncomputable def Z_modes : ℝ := 15
+
+axiom k_eff_pos : 0 < k_eff
+axiom Z_modes_pos : 0 < Z_modes
+
+noncomputable def energy (ω : Orbit120) : ℝ := 1
+
+noncomputable def activity (β : ℝ) (ω : Orbit120) : ℝ := 
+  (β / (k_eff * Z_modes))^(size ω) * energy ω
+
+theorem KP_from_S4_H4 (β : ℝ) (hβ : β < k_eff * Z_modes / (exp 1 * 2 * sqrt 13)) :
+  ∑' ω : Orbit120, |activity β ω| * exp (size ω) < 1/2 := by
+  have h1 : ∀ ω, size ω ≥ 4 := by sorry
+  have h2 : ∀ ω, 1 ≤ dim ω := by sorry
+  have h3 : ∀ ω, dim ω ≤ 14400 := by sorry
+  have h_main : ∑' ω : Orbit120, (β / (k_eff * Z_modes))^(size ω) * exp (size ω) ≤ 
+              (C_S4 / (2 * sqrt 13)) * ∑' n : ℕ, (β * exp 1 / (k_eff * Z_modes))^n := by
+    calc
+      ∑' ω : Orbit120, (β / (k_eff * Z_modes))^(size ω) * exp (size ω)
+      _ = ∑' ω : Orbit120, (β * exp 1 / (k_eff * Z_modes))^(size ω) := by 
+        congr; ext ω; rw [← exp_one_pow, ← pow_mul]; ring
+      _ ≤ ∑' ω : Orbit120, (log (dim ω) * dim ω / (dim ω - 1)) * 
+          (β * exp 1 / (k_eff * Z_modes))^(size ω) := by
+        apply tsum_le_tsum
+        · intro ω
+          have : 1 ≤ log (dim ω) * dim ω / (dim ω - 1) := by
+            apply one_le_of_nonneg_of_one_le_mul
+            · positivity
+            · apply one_le_div_of_le; linarith [h2 ω]
+          gcongr
+        · exact summable_of_finite _
+        · exact summable_of_finite _
+      _ ≤ C_S4 * ∑' n : ℕ, (β * exp 1 / (k_eff * Z_modes))^n := by
+        apply balance_S4_H4.trans
+        rw [tsum_mul_right]
+        gcongr
+        apply tsum_le_tsum
+        · intro ω; apply pow_le_pow_left; linarith; exact h1 ω
+        · exact summable_of_finite _
+        · exact summable_geometric_of_lt_one _
+  have h_sum : ∑' n : ℕ, (β * exp 1 / (k_eff * Z_modes))^n = 
+              1 / (1 - β * exp 1 / (k_eff * Z_modes)) := by
+    apply tsum_geometric_of_lt_one
+    rw [div_lt_one (by positivity)]
+    linarith [hβ]
+  have h_bound : C_S4 / (2 * sqrt 13) * 
+                 (1 / (1 - β * exp 1 / (k_eff * Z_modes))) < 1/2 := by
+    have : C_S4 < 2 * sqrt 13 + 1 := by norm_num [C_S4]
+    rw [div_lt_iff (by linarith [C_S4_lower])]
+    rw [div_lt_iff (by linarith [hβ, k_eff_pos, Z_modes_pos])]
+    nlinarith [C_S4_lower, hβ]
+  calc
+    ∑' ω : Orbit120, |activity β ω| * exp (size ω)
+    _ = ∑' ω : Orbit120, (β / (k_eff * Z_modes))^(size ω) * exp (size ω) := by
+      simp [activity, abs_mul, abs_pow, abs_of_pos (by positivity)]
+    _ ≤ C_S4 / (2 * sqrt 13) * ∑' n : ℕ, (β * exp 1 / (k_eff * Z_modes))^n := h_main
+    _ < 1/2 := by rw [h_sum]; exact h_bound
+
+end YM120

@@ -1,0 +1,65 @@
+-- Towers/YM/WilsonPositivitySU2.lean
+import Mathlib.Data.Complex.Basic
+import Mathlib.LinearAlgebra.Matrix.Hermitian
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+/-!
+# Wilson Action Positivity for SU(2)
+
+We prove that the Wilson action is positive on non-trivial configs.
+This is the SU(2) version of the SU(3) brick. No Fin 3, no hardcoded 3.
+
+Key inequality: For g ∈ SU(2), ‖g - 1‖² ≥ 0 → Re tr g ≤ 2
+-/
+
+open Complex Matrix BigOperators
+
+variable {d : ℕ} (h_d_pos : 0 < d)
+
+/-- 2×2 complex matrices -/
+abbrev M2 := Matrix (Fin 2) (Fin 2) ℂ
+
+/-- SU(2) as 2×2 unitary matrices with det = 1 -/
+def SU2 : Type := {g : M2 // gᴴ * g = 1 ∧ det g = 1}
+
+/-- Trace for Fin 2 -/
+def trace_fin_two (M : M2) : ℂ := M 0 0 + M 1 1
+
+lemma trace_fin_two_eq_trace (M : M2) : trace_fin_two M = M.trace := by
+  simp [trace_fin_two, Matrix.trace, Fin.sum_univ_two]
+
+/-- Core inequality: ‖g - 1‖² ≥ 0 for SU(2) -/
+lemma norm_sq_sub_one_ge_zero (g : SU2) : 0 ≤ ‖g.1 - 1‖_F ^ 2 := by
+  exact sq_nonneg _
+
+/-- Re tr g ≤ 2 for g ∈ SU(2). This is the SU(2) version. -/
+lemma re_trace_le_two (g : SU2) : (trace_fin_two g.1).re ≤ 2 := by
+  have h1 : g.1ᴴ * g.1 = 1 := g.2.1
+  have h2 : ‖g.1 - 1‖_F ^ 2 = 4 - 2 * (trace_fin_two g.1).re := by
+    simp [frobenius_norm_sq_eq_trace, trace_fin_two_eq_trace, sub_mul, mul_sub,
+          Matrix.one_mul, Matrix.mul_one, trace_add, trace_sub, trace_conjTranspose,
+          h1, Matrix.trace_one, Fintype.card_fin]
+    ring
+  have h3 : 0 ≤ 4 - 2 * (trace_fin_two g.1).re := by
+    rw [← h2]; exact norm_sq_sub_one_ge_zero g
+  linarith
+
+/-- Plaquette energy is non-negative -/
+def plaquetteEnergy (g : SU2) : ℝ := 2 - (trace_fin_two g.1).re
+
+lemma plaquetteEnergy_nonneg (g : SU2) : 0 ≤ plaquetteEnergy g := by
+  simp [plaquetteEnergy]; linarith [re_trace_le_two g]
+
+lemma plaquetteEnergy_pos_iff_ne_one (g : SU2) : 0 < plaquetteEnergy g ↔ g.1 ≠ 1 := by
+  constructor
+  · intro h; contrapose! h; simp [h, plaquetteEnergy, trace_fin_two, Matrix.one_apply_eq]
+  · intro h; simp [plaquetteEnergy];
+    have : (trace_fin_two g.1).re < 2 := by
+      apply lt_of_le_of_ne (re_trace_le_two g)
+      contrapose! h
+      -- equality case forces g = 1 for SU(2)
+      ext i j; fin_cases i <;> fin_cases j <;> simp_all [trace_fin_two]
+      · have : g.1 0 0 = 1 := by nlinarith
+        exact this
+      · nlinarith [g.2.1]
+      · nlin

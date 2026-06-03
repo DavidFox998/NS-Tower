@@ -1,0 +1,215 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem*{opengap}{Open Gap}
+\newtheorem*{conjecture}{Conjecture}
+
+\title{Surface \#2 (Research Program):\\
+A Polymer-Expansion Scaffold for 4D SU(3) Lattice Yang--Mills,\\
+With an Honest Accounting of the Open Analytic Gaps}
+\author{David J. Fox \\
+\href{mailto:Davidjfox998@gmail.com}{Davidjfox998@gmail.com} \\
+\href{https://orcid.org/0009-0008-1290-6105}{ORCID: 0009-0008-1290-6105}}
+\date{May 27, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This note states the polymer-expansion route to a convergent cluster
+expansion for 4D SU(3) lattice Yang--Mills at small coupling, as the
+intended consumer of the Peter--Weyl heat-kernel infrastructure
+established in Surface~\#1 (Installment A). It is \textbf{not} a
+proof of convergence: the central inequalities --- the per-plaquette
+exponential activity bound, the Kotecky--Preiss criterion, absolute
+convergence of the polymer log-partition series, and area-law decay
+of Wilson loops --- are all open in the formalization. The
+corresponding theorem statement \texttt{kotecky\_preiss\_criterion}
+exists in \texttt{Towers/Attempts/ClusterExpansion.lean} as a
+parked \texttt{sorry}, and the surrounding YM cluster-expansion file
+carries roughly 60 additional sorries. This document fixes the
+\emph{scaffold} that those sorries will eventually close into, and
+records the gaps explicitly so referees can audit them.
+\end{abstract}
+
+\section{Status declaration}
+
+\noindent\textbf{What is formalized (Surface~\#1, Installment A):}
+\begin{itemize}
+  \item \texttt{PeterWeyl\_Summable\_SU3} --- summability of the
+        Peter--Weyl heat-kernel series for every $t>0$.
+  \item \texttt{Weyl\_sum\_explicit\_SU3\_real\_le\_Heat\_kernel\_envelope\_real}
+        --- truncation $\le$ genuine $\mathsf{tsum}$ envelope.
+  \item \texttt{Heat\_kernel\_envelope\_real\_ge\_one\_of\_pos}.
+\end{itemize}
+Each closes under axiom footprint
+$\{\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}\}$.
+
+\noindent\textbf{What is not formalized (this surface):}
+The Varadhan small-$t$ asymptotic for $K(t)$, the per-plaquette
+exponential activity bound, the Kotecky--Preiss criterion as a true
+theorem, the cluster expansion $\log Z_\Lambda$, the Ursell-function
+identity, and exponential decay of Wilson-loop expectations. The
+shipped statement of \texttt{kotecky\_preiss\_criterion} is a
+\texttt{sorry} in the project's \texttt{Attempts/} directory; the
+Yang--Mills tower in \texttt{docs/ROADMAP.md} \S2 remains
+\emph{Status: Open}.
+
+\section{Definitions (informal scaffold)}
+
+\begin{definition}[Polymer]
+A polymer $\gamma$ is a finite, geometrically connected set of
+plaquettes in the 4D lattice $\mathbb{Z}^4$. Let $\mathcal{P}$
+denote the set of polymers. \emph{Not yet formalized as a Lean
+structure; the project ships a placeholder \texttt{Polymer} type in
+\texttt{Towers/Attempts/ClusterExpansion.lean}.}
+\end{definition}
+
+\begin{definition}[Polymer activity, target shape]
+For inverse coupling $\beta>0$ and Peter--Weyl truncation
+$N\in\mathbb{N}$,
+\[
+  w(\gamma) := \prod_{p \in \gamma}
+    \texttt{plaquette\_activity\_pw}(\beta, N, p).
+\]
+\emph{The product structure and combinatorial dependence on $\gamma$
+are not formalized; only the per-plaquette activity placeholder
+exists.}
+\end{definition}
+
+\begin{definition}[Kotecky--Preiss condition, target shape]
+The expansion is said to satisfy KP at $\beta$ if there exists
+$\mu:\mathcal{P}\to[0,\infty)$ such that for every
+$\gamma\in\mathcal{P}$,
+\[
+  \sum_{\gamma' \,:\, \gamma' \cap \gamma \neq \emptyset}
+    w(\gamma')\, e^{\mu(\gamma')} \;\le\; \mu(\gamma).
+\]
+\end{definition}
+
+\section{Target theorems (currently \texttt{sorry})}
+
+\begin{conjecture}[Per-plaquette exponential activity, target of
+\texttt{exists\_c\_per\_plaquette\_pw}]
+\label{conj:activity}
+There exist $C,c>0$ and $t_0>0$ such that for every $\beta>1/t_0$
+and every plaquette $p$,
+\[
+  \texttt{plaquette\_activity\_pw}(\beta, N, p)
+    \;\le\; C\,\beta^{-4}\, e^{-c/\beta}.
+\]
+\end{conjecture}
+
+\begin{opengap}
+Conjecture~\ref{conj:activity} is the direct consumer of the
+Varadhan small-$t$ asymptotic of Surface~\#1
+(project task \#156). Until that asymptotic is formalized, no
+quantitative per-plaquette decay rate is available; only the
+qualitative envelope bound $S_N(t)\le K(t)$ of
+Surface~\#1, Installment A.
+\end{opengap}
+
+\begin{conjecture}[KP criterion at small coupling, target of
+\texttt{kotecky\_preiss\_criterion}]
+\label{conj:kp}
+There exists $\beta_0>0$ such that for every $\beta\ge\beta_0$ the
+KP condition holds with $\mu(\gamma) = a|\gamma|$ for some $a>0$
+depending only on $C,c$ from Conjecture~\ref{conj:activity} and on
+the 4D plaquette-graph branching constant.
+\end{conjecture}
+
+\begin{opengap}
+The Lean identifier \texttt{kotecky\_preiss\_criterion} lives in
+\texttt{Towers/Attempts/ClusterExpansion.lean} (line $\approx$601)
+and is a \texttt{sorry}. The surrounding file carries roughly 60
+further sorries; \texttt{Towers/YM/ClusterExpansion.lean} carries
+another $\sim$60. The combinatorial geometric-series argument
+(``sum over polymers intersecting $\gamma$ is controlled by the
+branching constant raised to $|\gamma|$, times the activity bound'')
+is standard in the informal literature but requires formalizing
+(i) the polymer-graph branching count and (ii) the partial-sum
+estimate. Neither has been done in this project.
+\end{opengap}
+
+\begin{conjecture}[Cluster expansion of $\log Z_\Lambda$]
+For $\beta$ as in Conjecture~\ref{conj:kp},
+\[
+  \log Z_\Lambda(\beta) \;=\; \sum_X \Phi^T(X) \prod_{\gamma\in X} w(\gamma),
+\]
+where $X$ ranges over clusters and $\Phi^T$ is the Ursell function.
+The series converges absolutely.
+\end{conjecture}
+
+\begin{opengap}
+$Z_\Lambda$, $\Phi^T$, and the cluster sum are not formalized; the
+identity is the standard Kotecky--Preiss / Brydges--Federbush
+output, but a machine-checked derivation in this codebase does not
+exist.
+\end{opengap}
+
+\begin{conjecture}[Area-law decay of Wilson loops]
+For $\beta$ as above, every contractible Wilson loop $W_C$ satisfies
+\[
+  |\langle W_C\rangle| \;\le\; K\, e^{-m\,\mathrm{Area}(C)}
+\]
+for some $K,m>0$.
+\end{conjecture}
+
+\begin{opengap}
+Wilson loops are not defined in the codebase. The standard derivation
+(area law from convergent cluster expansion at strong coupling on
+the lattice) is conditional on Conjectures
+\ref{conj:activity}--\ref{conj:kp}; it is also \emph{lattice-only}
+and does not, by itself, address the continuum-limit mass-gap
+statement of the Clay problem. The continuum limit
+$a\to 0$ is its own surface and is not addressed here.
+\end{opengap}
+
+\section{Honest scope}
+
+This document does not claim to prove or formalize any of the
+conjectures above. It fixes the \emph{shape} of the polymer-expansion
+argument that the project intends to close, lists the open gaps by
+Lean identifier, and is consistent with the project's locked rule
+that the Yang--Mills tower remains \emph{Status: Open} until the Lean
+spine actually closes the named theorem with axiom debt empty.
+
+\section*{Cross-references}
+
+\noindent\textbf{Lean identifiers referenced:}
+\begin{itemize}
+  \item \texttt{plaquette\_activity\_pw}, \texttt{exists\_c\_per\_plaquette\_pw},
+        \texttt{polymer\_activity\_bound\_real\_pw},
+        \texttt{kotecky\_preiss\_criterion}
+        --- in \texttt{Towers/YM/ClusterExpansion.lean} and
+        \texttt{Towers/Attempts/ClusterExpansion.lean}.
+  \item \texttt{Heat\_kernel\_envelope\_real},
+        \texttt{Weyl\_sum\_explicit\_SU3\_real\_le\_Heat\_kernel\_envelope\_real},
+        \texttt{Heat\_kernel\_envelope\_real\_ge\_one\_of\_pos}
+        --- in \texttt{Towers/YM/PeterWeylHeat.lean}.
+  \item \texttt{PeterWeyl\_Summable\_SU3} --- in
+        \texttt{Towers/YM/PeterWeyl.lean}.
+\end{itemize}
+
+\noindent\textbf{Project task tracker:}
+\begin{itemize}
+  \item Task \#154 --- Peter--Weyl summability (closed).
+  \item Task \#155 --- truncation-to-envelope bridge (closed; this
+        is the entirety of formalized Surface~\#1 progress).
+  \item Task \#156 --- Varadhan small-$t$ asymptotic (open, blocks
+        Surface~\#2).
+  \item Task \#157 --- tightened Casimir / Weyl-dim envelopes
+        (open, tech-debt; would shorten Surface~\#1 proofs).
+\end{itemize}
+
+\noindent Genesis seal of the project ledger
+\texttt{data/hits.txt} at the time of writing:
+\texttt{eecbcd9a540aa7a2c90edd23827c73e4d1bb5af641d352f70a5de849b21f875f}.
+
+\end{document}

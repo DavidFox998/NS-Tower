@@ -1,0 +1,103 @@
+Morning Star / Theorema Aureum 143 — Full Repo Export Index
+Generated: 2026-06-03  By: full_repo_export()  Author: D. Fox
+
+== File count by top-level category ==
+   2366 attached_assets
+    235 lean-proof-towers
+    231 artifacts
+     81 lib
+     46 experiments
+     45 docs
+     37 .agents
+     35 paper
+     34 scripts
+     16 data
+     11 lean-proof
+      9 tests
+      1 Z_INPUT_SET.json
+      1 uv.lock
+      1 tsconfig.json
+      1 tsconfig.base.json
+      1 TOWERS_YM_v2.3.pdf
+      1 sorry.md
+      1 replit.nix
+      1 replit.md
+      1 .replitignore
+      1 .replit
+      1 README.md
+      1 pyproject.toml
+      1 pnpm-workspace.yaml
+      1 pnpm-lock.yaml
+      1 package.json
+      1 .npmrc
+      1 MorningStar_v1.9_master_manifesto.zip
+      1 main.py
+      1 lean_bridge.py
+      1 lab.py
+      1 kernel.py
+      1 .gitignore
+      1 CITATION.cff
+
+== File count by extension (top 25) ==
+   2202 .jpg
+    214 .lean
+    143 .ts
+    134 .tsx
+    130 .pdf
+     66 .md
+     46 .json
+     45 .py
+     43 .txt
+     24 .tex
+     17 .csv
+     15 .sh
+     13 .log
+     11 .aux
+      8 .zip
+      8 .yaml
+      8 .tar
+      5 .toml
+      5 .svg
+      4 .png
+      4 .out
+      2 (noext)
+      2 .lock
+      2 .html
+      2 .gitkeep
+
+== Disk size by top-level category ==
+    0.1 MB  .agents
+   13.2 MB  artifacts
+  822.1 MB  attached_assets
+    0.0 MB  CITATION.cff
+   12.3 MB  data
+    4.1 MB  docs
+    0.6 MB  experiments
+    0.0 MB  .gitignore
+    0.1 MB  kernel.py
+    0.0 MB  lab.py
+    0.0 MB  lean_bridge.py
+    0.0 MB  lean-proof
+   21.5 MB  lean-proof-towers
+    0.7 MB  lib
+    0.0 MB  main.py
+    1.9 MB  MorningStar_v1.9_master_manifesto.zip
+    0.0 MB  .npmrc
+    0.0 MB  package.json
+    1.6 MB  paper
+    0.2 MB  pnpm-lock.yaml
+    0.0 MB  pnpm-workspace.yaml
+    0.0 MB  pyproject.toml
+    0.0 MB  README.md
+    0.0 MB  .replit
+    0.0 MB  .replitignore
+    0.0 MB  replit.md
+    0.0 MB  replit.nix
+    0.4 MB  scripts
+    0.0 MB  sorry.md
+    0.1 MB  tests
+    0.0 MB  TOWERS_YM_v2.3.pdf
+    0.0 MB  tsconfig.base.json
+    0.0 MB  tsconfig.json
+    0.1 MB  uv.lock
+    0.0 MB  Z_INPUT_SET.json

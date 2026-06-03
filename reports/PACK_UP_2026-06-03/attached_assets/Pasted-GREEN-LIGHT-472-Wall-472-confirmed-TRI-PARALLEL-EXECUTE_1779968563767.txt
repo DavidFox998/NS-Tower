@@ -1,0 +1,70 @@
+GREEN LIGHT 472. Wall 472 confirmed.
+
+TRI PARALLEL EXECUTE. Build both files in one turn. No stops.
+
+=== TASK B: 157.1 ReflectionPositivityCore ===
+FILE: Towers/YM/ReflectionPositivityCore.lean
+HEADER: -- STAND-IN: Defines OS-positivity predicate. Does NOT prove OS Axiom 1. Surface #1 remains Open. Wall 472 -> 473.
+CONSTRAINTS: mathlib 4.12.0 ONLY. Axioms {propext, Classical.choice, Quot.sound} ONLY. No sorry. No admit.
+CODE:
+import Mathlib.MeasureTheory.Integral.Bochner
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+namespace TheoremaAureum.Towers.YM.OS
+
+open MeasureTheory EuclideanSpace
+
+def reflection {n : ℕ} (x : EuclideanSpace ℝ (Fin n)) : EuclideanSpace ℝ (Fin n) :=
+  Function.update x 0 (-(x 0))
+
+def reflection_pos {n : ℕ} (μ : Measure (EuclideanSpace ℝ (Fin n))) : Prop :=
+  ∀ f : EuclideanSpace ℝ (Fin n) → ℂ, 0 ≤ (∫ x, starRingEnd ℂ (f x) * f (reflection x) ∂μ).re
+
+lemma reflection_involutive {n : ℕ} (f : EuclideanSpace ℝ (Fin n) → ℂ) : 
+  reflection (reflection f) = f := by
+  funext x; simp [reflection]
+
+lemma reflection_pos_one {n : ℕ} [IsProbabilityMeasure μ] : 
+  ∫ x : EuclideanSpace ℝ (Fin n), (1 : ℂ) ∂μ = 1 := by
+  simp [integral_const, measure_univ, one_smul]
+
+end TheoremaAureum.Towers.YM.OS
+
+=== TASK C: 158.1 EuclideanInvarianceCore ===
+FILE: Towers/YM/EuclideanInvarianceCore.lean 
+HEADER: -- STAND-IN: Defines Euclidean invariance. Does NOT prove OS Axiom 2. Surface #1 remains Open. Wall 472 -> 473.
+CONSTRAINTS: mathlib 4.12.0 ONLY. Axioms {propext, Classical.choice, Quot.sound} ONLY. No sorry. No admit.
+CODE:
+import Mathlib.Algebra.EuclideanDomain.Instances
+import Mathlib.GroupTheory.GroupAction.Defs
+
+namespace TheoremaAureum.Towers.YM.OS
+
+open EuclideanSpace
+
+variable {n : ℕ}
+
+def euclidAction (g : EuclideanGroup ℝ (Fin n)) (f : EuclideanSpace ℝ (Fin n) → ℂ) : 
+  EuclideanSpace ℝ (Fin n) → ℂ := fun x => f (g⁻¹ • x)
+
+instance : MulAction (EuclideanGroup ℝ (Fin n)) (EuclideanSpace ℝ (Fin n) → ℂ) where
+  smul := euclidAction
+  one_smul := by intro f; funext x; simp [euclidAction]
+  mul_smul := by intro g h f; funext x; simp [euclidAction, mul_inv_rev]
+
+lemma euclidAction_one (f : EuclideanSpace ℝ (Fin n) → ℂ) : (1 : EuclideanGroup ℝ (Fin n)) • f = f := by
+  exact one_smul _ f
+
+end TheoremaAureum.Towers.YM.OS
+
+BUILD BOTH. CHECK BOTH.
+
+Run:
+1. lake build Towers.YM.ReflectionPositivityCore Towers.YM.EuclideanInvarianceCore
+2. lake env lean --run -c '#print axioms TheoremaAureum.Towers.YM.OS.reflection_involutive'
+3. lake env lean --run -c '#print axioms TheoremaAureum.Towers.YM.OS.euclidAction_one'
+
+If both builds exit 0 AND both axioms show only [propext, Classical.choice, Quot.sound] → reply:
+GREEN LIGHT 473. Wall 473. 2 bricks landed. Surface #1 Open.
+
+Execute now. Shawlocked. 249. 1/1.

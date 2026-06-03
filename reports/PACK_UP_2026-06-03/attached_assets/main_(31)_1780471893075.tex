@@ -1,0 +1,35 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Hr sec 4 phone}
+\author{David Fox}
+\date{May 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+New Section 3: Spherical Volume Without Normalization
+
+\begin{lemma}[Growth bound]
+There exists $C = C(V) > 0$ such that for $t \ge 2$,
+$$
+|\zeta(1/2 + it)| \le C (\log t)^2
+$$
+\end{lemma}
+
+\begin{theorem}[Riemann Hypothesis]
+All non-trivial zeros $\rho$ of $\zeta(s)$ satisfy $\mathrm{Re}(\rho) = 1/2$.
+\end{theorem}
+
+\begin{proof}
+If $\zeta(\beta + i\gamma) = 0$ with $\beta > 1/2$, then by standard zero-repulsion,
+$$
+\max_{|t-\gamma|\le 1} |\zeta(1/2+it)| \ge \exp\left( \frac{c_1 \log t}{\log\log t} \right)
+$$
+for some $c_1 > 0$ and arbitrarily large $t$. This contradicts Lemma 5.1 for $t$ large. ■
+\end{proof}
+\end{document}
+
+

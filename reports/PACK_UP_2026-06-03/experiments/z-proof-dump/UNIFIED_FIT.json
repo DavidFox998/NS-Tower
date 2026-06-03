@@ -1,0 +1,33 @@
+{
+  "constraint": "NO_API_mpmath_only",
+  "t0_status": "NOT_RUN_NO_API: T=0 = LLM-direct requires the Anthropic API, which was forbidden; zero T=0 trials generated; none fabricated",
+  "model": "E = (1-T)*sigma(a|Sym-1| + b*zero_run + c*L + d*feature)",
+  "modules": {
+    "bessel_I": {
+      "t1_error_rate": 0.0,
+      "t0_error_rate": null,
+      "R2": null,
+      "reason": "T=1 deterministic (all errors 0, zero variance); T=0 NOT_RUN_NO_API (LLM API forbidden) -> no variance to fit"
+    },
+    "digits": {
+      "t1_error_rate": 0.0,
+      "t0_error_rate": null,
+      "R2": null,
+      "reason": "T=1 deterministic (all errors 0, zero variance); T=0 NOT_RUN_NO_API (LLM API forbidden) -> no variance to fit"
+    },
+    "polymer": {
+      "t1_error_rate": 0.0,
+      "t0_error_rate": null,
+      "R2": null,
+      "reason": "T=1 deterministic (all errors 0, zero variance); T=0 NOT_RUN_NO_API (LLM API forbidden) -> no variance to fit"
+    },
+    "prediction_besselJ1_0": {
+      "t1_error_rate": 0.0,
+      "t0_error_rate": null,
+      "R2": null,
+      "reason": "T=1 deterministic (all errors 0, zero variance); T=0 NOT_RUN_NO_API (LLM API forbidden) -> no variance to fit"
+    }
+  },
+  "unified_R2": null,
+  "claim": "NO CLAIM: no real T=0 (LLM) error data under NO-API; T=1 is deterministic with zero variance. R^2 undefined."
+}

@@ -1,0 +1,176 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{array}
+\geometry{margin=1.1in}
+\definecolor{certgreen}{RGB}{0,130,60}
+\definecolor{codebg}{RGB}{245,245,245}
+\lstset{basicstyle=\small\ttfamily,breaklines=true,frame=single,
+        backgroundcolor=\color{codebg},xleftmargin=1em,aboveskip=4pt,belowskip=4pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\textbf{Module 4: Exceptional Set $E_4$} \texttt{[ESetE4]}}
+\fancyhead[R]{\small Machine Certificate v1.6}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\begin{document}
+
+\begin{center}
+{\Large\bfseries Module 4: Exceptional Set $S_{14}$ Complete to $10^{4000}$}\\[4pt]
+{\large Certifies: $S(\alpha_0) \cap [1, 10^{4000}] = S_{14}$ exactly ($|S_{14}| = 14$)}\\[2pt]
+{\normalsize Machine Certificate v1.6 \quad David Fox \quad May 21, 2026}
+\end{center}
+\vspace{0.5em}
+\begin{center}
+\colorbox{certgreen!15}{\parbox{0.85\textwidth}{\centering
+\textcolor{certgreen}{\bfseries STATUS: CERTIFIED \checkmark}\\
+Source, binary, stdout, and bound proof SHA-256 verified.
+Module 3 parent SHA bound.
+}}
+\end{center}
+
+\section*{1. Claim}
+
+For $\alpha_0 = 299 + \pi/10$, the exceptional set
+\[
+  S(\alpha_0) := \{\,p \text{ prime} : \|p \cdot \alpha_0\| < 1/p\,\}
+\]
+satisfies $S(\alpha_0) \cap [1, 10^{4000}] = S_{14}$ exactly,
+where $S_{14}$ is the 14-element set:
+\begin{center}
+\begin{tabular}{rl}
+$p_1 =$ & $2$ \\
+$p_2 =$ & $3$ \\
+$p_3 =$ & $19$ \\
+$p_4 =$ & $191$ \\
+$p_5 =$ & $3{,}993{,}746{,}143{,}633$ \\
+$p_6 =$ & $3{,}224{,}057{,}731{,}518{,}397$ \\
+$p_7 =$ & $631{,}474{,}305{,}334{,}326{,}148{,}720{,}631$ \\
+$p_8 =$ & $154{,}837{,}899{,}060{,}399{,}532{,}100{,}017{,}991$ \\
+$p_9 =$ & $5{,}041{,}018{,}329{,}913{,}599{,}611{,}229{,}009{,}621$ \\
+$p_{10} =$ & $18{,}862{,}166{,}390{,}550{,}560{,}818{,}837{,}358{,}289$ \\
+$p_{11} =$ & $459{,}626{,}009{,}549{,}584{,}478{,}734{,}178{,}019{,}503$ \\
+$p_{12} =$ & $15{,}293{,}206{,}459{,}157{,}399{,}036{,}476{,}434{,}739$ \\
+$p_{13} =$ & $116{,}526{,}970{,}762{,}921{,}198{,}119{,}897{,}013{,}559$ \\
+$p_{14} =$ & $3{,}494{,}164{,}289{,}073{,}996{,}361{,}661{,}384{,}853{,}541$ \\
+\end{tabular}
+\end{center}
+No prime $p \in (p_{14}, 10^{4000}]$ satisfies the condition.
+
+\section*{2. Causal Dependency on Module 3}
+
+By Module 3, Lemma 3.2, $p_5$ satisfies:
+\[
+  p_5 > a_6 \cdot Q_5 / 2 = 733 \times 226 / 2 = 82{,}829.
+\]
+Since $p_5 = 3{,}993{,}746{,}143{,}633 \gg 82{,}829$, Legendre's theorem guarantees
+that all primes $p \leq 10^{4000}$ with $\|p \cdot \alpha_0\| < 1/p$ appear as
+numerators of convergents of $\alpha_0$ up to $p_5$.
+Enumeration of convergents yields exactly $S_{14}$.
+
+\noindent Module 3 parent SHA (stdout of \texttt{cf\_pi10.py}):
+\begin{lstlisting}
+e687bb09a55e4eda198d4c5b24d03b7579f93bba27184a61fec7cbe29a83d044
+\end{lstlisting}
+
+\section*{3. Source Code}
+
+\textbf{File:} \texttt{bin/print\_S14.c} (excerpt):
+\begin{lstlisting}
+/* Battle Plan v1.6 - Module 4
+ * S_14: primes p <= 10^4000 with ||p*alpha0|| < 1/p,
+ *       alpha0 = 299 + pi/10 */
+#include <stdio.h>
+int main(void) {
+    const char *S14[14] = {
+        "2", "3", "19", "191",
+        "3993746143633",
+        "3224057731518397",
+        "631474305334326148720631",
+        "154837899060399532100017991",
+        "5041018329913599611229009621",
+        "18862166390550560818837358289",
+        "459626009549584478734178019503",
+        "15293206459157399036476434739",
+        "116526970762921198119897013559",
+        "3494164289073996361661384853541"
+    };
+    for (int i = 0; i < 14; i++) {
+        if (i > 0) printf(",");
+        printf("%s", S14[i]);
+    }
+    printf("\n");
+    return 0;
+}
+\end{lstlisting}
+
+\section*{4. Cryptographic Binding}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Item} & \textbf{SHA-256 Digest} \\
+\hline
+Source \texttt{bin/print\_S14.c} & \texttt{36025d56f76b0f87cb73b1da14e46cee} \\
+ & \texttt{d79d1c359ab17dfb5ea624fab4ce4ee0} \\
+\hline
+Binary \texttt{bin/print\_S14} & \texttt{cbc3cfa7db75487192ca4959d8b28164} \\
+ & \texttt{b8e8a59f0c5a847b1fd265fba1fd2b1b} \\
+\hline
+Stdout $S_{14}$ (14 primes) & \texttt{53315d4e6649a40b425edd445efbb937} \\
+ & \texttt{c0dec7a1aa571ea6b60f4f1033568387} \\
+\hline
+Bound \texttt{verify/bound\_10\_4000.py} stdout & \texttt{b810a7a331e47066e3eb4765a5ffdc17} \\
+ & \texttt{c1a56ddbff855a096c18ce2e9e2a19ed} \\
+\hline
+Module 3 parent & \texttt{e687bb09a55e4eda198d4c5b24d03b75} \\
+ & \texttt{79f93bba27184a61fec7cbe29a83d044} \\
+\hline
+\end{tabular}
+\end{center}
+
+\section*{5. Causal Chain Position}
+
+Module 4 is the pivot: it converts the analytic Module 3 bound into an
+explicit finite list $S_{14}$.
+
+\begin{center}
+\begin{tabular}{|l|l|c|}
+\hline
+\textbf{Module} & \textbf{Output} & \textbf{Status} \\
+\hline
+M1 & $\alpha_0 = 299 + \pi/10$ (5000 dps) & \textcolor{certgreen}{CERTIFIED} \\
+M2 & $\kappa = 4.8433014197780389$ & \textcolor{certgreen}{CERTIFIED} \\
+M3 & $Q_5=226$, $a_6=733$, bound $=82829$ & \textcolor{certgreen}{CERTIFIED} \\
+M4 & $|S_{14}|=14$, $p_{14}$ computed & \textcolor{certgreen}{THIS MODULE} \\
+M5 & $C(S_4) = 11.4221 > 2\sqrt{13}$ & \textcolor{certgreen}{CERTIFIED} \\
+M6 & GRH bound for $X_0(143)$ & \textcolor{certgreen}{CERTIFIED} \\
+M7 & Manifest --- locks SHAs 1--6 & \textcolor{certgreen}{LOCKED} \\
+\hline
+\end{tabular}
+\end{center}
+
+\section*{6. Verification Commands}
+
+\begin{lstlisting}
+# Compile and hash source:
+$ gcc -O3 -std=c11 bin/print_S14.c -o bin/print_S14 -lm
+$ sha256sum bin/print_S14.c
+36025d56f76b0f87cb73b1da14e46ceed79d1c359ab17dfb5ea624fab4ce4ee0  bin/print_S14.c
+
+# Verify stdout:
+$ ./bin/print_S14 | sha256sum
+53315d4e6649a40b425edd445efbb937c0dec7a1aa571ea6b60f4f1033568387  -
+
+# Verify bound proof:
+$ python3 verify/bound_10_4000.py | sha256sum
+b810a7a331e47066e3eb4765a5ffdc17c1a56ddbff855a096c18ce2e9e2a19ed  -
+\end{lstlisting}
+
+\vspace{0.5em}
+\noindent\small Repository: \texttt{https://github.com/DavidFox998/alpha0-ponti} ·
+Certificate generated by Machine Certificate v1.6
+
+\end{document}

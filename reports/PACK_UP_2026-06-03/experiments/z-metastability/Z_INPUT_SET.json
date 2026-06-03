@@ -1,0 +1,302 @@
+[
+  {
+    "s": "2",
+    "digits": 1,
+    "zero_run": 0,
+    "sym": 120
+  },
+  {
+    "s": "3",
+    "digits": 1,
+    "zero_run": 0,
+    "sym": 20
+  },
+  {
+    "s": "19",
+    "digits": 2,
+    "zero_run": 0,
+    "sym": 2
+  },
+  {
+    "s": "191",
+    "digits": 3,
+    "zero_run": 0,
+    "sym": 2
+  },
+  {
+    "s": "1000000001119",
+    "digits": 13,
+    "zero_run": 8,
+    "sym": 1
+  },
+  {
+    "s": "10000000001119",
+    "digits": 14,
+    "zero_run": 9,
+    "sym": 1
+  },
+  {
+    "s": "1000000001357",
+    "digits": 13,
+    "zero_run": 8,
+    "sym": 1
+  },
+  {
+    "s": "1000000001511",
+    "digits": 13,
+    "zero_run": 8,
+    "sym": 1
+  },
+  {
+    "s": "1000000001723",
+    "digits": 13,
+    "zero_run": 8,
+    "sym": 1
+  },
+  {
+    "s": "1000000001831",
+    "digits": 13,
+    "zero_run": 8,
+    "sym": 1
+  },
+  {
+    "s": "1234567891",
+    "digits": 10,
+    "zero_run": 0,
+    "sym": null
+  },
+  {
+    "s": "1000123456",
+    "digits": 10,
+    "zero_run": 3,
+    "sym": null
+  },
+  {
+    "s": "1000000123",
+    "digits": 10,
+    "zero_run": 6,
+    "sym": null
+  },
+  {
+    "s": "1000000000",
+    "digits": 10,
+    "zero_run": 9,
+    "sym": null
+  },
+  {
+    "s": "12345678912",
+    "digits": 11,
+    "zero_run": 0,
+    "sym": null
+  },
+  {
+    "s": "10001234567",
+    "digits": 11,
+    "zero_run": 3,
+    "sym": null
+  },
+  {
+    "s": "10000001234",
+    "digits": 11,
+    "zero_run": 6,
+    "sym": null
+  },
+  {
+    "s": "10000000001",
+    "digits": 11,
+    "zero_run": 9,
+    "sym": null
+  },
+  {
+    "s": "123456789123",
+    "digits": 12,
+    "zero_run": 0,
+    "sym": null
+  },
+  {
+    "s": "100012345678",
+    "digits": 12,
+    "zero_run": 3,
+    "sym": null
+  },
+  {
+    "s": "100000012345",
+    "digits": 12,
+    "zero_run": 6,
+    "sym": null
+  },
+  {
+    "s": "100000000012",
+    "digits": 12,
+    "zero_run": 9,
+    "sym": null
+  },
+  {
+    "s": "1234567891234",
+    "digits": 13,
+    "zero_run": 0,
+    "sym": null
+  },
+  {
+    "s": "1000123456789",
+    "digits": 13,
+    "zero_run": 3,
+    "sym": null
+  },
+  {
+    "s": "1000000123456",
+    "digits": 13,
+    "zero_run": 6,
+    "sym": null
+  },
+  {
+    "s": "1000000000123",
+    "digits": 13,
+    "zero_run": 9,
+    "sym": null
+  },
+  {
+    "s": "1000000000000",
+    "digits": 13,
+    "zero_run": 12,
+    "sym": null
+  },
+  {
+    "s": "12345678912345",
+    "digits": 14,
+    "zero_run": 0,
+    "sym": null
+  },
+  {
+    "s": "10001234567891",
+    "digits": 14,
+    "zero_run": 3,
+    "sym": null
+  },
+  {
+    "s": "10000001234567",
+    "digits": 14,
+    "zero_run": 6,
+    "sym": null
+  },
+  {
+    "s": "10000000001234",
+    "digits": 14,
+    "zero_run": 9,
+    "sym": null
+  },
+  {
+    "s": "10000000000001",
+    "digits": 14,
+    "zero_run": 12,
+    "sym": null
+  },
+  {
+    "s": "123456789123456",
+    "digits": 15,
+    "zero_run": 0,
+    "sym": null
+  },
+  {
+    "s": "100012345678912",
+    "digits": 15,
+    "zero_run": 3,
+    "sym": null
+  },
+  {
+    "s": "100000012345678",
+    "digits": 15,
+    "zero_run": 6,
+    "sym": null
+  },
+  {
+    "s": "100000000012345",
+    "digits": 15,
+    "zero_run": 9,
+    "sym": null
+  },
+  {
+    "s": "100000000000012",
+    "digits": 15,
+    "zero_run": 12,
+    "sym": null
+  },
+  {
+    "s": "1234567891234567",
+    "digits": 16,
+    "zero_run": 0,
+    "sym": null
+  },
+  {
+    "s": "1000123456789123",
+    "digits": 16,
+    "zero_run": 3,
+    "sym": null
+  },
+  {
+    "s": "1000000123456789",
+    "digits": 16,
+    "zero_run": 6,
+    "sym": null
+  },
+  {
+    "s": "1000000000123456",
+    "digits": 16,
+    "zero_run": 9,
+    "sym": null
+  },
+  {
+    "s": "1000000000000123",
+    "digits": 16,
+    "zero_run": 12,
+    "sym": null
+  },
+  {
+    "s": "1000000000000000",
+    "digits": 16,
+    "zero_run": 15,
+    "sym": null
+  },
+  {
+    "s": "123456789123456789",
+    "digits": 18,
+    "zero_run": 0,
+    "sym": null
+  },
+  {
+    "s": "100012345678912345",
+    "digits": 18,
+    "zero_run": 3,
+    "sym": null
+  },
+  {
+    "s": "100000012345678912",
+    "digits": 18,
+    "zero_run": 6,
+    "sym": null
+  },
+  {
+    "s": "100000000012345678",
+    "digits": 18,
+    "zero_run": 9,
+    "sym": null
+  },
+  {
+    "s": "100000000000012345",
+    "digits": 18,
+    "zero_run": 12,
+    "sym": null
+  },
+  {
+    "s": "100000000000000012",
+    "digits": 18,
+    "zero_run": 15,
+    "sym": null
+  },
+  {
+    "s": "12345678912345678912",
+    "digits": 20,
+    "zero_run": 0,
+    "sym": null
+  }
+]
