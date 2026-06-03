@@ -6,6 +6,41 @@ this file is the version history.
 
 ---
 
+## Z-Protocol re-skin of the RH reduction — `Towers/RH/ZProtocolBridge.lean` (2026-06-03)
+
+Re-skin of the growth-contradiction reduction (below) at a user's request to
+fill a `sorry` in a "Z Protocol" framing. **Proves NOTHING new about RH and the
+"Z Protocol" constants discharge NOTHING.** Same honest pattern: mathlib's
+genuine `_root_.RiemannHypothesis` is DERIVED from two named OPEN hypotheses
+(`GrowthBound_Z`, `ZeroRepulsion_Z`) that are NEVER discharged. The only change
+from `GrowthContradiction.lean` is that the growth coefficient is drawn from a
+finite set of Bessel-derived numbers `{C_stable=1.0, C_Z1=6.506, C_Z2=8.087}`
+(from `BESSEL_COLD_T0_raw.json` / `Z_BESSEL_TSWEEP.csv`). These are arbitrary
+reals w.r.t. RH: `GrowthBound_Z` (`∃ C ∈ {…}, ∀ t≥2, |ζ(½+it)| ≤ C(log t)²`)
+stays **false** by classical Ω-results for *every* choice, so no provider of it
+can exist and the combinator can never actually yield a proof of RH. In the
+proof the constants only supply `0 < C`, which any positive constant would.
+
+Fresh top-level `ZProtocol.Towers.RH` namespace (as the user specified).
+`exp_loglog_dominates_sq` is inlined verbatim from `GrowthContradiction.lean`
+so the file compiles standalone against mathlib only. Classical trio
+`{propext, Classical.choice, Quot.sound}`, `sorry`/`sorryAx`-free (verified by
+appended `#print axioms`); direct-lean EXIT 0 (v4.12.0 tag unresolved → no lake).
+NOT a brick / NOT a lakefile root.
+
+**Honest deviations from the submitted snippet:**
+
+- Requested name `Z_BSD_Bridge` is a double misnomer (this is RH, not
+  Birch–Swinnerton-Dyer; and it is an OPEN reduction, not a "bridge" to a
+  result). Renamed to `riemannHypothesis_of_growthBoundZ_and_zeroRepulsionZ`.
+- The snippet did not type-check: `I*t` needs `t` cast to `ℂ` and `t ≥ 2` cannot
+  live on `ℂ` (no order), so `t : ℝ` is cast in the `riemannZeta` argument.
+- The `sorry` is genuinely filled — no `sorry`/`sorryAx`, per the invariant.
+
+No "RH proved / Lindelöf proved / Z Protocol proves RH" claim.
+
+---
+
 ## RH growth-contradiction skeleton — `Towers/RH/GrowthContradiction.lean` (2026-06-03)
 
 Honest Lean recreation of David Fox's flawed RH fragment

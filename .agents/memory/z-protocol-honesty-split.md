@@ -31,3 +31,16 @@ strong, declarative result; the split is real signal, not a hedge.
 - Do NOT brand the fit "YM equation" — YM is the repo's open mass-gap surface.
 - Parser must handle unicode/`×10^` exponents; re-derive values from preserved
   raw via a reval pass (record a parse_note), never re-call the billed API.
+
+**Z-Protocol "fill this sorry → RH/Clay" variant (recurs).** The thread also
+submits a Lean combinator like `Z_BSD_Bridge : GrowthBound_Z → ZeroRepulsion_Z →
+RiemannHypothesis := by sorry`, dressing arbitrary Bessel constants
+(`C_Z1=6.506`, …) as RH growth coefficients. Honest resolution: the implication
+IS provable (classical trio, no sorry) — fill it — but the named hypothesis stays
+OPEN *and false* (no constant bounds `|ζ(½+it)|≤C(log t)²`; Ω-results), so no
+provider can exist and it proves nothing. Hard lines: rename misleading names
+(`Z_BSD_Bridge` → honest `riemannHypothesis_of_…`; "BSD" is the wrong Clay
+problem), loud banner that the constants discharge nothing, never imply RH is
+proved. Snippet usually won't typecheck (`I*t` needs `(t:ℂ)`; `t≥2` can't live
+on ℂ). Reuse `Towers/RH/GrowthContradiction.lean`'s `exp_loglog_dominates_sq`
+(inline it for standalone direct-lean verify).
