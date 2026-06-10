@@ -1,0 +1,28 @@
+{
+  "description": "S(2pi/7) prime convergents, Rake v1.6 + Lemma G0.3 + C07 Arakelov Fix",
+  "N_end": 1000000000000000,
+  "bands": [
+    127,
+    414679
+  ],
+  "conditions": {
+    "1_primality": "Miller-Rabin deterministic (witnesses 2..37, valid <= 3.3e24)",
+    "2_diophantine_v16": "dist(h)*h < DENOM=1  (h is CF best-approximator to 2*pi/7)",
+    "3_G0_3": "pow(3,h,7) in {3,5,6}  (odd powers of 3 mod 7)",
+    "4_C07_arakelov": "arakelov_term(h,genus=13) = 2*13-2 = 24 > 0  [C01 Lean fix 2026-06-04]"
+  },
+  "arakelov_term_genus_13": 24,
+  "arakelov_fix_date": "2026-06-04",
+  "lean_binding": {
+    "C01_Arakelov.lean": "db291fc7dcf6debf9503a98d032f3238fef3e04af9d76d6cb5705eb8882c0c96",
+    "theorem": "ArakelovPositivity_X0_143 : 0 < 24  [proved, no sorry]",
+    "C07_RH.lean": "0f7faf2c4e604e9c17619d5472ece16c1bfcb2591476169c7f21bca7377f9c3e"
+  },
+  "source_file": "rake_v16_c07.py",
+  "stdout_file": "rake_v16_c07.out",
+  "sha256_source": "1fc3e7811ef5dacadacef1e09ecec9e1ac547edb7d8bf7b4c734a34c4c87b3b7",
+  "sha256_stdout": "f45b8e0acc1389303922b82fdb683605094610475e496936932935a24fd61acd",
+  "sha256_prior_bands": "6775013bd8a1ba42ef65315880babb77f1bab3e61992a65854cda234630d1e17",
+  "status": "CERTIFIED_C07",
+  "date": "2026-06-04"
+}

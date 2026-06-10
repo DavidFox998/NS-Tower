@@ -1,0 +1,181 @@
+{
+  "plan": {
+    "id": "kp-surface-discharge-decomposition",
+    "objective": "DECOMPOSE (not discharge) kotecky_preiss_criterion_Surface for the real integral operator T_L",
+    "mode": "BUILD",
+    "output_type": "plan_only",
+    "exported_as": "KP_Plan_2026-06-01.json",
+    "export_date": "2026-06-01",
+    "code_changes": false,
+    "files_written": ["lean-proof-towers/exports/KP_Plan_2026-06-01.json"],
+    "attestation": {
+      "read_only_audit_output": true,
+      "surface_discharged": false,
+      "replit_md_invariants_modified": false,
+      "note": "This file is an external record of a decomposition/enumeration plan. It is not a proof, discharges no surface, and modifies no locked invariant."
+    },
+    "honesty_locks": {
+      "discharges_surface": false,
+      "mass_gap_proven": false,
+      "m_gt_0_claimed": false,
+      "surface_1_status": "OPEN",
+      "ym_tower_status": "OPEN",
+      "replit_invariants_modified": false,
+      "terminal_inputs_all_open": true,
+      "note": "This plan ENUMERATES requirements only. Every leaf input is either genuine open combinatorics/analysis or OUT-OF-TOWER (absent from mathlib v4.12.0). It proves nothing, closes no surface, and asserts no gap."
+    },
+    "target_surface": {
+      "name": "kotecky_preiss_criterion_Surface",
+      "file": "lean-proof-towers/Towers/YM/Transfer.lean",
+      "line": 409,
+      "statement": "∃ β₀:ℝ, 0<β₀ ∧ ∀ β:ℝ, β₀<β → ∃ gap:ℝ, 0<gap ∧ ∀ (L:ℕ) (f:Lp ℝ 2 (haarN (4*L^4))), (∫ U, f U ∂(haarN (4*L^4)) = 0) → ‖T_L L β f‖ ≤ Real.exp (-(β*gap)) * ‖f‖",
+      "non_vacuous": true,
+      "non_vacuous_reason": "exp(-(β*gap))<1 for gap>0,β>0, so the bound is STRICTLY stronger than the proven ‖T_L‖≤1 (transfer_operator_norm_le); not implied by existing facts.",
+      "scope": "uniform-in-L, FIXED-β LATTICE spectral gap on vacuum-orthogonal sector",
+      "NOT_in_scope": "continuum limit, lattice-spacing->0, OS reconstruction, Clay continuum mass gap"
+    }
+  },
+  "scope_1_dependencies": {
+    "already_proven_trio_clean": [
+      {"name": "T_L", "line": 296},
+      {"name": "transfer_operator_norm_le (‖T_L‖≤1)", "line": 322},
+      {"name": "polymerActivity (def, ≥0, antitone-in-β)", "line": "~426"},
+      {"name": "polymerActivity_tendsto_zero_of_null (DCT reduction, CONDITIONAL on null hyp)", "line": 589}
+    ],
+    "open_inputs_required_to_close": {
+      "D1_polymer_counting": {
+        "statement": "#{ γ : |γ|=n, energy(γ)<ε } ≤ Cⁿ · ε^(α·n)   (∃ C,α>0)",
+        "status": "OPEN",
+        "provenance": "open_combinatorics",
+        "in_mathlib_v4_12_0": false,
+        "see": "scope_2"
+      },
+      "D2_activity_bound": {
+        "statement": "|z(γ)| ≲ exp(-β · energy(γ))   (truncated/connected weight bound)",
+        "status": "OPEN"
+      },
+      "D3_kp_summability": {
+        "statement": "∑_{γ ∋ 0} |z(γ)| e^{|γ|} < ∞  at FINITE β₀<∞",
+        "derivation": "follows from D1+D2: Cⁿ entropy beaten by ε^{α·n} small-energy gain for β large-but-finite",
+        "status": "OPEN"
+      },
+      "D4_w1_strict_bound": {
+        "statement": "w1 := ∫_{SU(3)} exp(-β·S) d haarSU3 ;  w1 < 1/7  for β > β₀≈0.85",
+        "strictness_critical": "= 1/7 ⟹ I=log 7 ⟹ ∑ₙ 7ⁿ(1/7)ⁿ diverges; STRICT < required",
+        "status": "OPEN",
+        "provenance": "OUT_OF_TOWER",
+        "needs": "SU(3) character theory OR verified cubature",
+        "in_mathlib_v4_12_0": false
+      },
+      "D5_os_cluster_step": {
+        "statement": "w1 < 1/7 → TruncatedActivityBound a   (Osterwalder–Seiler 1978 Thm 2.1, Ursell/cluster)",
+        "status": "OPEN",
+        "provenance": "OUT_OF_TOWER"
+      },
+      "D6_kp_implies_decay": {
+        "statement": "KP-summability ⟹ geometric two-point clustering ρ<1 ⟹ ‖T_L f‖≤exp(-β·gap)‖f‖ on {∫f=0}",
+        "ref": "Brydges–Federbush; Friedli–Velenik 2018 Ch.5",
+        "status": "OPEN",
+        "provenance": "OUT_OF_TOWER"
+      }
+    },
+    "reduction_chain": "D4 ⟹ D5 ⟹ (D1+D2 ⟹ D3, KP-summable) ⟹ D6 ⟹ target. Valid ONLY if all of D1..D6 hold; NONE discharged or scheduled.",
+    "branch_warning": {
+      "surface": "trivial_polymer_set_null_Surface",
+      "relation_to_KP": "necessary-NOT-sufficient, DIFFERENT branch",
+      "basis": "Transfer.lean:569-578 — even full polymerActivity_tendsto_zero is a SINGLE polymer's β→∞ limit; KP needs a UNIFORM SUM at finite β₀. Closing trivial_polymer_set_null does NOT close KP."
+    }
+  },
+  "scope_2_polymer_counting_lemma": {
+    "identified_dependency": "D1",
+    "name_in_source": "cluster-entropy / Peierls-contour / polymer-counting bound",
+    "location": "Transfer.lean:386-402 (docstring), restated 390 & 400",
+    "statement": "#{ γ : |γ|=n, energy(γ)<ε } ≤ Cⁿ · ε^(α·n)",
+    "role": "SOLE stated upstream dependency of the criterion; the Clay-grade open content (Surface #1)",
+    "status": "OPEN",
+    "attempt_directive_in_source": "do NOT attempt without the counting estimate"
+  },
+  "scope_3_trivial_polymer_set_null": {
+    "already_exists": true,
+    "surface_def": {
+      "name": "trivial_polymer_set_null_Surface",
+      "file": "lean-proof-towers/Towers/YM/Transfer.lean",
+      "line": 669,
+      "statement": "(L:ℕ) [NeZero L] (γ : Finset (Lattice 4 L × Fin 4 × Fin 4)) : Prop := haarN (4*L^4) {w | polymerEnergy (toGauge L w) γ = 0} = 0",
+      "consumer": "trivial_polymer_set_null (673), polymerActivity_tendsto_zero (685)"
+    },
+    "required_supporting_hypothesis": {
+      "name": "NoAtoms_haarSU3",
+      "statement": "NoAtoms haarSU3",
+      "route_in_mathlib": "MeasureTheory.Measure.IsHaarMeasure.noAtoms",
+      "precondition_unproved": "(𝓝[≠] (1 : SU3)).NeBot   — identity non-isolated in SU(3)",
+      "status": "OPEN"
+    },
+    "sufficiency_note": "NoAtoms kills only COUNTABLE sets; the trivial set is an UNCOUNTABLE positive-codim subvariety ⟹ NoAtoms alone insufficient, see scope_4.",
+    "branch_status": "necessary-not-sufficient for KP (see scope_1.branch_warning)"
+  },
+  "scope_4_proof_sketch_null_set": {
+    "goal": "haarN-nullity of {w | polymerEnergy(toGauge w)γ = 0} for γ≠∅",
+    "case_L_ge_2": {
+      "method": "Measure.pi single-coordinate marginal",
+      "tools": ["measurePreserving_piFinSuccAbove", "measure_prod_null"],
+      "argument": "fix all links but one; plaquette-triviality forces the remaining link to a single point ⟹ null fibre ⟹ product null",
+      "requires": "NoAtoms_haarSU3",
+      "caveat": "naive 'codimension 8·|γ|' count is LATTICE-SIZE dependent; clean only when the |γ| plaquette links are distinct freely-varying coordinates"
+    },
+    "case_L_eq_1": {
+      "degeneracy": "a plaquette degenerates to a commutator [g,h]",
+      "triviality_set": "the COMMUTING VARIETY {(g,h) | [g,h]=1}",
+      "method": "centralizer-codimension / regular-element analysis (NOT the marginal argument)",
+      "reason": "the four plaquette links are NOT four distinct freely-varying coordinates",
+      "status": "OPEN",
+      "difficulty": "harder; needs regular-element measure estimate for SU(3)"
+    }
+  },
+  "scope_5_out_of_tower_estimates_needed": [
+    {
+      "id": "E1",
+      "for": "D4_w1_strict_bound",
+      "need": "verified numeric/analytic bound  ∫_{SU(3)} exp(-β·S) d haarSU3 < 1/7  for β>~0.85",
+      "method_options": ["SU(3) character expansion", "interval-arithmetic cubature over SU(3)"],
+      "mathlib_v4_12_0": "absent"
+    },
+    {
+      "id": "E2",
+      "for": "D1_polymer_counting",
+      "need": "explicit constants C,α>0 for the 4D-lattice connected-polymer count with SU(3) small-energy constraint",
+      "method": "verified combinatorial/contour counting",
+      "mathlib_v4_12_0": "absent"
+    },
+    {
+      "id": "E3",
+      "for": "D6_kp_implies_decay",
+      "need": "geometric two-point clustering radius ρ<1 from KP-summability (Brydges–Federbush bridge)",
+      "ref": "Friedli–Velenik 2018, Ch.5",
+      "mathlib_v4_12_0": "absent"
+    },
+    {
+      "id": "E4",
+      "for": "D5_os_cluster_step",
+      "need": "Osterwalder–Seiler Ursell/cluster activity bound (1978 Thm 2.1)",
+      "mathlib_v4_12_0": "absent"
+    },
+    {
+      "id": "E5",
+      "for": "NoAtoms_haarSU3",
+      "need": "proof that (𝓝[≠] (1:SU3)).NeBot (identity non-isolated) ⟹ NoAtoms haarSU3",
+      "mathlib_v4_12_0": "IsHaarMeasure.noAtoms exists; the NeBot precondition is unproved here"
+    },
+    {
+      "id": "E6",
+      "for": "scope_4.case_L_eq_1",
+      "need": "SU(3) commuting-variety / regular-element codimension measure estimate",
+      "mathlib_v4_12_0": "absent"
+    }
+  ],
+  "termination": {
+    "closes_surface": false,
+    "blocking_leaves": ["D1", "D4", "D5", "D6", "NoAtoms_haarSU3", "E1", "E2", "E3", "E4", "E6"],
+    "conclusion": "The criterion reduces cleanly to D1..D6, but EVERY leaf is open research or OUT-OF-TOWER. No leaf is dischargeable in mathlib v4.12.0 today. Surface #1 and the YM tower stay OPEN; no mass-gap / m>0 / Clay claim is made."
+  }
+}
