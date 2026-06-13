@@ -8,7 +8,7 @@ plan:
   code_changes: false
   lean_changes: false
   scope: "Interval enclosure for β₀, no Lean"
-  export_date: "2026-06-12"
+  export_date: "2026-06-01"
 
 objective: >
   Upgrade the EXISTING numerical result (β₀ ≈ 2.07942, w1(0.86) ≈ 0.4324 > 1/7,
