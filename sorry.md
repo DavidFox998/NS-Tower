@@ -14,5 +14,5 @@ carries no `sorry` / `admit` / `sorryAx` — the **Lean SORRY count remains 0**.
 The `SORRY: 1` tag below refers to this single markdown apology file, nothing in
 `Towers/`. No glueball, Reynolds, or mass-gap link is claimed.
 
-STATE: FROZEN 2026-06-01
+STATE: FROZEN 2026-06-12
 SORRY: 1 (this file) · Lean tower: 0
