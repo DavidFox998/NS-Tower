@@ -1,6 +1,6 @@
 # CLAY_STATUS — 13 witness-collapse bricks
 
-**Date:** 2026-06-12 · **Author:** D. Fox · **Mathlib:** v4.12.0
+**Date:** 2026-06-03 · **Author:** D. Fox · **Mathlib:** v4.12.0
 **Full report:** `reports/CLAY_REPAIR_2026-06-03.md` · **Diff:**
 `provenance/clay_repair.diff` · **Manifest:** `BUILD_MANIFEST_v2.7.json`
 
