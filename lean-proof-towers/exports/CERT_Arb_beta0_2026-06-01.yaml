@@ -3,7 +3,7 @@ plan:
   id: CERT_Arb_beta0_enclosure
   parent_plan: kp-surface-discharge-decomposition
   parent_leaf: D4_w1_strict_bound
-  date: "2026-06-12"
+  date: "2026-06-01"
   scope: OUT_OF_TOWER_NUMERICAL
   status: VERIFIED_OUT_OF_TOWER
   beta0_certified_interval: ["2.079416880123", "2.079416880124"]
