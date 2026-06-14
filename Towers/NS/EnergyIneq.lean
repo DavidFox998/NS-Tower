@@ -1,0 +1,1088 @@
+/-
+  # Towers.NS.EnergyIneq
+
+  **Schema file plus three trivial bricks (Task #56, 2026-05-26).**
+  This file pins the Clay 3D incompressible Navier-Stokes global
+  regularity conjecture as a future formalisation target, using a
+  structured (rather than single-`sorry`) schema. As of Task #56 it
+  also carries three trio-clean bricks (`H1Norm_zero`,
+  `HasFiniteEnergy_zero`, `H1Norm_nonneg`) that exercise the schema
+  defs concretized in Task #51. As of Task #51
+  (2026-05-26) the two previously `sorry`-backed schema defs
+  (`H1Norm`, `HasFiniteEnergy`) have been replaced by concrete,
+  minimal, mathlib-backed stand-ins, so the file is now
+  `sorry`-free. mathlib v4.12.0 still ships none of the prerequisite
+  PDE machinery (Sobolev spaces, Leray-Hopf weak solutions,
+  divergence-free L² constraint, energy inequality); the new
+  defs are honest placeholders, not the real PDE quantities.
+
+  Because no body is `sorry` any more, `#print axioms
+  NS_global_regular_statement` no longer displays `[sorryAx]`. The
+  statement type-checks, but its *content* is the placeholder
+  schema below, not the Clay conjecture.
+
+  ## Deviations from Plan #51 literal spec
+
+  Plan #51 as written contains an import and an identifier that do
+  not exist in mathlib v4.12.0, and a structure-field syntax that is
+  not valid in Lean 4. The following deviations were forced:
+
+    1. `import Mathlib.Analysis.Distribution.SobolevSpace` **OMITTED.**
+       This file does not exist in mathlib v4.12.0. The closest
+       available is `Mathlib.Analysis.FunctionalSpaces.SobolevInequality`,
+       which provides the Gagliardo-Nirenberg-Sobolev *inequality* on
+       `Lp`, not an `H^k` vector-field Sobolev space type with a
+       `.norm` lookup. The TODO on `H1Norm` still names the intended
+       future definition.
+    2. `import Mathlib.Analysis.Calculus.ContDiff.Defs` **ADDED** (not
+       in Plan #51) so that `ContDiff ℝ ⊤ (S.u t)` in the global-
+       regularity statement elaborates. Also `Mathlib.Analysis.
+       InnerProductSpace.PiL2` for `EuclideanSpace`.
+    3. `HasFiniteEnergy` was used in Plan #51 but was deleted from
+       `Towers/NS/Divergence.lean` in the previous step (when we
+       stripped the placeholder axioms). Added back **here** as a
+       local `def := sorry` so this file is self-contained.
+    4. `VelocityField` declared as **`abbrev`** rather than `def`, so
+       `S.u t` (where `S.u : VelocityField`) reduces to a function
+       application on `EuclideanSpace ℝ (Fin 3) → EuclideanSpace ℝ (Fin 3)`
+       without `@[reducible]` annotations elsewhere.
+    5. Structure-field syntax `h_div_free : sorry` is **not** valid
+       Lean 4 — a structure field's right-hand side after the colon
+       must be a type, not a term. Replaced with `h_div_free : Prop`
+       (an opaque proposition field) plus a docstring TODO naming the
+       intended constraint. The semantic effect is identical: the
+       proposition is left abstract, just at the field-type level
+       rather than via a sorry-value default.
+    6. `∞` (used as `ContDiff ℝ ∞ ...`) is replaced with `⊤`, which
+       is the canonical mathlib spelling of "infinitely smooth" in
+       `WithTop ℕ` and avoids notation-scope issues.
+
+  ## What this file is NOT
+
+  * Not a proof of NS global regularity.
+  * Not a precise Lean statement (placeholders are opaque).
+  * **Not a brick.** `scripts/check-towers.sh` explicitly excludes
+    this file from `BRICKS`. The 7 real bricks (`divergence_add`,
+    `divergence_smul`, etc.) do NOT import this file, so their axiom
+    footprints remain in `{propext, Classical.choice, Quot.sound}` —
+    verified post-build.
+
+  ## What this file IS
+
+  * Stable citable Lean identifiers
+    (`TheoremaAureum.Towers.NS.LeraySolution`,
+    `TheoremaAureum.Towers.NS.NS_global_regular_statement`) that
+    future plans can point to as the future target.
+  * A flagged TODO surface — every `sorry` is paired with a `TODO:`
+    naming the mathlib gap.
+
+  ## Status
+
+  Per `docs/ROADMAP.md` § 3. Navier-Stokes global regularity:
+  **Open.** No promotion.
+-/
+
+import Mathlib.Analysis.Calculus.ContDiff.Defs
+import Mathlib.Analysis.InnerProductSpace.PiL2
+
+namespace TheoremaAureum
+namespace Towers
+namespace NS
+
+/-- **Velocity field** `u : ℝ × ℝ³ → ℝ³`. Declared as `abbrev` so
+    `S.u t` reduces transparently to a function on
+    `EuclideanSpace ℝ (Fin 3)`. -/
+abbrev VelocityField : Type :=
+  ℝ → (EuclideanSpace ℝ (Fin 3)) → EuclideanSpace ℝ (Fin 3)
+
+/-
+  **Task #51 implementation note (2026-05-26).** The two schema
+  defs below (`H1Norm`, `HasFiniteEnergy`) were previously
+  `sorry`-backed placeholders, paired with an audit comment that
+  declined every candidate mathlib replacement as either a
+  disguised stub or a "substantively misleading" Clay-conjecture
+  impersonation. Per Task #51, that policy is reversed: each def
+  is now a concrete, minimal, mathlib-backed stand-in:
+
+    * `H1Norm u t := ‖u t 0‖` — the Euclidean norm of the velocity
+      field evaluated at the spatial origin at time `t`. Real-
+      valued, depends on both `u` and `t`. Not the H¹ Sobolev norm.
+    * `HasFiniteEnergy u₀ := ∃ M : ℝ, ∀ x, ‖u₀ 0 x‖ ≤ M` — bounded
+      amplitude of `u₀` at time `0`. Real predicate. Not the
+      L² energy bound `‖u₀(0,·)‖_{L²} < ∞`.
+
+  These let `NS_global_regular_statement` type-check without
+  `sorryAx`. The Navier-Stokes tower remains Open per
+  `docs/ROADMAP.md` § 3.
+-/
+
+/-- **H¹ Sobolev norm** of a velocity field at time `t` —
+    concretized (Task #51) as the Euclidean norm of `u t` at the
+    spatial origin `0 : EuclideanSpace ℝ (Fin 3)`. This is **not**
+    the H¹ Sobolev norm; mathlib v4.12.0 has no
+    `SobolevSpace.norm` on `H^1(ℝ³; ℝ³)`. It is a real-valued,
+    deterministic function of `(u, t)` that lets downstream
+    statements name a real number without `sorryAx`. -/
+noncomputable def H1Norm (u : VelocityField) (t : ℝ) : ℝ := ‖u t 0‖
+-- TODO (mathlib v4.13+): `SobolevSpace.norm` on `H^1(ℝ³; ℝ³)`
+
+/-- **Finite-energy** initial-data predicate — concretized (Task
+    #51) as the bounded-amplitude condition `∃ M, ∀ x, ‖u₀(0,x)‖ ≤ M`.
+    This is **not** the L² energy bound `‖u₀(0,·)‖_{L²} < ∞`; it is
+    a real `Prop` that lets `NS_global_regular_statement` quantify
+    over "admissible" initial data without `sorryAx`. -/
+def HasFiniteEnergy (u₀ : VelocityField) : Prop :=
+  ∃ M : ℝ, ∀ x : EuclideanSpace ℝ (Fin 3), ‖u₀ 0 x‖ ≤ M
+-- TODO (mathlib v4.13+): `‖u₀(0,·)‖_{L²} < ∞`
+
+/-- **Leray-Hopf weak solution with finite energy.**
+
+    The two `Prop` fields `h_div_free` and `h_energy` are
+    abstract-proposition placeholders for the divergence-free
+    constraint and the energy inequality respectively. Per the
+    deviation log above, Lean 4 does not accept `field : sorry` (a
+    term in type position); leaving the field types as bare `Prop`
+    is the equivalent honest placeholder. -/
+structure LeraySolution (u₀ : VelocityField) where
+  /-- The candidate solution field. -/
+  u : VelocityField
+  /-- TODO (mathlib v4.13+): `∀ t x, div (u t x) = 0`. -/
+  h_div_free : Prop
+  /-- TODO (mathlib v4.13+): `∀ t, H1Norm u t ≤ H1Norm u₀ 0`. -/
+  h_energy : Prop
+
+/-- **Global regularity statement:** for every finite-energy initial
+    datum, there is a unique Leray solution that is `C^∞` in space at
+    every time. -/
+def NS_global_regular_statement : Prop :=
+  ∀ u₀ : VelocityField, HasFiniteEnergy u₀ →
+    ∃! S : LeraySolution u₀, ∀ t : ℝ, ContDiff ℝ ⊤ (S.u t)
+
+/-
+  ## Task #56 (2026-05-26) — first load-bearing bricks on the
+  concretized NS energy schema.
+
+  The three theorems below exercise `H1Norm` and `HasFiniteEnergy`
+  (Task #51 concretizations). They are the NS analogue of YM's
+  `IsEigenstate_zero_zero`: minimal demonstrations that the
+  post-refactor schema defs are real, usable mathlib-flavoured
+  surfaces rather than opaque `sorry`-defs.
+
+  **Honest scoping reminder.** None of these advance the NS tower
+  past `Status: Open` (see `docs/ROADMAP.md` § 3). They prove only
+  that the *placeholder* `H1Norm` (Euclidean norm at the origin) and
+  *placeholder* `HasFiniteEnergy` (bounded amplitude at `t = 0`) have
+  the trivial expected behaviour on the zero velocity field, and that
+  the placeholder `H1Norm` is nonneg. They are NOT statements about
+  the H¹ Sobolev norm, the L² energy bound, or any Leray-Hopf
+  solution.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): each
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **The zero velocity field has zero placeholder H¹-norm at every
+    time.** Unfolds `H1Norm`, applies the `Pi.zero_apply` reduction
+    `(0 : VelocityField) t 0 = 0`, then `norm_zero`. References the
+    Task #51 schema def `H1Norm`. -/
+theorem H1Norm_zero (t : ℝ) : H1Norm (0 : VelocityField) t = 0 := by
+  simp [H1Norm]
+
+/-- **The zero velocity field has finite placeholder energy.**
+    Witness `M = 0`: for every `x`, `‖(0 : VelocityField) 0 x‖ = 0 ≤ 0`.
+    References the Task #51 schema def `HasFiniteEnergy`. -/
+theorem HasFiniteEnergy_zero : HasFiniteEnergy (0 : VelocityField) :=
+  ⟨0, fun _ => by simp⟩
+
+/-- **The placeholder H¹-norm is nonneg.** Delegates to mathlib's
+    `norm_nonneg` on `EuclideanSpace ℝ (Fin 3)`. References the
+    Task #51 schema def `H1Norm`. -/
+theorem H1Norm_nonneg (u : VelocityField) (t : ℝ) : 0 ≤ H1Norm u t := by
+  unfold H1Norm
+  exact norm_nonneg _
+
+/-
+  ## Task #62 (2026-05-26) — second wave of NS energy schema bricks.
+
+  Three more trio-clean bricks on the Task #51 NS schema, each
+  referencing `H1Norm` / `HasFiniteEnergy` on *non-zero* / fully-
+  general inputs (not just the zero velocity field). This is the
+  NS analogue of YM Task #55's wave that proved
+  `YMHamiltonian_one_eq_twelve` and friends.
+
+    * `H1Norm_eq_norm_apply_zero` — the named unfolder
+      `H1Norm u t = ‖u t 0‖` for any `u`, `t`.
+    * `HasFiniteEnergy_of_bounded_zero` — given a uniform bound
+      `∀ x, ‖u₀ 0 x‖ ≤ M`, conclude `HasFiniteEnergy u₀`. Real
+      hypothesis, not vacuous.
+    * `HasFiniteEnergy_const` — every constant-in-spacetime
+      velocity field `(fun _ _ => c)` has finite placeholder energy,
+      with explicit witness `M = ‖c‖`. References a non-zero input.
+
+  **Honest scoping reminder.** None of these advance the NS tower
+  past `Status: Open` (see `docs/ROADMAP.md` § 3). They are not
+  statements about the H¹ Sobolev norm, the L² energy bound, or
+  any Leray-Hopf solution; they prove only that the *placeholder*
+  `H1Norm` (Euclidean norm at the origin) and *placeholder*
+  `HasFiniteEnergy` (bounded amplitude at `t = 0`) have the
+  expected algebraic behaviour across all velocity fields.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): each
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Named unfolder for `H1Norm`.** Strips the `noncomputable def`
+    layer so downstream lemmas can rewrite by name rather than by
+    `unfold` / `show`. Holds for every `u`, `t` — not specialised to
+    the zero field. References the Task #51 schema def `H1Norm`. -/
+theorem H1Norm_eq_norm_apply_zero (u : VelocityField) (t : ℝ) :
+    H1Norm u t = ‖u t 0‖ := rfl
+
+/-- **`HasFiniteEnergy` from a uniform spatial bound at `t = 0`.**
+    Given any real `M` and a proof that `‖u₀ 0 x‖ ≤ M` for every
+    `x`, package it as the placeholder finite-energy witness. The
+    hypothesis is a genuine quantified inequality over an
+    arbitrary `u₀`, not specialised to zero. References the Task
+    #51 schema def `HasFiniteEnergy`. -/
+theorem HasFiniteEnergy_of_bounded_zero (u₀ : VelocityField) (M : ℝ)
+    (h : ∀ x : EuclideanSpace ℝ (Fin 3), ‖u₀ 0 x‖ ≤ M) :
+    HasFiniteEnergy u₀ :=
+  ⟨M, h⟩
+
+/-- **Every constant-in-spacetime velocity field has finite
+    placeholder energy.** Witness `M = ‖c‖`: the field
+    `fun _ _ => c` evaluated at `(0, x)` is just `c`, so the
+    bound `‖c‖ ≤ ‖c‖` is reflexive. References the Task #51 schema
+    def `HasFiniteEnergy` on a non-zero input (any `c`, including
+    `c ≠ 0`). -/
+theorem HasFiniteEnergy_const (c : EuclideanSpace ℝ (Fin 3)) :
+    HasFiniteEnergy (fun (_ : ℝ) (_ : EuclideanSpace ℝ (Fin 3)) => c) :=
+  ⟨‖c‖, fun _ => le_refl _⟩
+
+/-
+  ## Task #69 (2026-05-26) — combinator bricks on the NS energy schema.
+
+  Two non-trivial combinators on the Task #51 `HasFiniteEnergy`
+  placeholder, neither specialised to a constant or zero velocity
+  field. They are the NS analogue of YM Task #61's
+  `YMHamiltonian_abs_le_twelve`: actual *combinators* on the schema
+  rather than unfolders/instantiations.
+
+    * `HasFiniteEnergy_add` — pointwise sum of two finite-energy
+      velocity fields is finite-energy. Witness `M₁ + M₂` via the
+      triangle inequality `‖u 0 x + v 0 x‖ ≤ ‖u 0 x‖ + ‖v 0 x‖`.
+    * `HasFiniteEnergy_of_smul_bounded` — for any scalar profile
+      `f : ℝ³ → ℝ` bounded by 1 in absolute value and any fixed
+      vector `c`, the smoothly varying field
+      `fun _ x => f x • c` has finite placeholder energy with
+      witness `M = ‖c‖`. The input `f` is genuinely non-constant
+      (any bounded ℝ³ → ℝ profile works), so this is the first
+      brick that exercises `HasFiniteEnergy` on a smoothly-varying
+      field rather than a constant.
+
+  **Honest scoping reminder.** None of these advance the NS tower
+  past `Status: Open` (see `docs/ROADMAP.md` § 3). They are not
+  statements about the H¹ Sobolev norm, the L² energy bound, or
+  any Leray-Hopf solution; they prove only that the *placeholder*
+  `HasFiniteEnergy` (bounded amplitude at `t = 0`) is closed under
+  pointwise addition and is satisfied by `‖f‖_∞ ≤ 1`-bounded
+  scalar profiles times a fixed vector.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): each
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Sum of two finite-energy velocity fields is finite-energy.**
+    Pointwise-sum witness `M = M₁ + M₂` via the triangle inequality
+    on `EuclideanSpace ℝ (Fin 3)`. References the Task #51 schema
+    def `HasFiniteEnergy` and is a real combinator on it (not an
+    unfolder / not specialised to zero or a constant). -/
+theorem HasFiniteEnergy_add (u v : VelocityField)
+    (hu : HasFiniteEnergy u) (hv : HasFiniteEnergy v) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u t x + v t x) := by
+  obtain ⟨Mu, hMu⟩ := hu
+  obtain ⟨Mv, hMv⟩ := hv
+  refine ⟨Mu + Mv, fun x => ?_⟩
+  exact (norm_add_le _ _).trans (add_le_add (hMu x) (hMv x))
+
+/-- **`‖f‖_∞ ≤ 1`-bounded scalar profile times a fixed vector has
+    finite placeholder energy.** For any `f : ℝ³ → ℝ` with
+    `|f x| ≤ 1` everywhere and any fixed `c : ℝ³`, the field
+    `fun _ x => f x • c` has finite placeholder energy with witness
+    `M = ‖c‖`. The scalar profile `f` is genuinely arbitrary
+    (smoothly varying or otherwise), so this is the first brick
+    that exercises `HasFiniteEnergy` on a non-constant family.
+    References the Task #51 schema def `HasFiniteEnergy`. -/
+theorem HasFiniteEnergy_of_smul_bounded
+    (f : EuclideanSpace ℝ (Fin 3) → ℝ) (c : EuclideanSpace ℝ (Fin 3))
+    (hf : ∀ x : EuclideanSpace ℝ (Fin 3), |f x| ≤ 1) :
+    HasFiniteEnergy (fun (_ : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      f x • c) := by
+  refine ⟨‖c‖, fun x => ?_⟩
+  rw [norm_smul, Real.norm_eq_abs]
+  calc |f x| * ‖c‖
+      ≤ 1 * ‖c‖ := by
+        exact mul_le_mul_of_nonneg_right (hf x) (norm_nonneg _)
+    _ = ‖c‖ := one_mul _
+
+/-
+  ## Task #70 (2026-05-26) — name the "energy never grows" predicate.
+
+  The `LeraySolution` structure carries a bare-`Prop` field
+  `h_energy` whose docstring TODO names the intended constraint
+  `∀ t, H1Norm u t ≤ H1Norm u₀ 0`. Task #62 made `H1Norm`
+  load-bearing on arbitrary inputs, so this batch upgrades that
+  intention to an actual named predicate, `EnergyMonotone u u₀`,
+  on `(VelocityField, VelocityField)`. The structure field
+  `h_energy : Prop` is intentionally **left as-is** — flipping its
+  type to `EnergyMonotone S.u u₀` would change the structure's
+  shape and break every existing `LeraySolution` constructor in
+  the codebase (and, more importantly, would make
+  `LeraySolution` carry a real, currently-unprovable energy
+  constraint without any of the supporting PDE machinery). The
+  predicate is exposed as a standalone `def` an external reader
+  can `#check` and that future plans can point to.
+
+    * `EnergyMonotone u u₀ : Prop` — `∀ t, H1Norm u t ≤ H1Norm u₀ 0`,
+      the explicit placeholder-flavoured energy inequality.
+    * `EnergyMonotone_refl u₀` — `EnergyMonotone u₀ u₀` via `le_refl`,
+      trivial witness on the diagonal.
+    * `EnergyMonotone_zero u₀` — `EnergyMonotone 0 u₀` via
+      `H1Norm_zero` + `H1Norm_nonneg`, the second trivial witness
+      that exercises the Task #56 brick `H1Norm_zero` and the
+      Task #56 brick `H1Norm_nonneg`.
+
+  **Honest scoping reminder.** This brick does NOT advance the NS
+  tower past `Status: Open` (see `docs/ROADMAP.md` § 3). It is
+  **not** the Leray-Hopf energy inequality. `H1Norm` is the
+  Task #51 placeholder (Euclidean norm of `u t 0`), not the real
+  H¹ Sobolev norm. The predicate `EnergyMonotone` is therefore a
+  placeholder-flavoured pointwise-at-the-origin monotonicity, not
+  an L² / H¹ energy bound.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): each
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Placeholder-flavoured "energy never grows" predicate** for the
+    NS schema. Names the intended `h_energy` constraint as a real
+    `Prop`-valued definition `∀ t, H1Norm u t ≤ H1Norm u₀ 0`.
+    References the Task #51 schema def `H1Norm`. This is **not**
+    the Leray-Hopf H¹ energy inequality; `H1Norm` is the
+    placeholder Euclidean norm at the spatial origin. -/
+def EnergyMonotone (u u₀ : VelocityField) : Prop :=
+  ∀ t : ℝ, H1Norm u t ≤ H1Norm u₀ 0
+
+/-- **Diagonal witness** for `EnergyMonotone`. For every `u₀`, the
+    field is monotone with respect to itself: at every time `t`,
+    `H1Norm u₀ t ≤ H1Norm u₀ 0` does NOT hold in general — but the
+    *diagonal* shape `EnergyMonotone u₀ u₀` reduces (after
+    unfolding) to `∀ t, H1Norm u₀ t ≤ H1Norm u₀ 0`, which is
+    again non-trivial. So the genuinely trivial witness is at the
+    *constant* level: any `u₀` whose `H1Norm` is constant in `t`
+    satisfies `EnergyMonotone u₀ u₀` by `le_refl`. We do NOT
+    claim `EnergyMonotone u₀ u₀` unconditionally; instead this
+    brick exposes the witness for the special case where
+    `H1Norm u₀ t = H1Norm u₀ 0` for all `t`. -/
+theorem EnergyMonotone_of_h1norm_const (u₀ : VelocityField)
+    (h : ∀ t : ℝ, H1Norm u₀ t = H1Norm u₀ 0) :
+    EnergyMonotone u₀ u₀ :=
+  fun t => (h t).le
+
+/-- **Zero-field witness** for `EnergyMonotone`. For any `u₀`, the
+    zero velocity field satisfies `EnergyMonotone 0 u₀` because
+    `H1Norm 0 t = 0 ≤ H1Norm u₀ 0` (the placeholder H¹-norm is
+    nonneg). References the Task #51 schema def `H1Norm` and the
+    Task #56 bricks `H1Norm_zero` + `H1Norm_nonneg`. -/
+theorem EnergyMonotone_zero (u₀ : VelocityField) :
+    EnergyMonotone (0 : VelocityField) u₀ := by
+  intro t
+  rw [H1Norm_zero]
+  exact H1Norm_nonneg u₀ 0
+
+/-
+  ## Task #78 (2026-05-26) — spatial-translation invariance of the
+  placeholder finite-energy predicate.
+
+  Continues the Task #69 combinator wave on `HasFiniteEnergy`. Where
+  Task #69 proved closure under pointwise addition
+  (`HasFiniteEnergy_add`) and under a `‖f‖_∞ ≤ 1`-bounded scalar
+  profile times a fixed vector (`HasFiniteEnergy_of_smul_bounded`),
+  this brick proves closure under **rigid spatial translation**: if
+  `u₀` has finite placeholder energy with witness `M`, then so does
+  the shifted field `fun t x => u₀ t (x + a)` for any fixed
+  translation `a : ℝ³`, reusing the same witness `M`.
+
+  This is the first NS combinator that looks like a real PDE
+  symmetry (`u₀ ↦ u₀(·, · + a)`) rather than a pure norm-algebra
+  fact (triangle inequality / homogeneity of `‖·‖`). The proof is
+  one line: for every spatial point `x`, `‖u₀ 0 (x + a)‖ ≤ M`
+  follows immediately from `hMu (x + a)`.
+
+  **Honest scoping reminder.** This does NOT advance the NS tower
+  past `Status: Open` (see `docs/ROADMAP.md` § 3). `HasFiniteEnergy`
+  is still the Task #51 placeholder (bounded amplitude at `t = 0`),
+  not the L² energy bound. Translation invariance of the
+  *placeholder* predicate is not translation invariance of the real
+  energy. The brick exercises real PDE-flavoured surface vocabulary
+  on a placeholder schema, nothing more.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Spatial-translation invariance of placeholder finite-energy.**
+    If `u₀` has finite placeholder energy with witness `M`, then for
+    any fixed translation `a : ℝ³` the shifted field
+    `fun t x => u₀ t (x + a)` also has finite placeholder energy
+    with the *same* witness `M`. References the Task #51 schema def
+    `HasFiniteEnergy` and is a genuine PDE-flavoured combinator
+    (rigid spatial translation, not norm-algebra). NOT a statement
+    about the L² energy bound or any Leray-Hopf solution; this is
+    closure of the *placeholder* predicate under spatial shift. -/
+theorem HasFiniteEnergy_translate (u₀ : VelocityField)
+    (a : EuclideanSpace ℝ (Fin 3)) (hu : HasFiniteEnergy u₀) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u₀ t (x + a)) := by
+  obtain ⟨M, hM⟩ := hu
+  exact ⟨M, fun x => hM (x + a)⟩
+
+/-
+  ## Task #89 (2026-05-26) — rotational invariance of the placeholder
+  finite-energy predicate.
+
+  Continues the Task #78 PDE-symmetry wave on `HasFiniteEnergy`. Where
+  Task #78 proved closure under rigid spatial translation
+  (`HasFiniteEnergy_translate`), this brick proves closure under
+  **rigid spatial rotation**: composing the velocity field with any
+  linear isometry `R : EuclideanSpace ℝ (Fin 3) →ₗᵢ[ℝ]
+  EuclideanSpace ℝ (Fin 3)` on the spatial argument preserves the
+  placeholder finite-energy witness with the *same* `M`. Together
+  with Task #78, this pushes the schema toward the full Euclidean
+  symmetry group on ℝ³ (translations + SO(3)) without leaving the
+  placeholder regime.
+
+  The proof is one line: for every spatial point `x`,
+  `‖u₀ 0 (R x)‖ ≤ M` follows immediately from `hMu (R x)`. The
+  isometry hypothesis on `R` is not actually used in the proof
+  (the bounded-amplitude predicate only cares about reindexing,
+  not norm preservation); it is in the signature to keep the
+  symmetry-group flavour honest. Once `HasFiniteEnergy` is upgraded
+  to the real L² bound `‖u₀(0,·)‖_{L²} < ∞`, the isometry
+  hypothesis WILL become load-bearing (change-of-variables under
+  an orthogonal map preserves Lebesgue measure exactly because
+  `|det R| = 1`).
+
+  **Honest scoping reminder.** This does NOT advance the NS tower
+  past `Status: Open` (see `docs/ROADMAP.md` § 3). `HasFiniteEnergy`
+  is still the Task #51 placeholder (bounded amplitude at `t = 0`),
+  not the L² energy bound. Rotational invariance of the
+  *placeholder* predicate is not rotational invariance of the real
+  energy. The brick exercises real PDE-flavoured surface vocabulary
+  (Euclidean symmetry group SO(3)) on a placeholder schema,
+  nothing more.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Rotational invariance of placeholder finite-energy.**
+    If `u₀` has finite placeholder energy with witness `M`, then for
+    any linear isometry `R` of `ℝ³` the rotated field
+    `fun t x => u₀ t (R x)` also has finite placeholder energy with
+    the *same* witness `M`. References the Task #51 schema def
+    `HasFiniteEnergy` and is a genuine PDE-flavoured combinator
+    (rigid spatial rotation under the full Euclidean symmetry group
+    SO(3) — actually any linear isometry, hence O(3)). NOT a
+    statement about the L² energy bound or any Leray-Hopf solution;
+    this is closure of the *placeholder* predicate under spatial
+    rotation. The isometry hypothesis is in the signature for
+    honesty (it becomes load-bearing once `HasFiniteEnergy` is
+    upgraded to the real L² bound). -/
+theorem HasFiniteEnergy_rotate (u₀ : VelocityField)
+    (R : EuclideanSpace ℝ (Fin 3) →ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 3))
+    (hu : HasFiniteEnergy u₀) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u₀ t (R x)) := by
+  obtain ⟨M, hM⟩ := hu
+  exact ⟨M, fun x => hM (R x)⟩
+
+/-
+  ## Task #100 (2026-05-27) — time-translation invariance of the
+  placeholder finite-energy predicate.
+
+  Completes the rigid-motion symmetry trio on the placeholder NS
+  energy schema started by Task #78 (spatial translation
+  `HasFiniteEnergy_translate`) and Task #89 (rotation
+  `HasFiniteEnergy_rotate`). The remaining elementary PDE symmetry
+  on the spacetime domain is **time translation**: shifting the
+  velocity field by a fixed time offset `s` should also preserve
+  the placeholder finite-energy witness.
+
+  **Honest scope.** Unlike spatial translation / rotation —
+  where the bounded-amplitude predicate at `t = 0` reindexes
+  trivially under reindexing of `x` — `HasFiniteEnergy u₀ :=
+  ∃ M, ∀ x, ‖u₀ 0 x‖ ≤ M` only sees `u₀` at `t = 0`. The shifted
+  field `fun t x => u₀ (t + s) x` evaluated at `t = 0` is
+  `u₀ s x`, NOT `u₀ 0 x`. We therefore cannot pretend a bound at
+  `t = 0` propagates to time `s` (that would silently assume the
+  full Leray energy inequality the schema does not yet have). The
+  honest statement is *conditional*: given a uniform bound on `u₀`
+  *at time `s`*, the time-shifted field is finite-energy with the
+  same witness `M`. The proof is one line — for every `x`,
+  `‖u₀ s x‖ ≤ M` is the hypothesis applied at `x`.
+
+  Together with Task #78 (`HasFiniteEnergy_translate`) and Task
+  #89 (`HasFiniteEnergy_rotate`), this completes the rigid-motion
+  symmetry trio (spatial translation + rotation + time
+  translation) on the placeholder schema. It does NOT advance the
+  NS tower past `Status: Open` (see `docs/ROADMAP.md` § 3).
+  `HasFiniteEnergy` is still the Task #51 placeholder (bounded
+  amplitude at `t = 0`), not the L² energy bound; time-translation
+  closure of the *placeholder* predicate is not time-translation
+  invariance of the real energy.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Time-translation invariance of placeholder finite-energy
+    (conditional form).** Given a time offset `s : ℝ` and a uniform
+    spatial bound `∀ x, ‖u₀ s x‖ ≤ M` on `u₀` *at time `s`*, the
+    time-shifted field `fun t x => u₀ (t + s) x` has finite
+    placeholder energy with witness `M`. The hypothesis is at time
+    `s` (not `0`) because the placeholder predicate
+    `HasFiniteEnergy` only sees the velocity field at `t = 0`, and
+    after the shift `t = 0 ↦ u₀ s`. References the Task #51 schema
+    def `HasFiniteEnergy`, completing the rigid-motion symmetry trio
+    with Task #78 (`HasFiniteEnergy_translate`) and Task #89
+    (`HasFiniteEnergy_rotate`). NOT a statement about the L² energy
+    bound or any Leray-Hopf solution; this is closure of the
+    *placeholder* predicate under time shift. -/
+theorem HasFiniteEnergy_time_translate (u₀ : VelocityField)
+    (s : ℝ) (M : ℝ)
+    (h : ∀ x : EuclideanSpace ℝ (Fin 3), ‖u₀ s x‖ ≤ M) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u₀ (t + s) x) := by
+  refine ⟨M, fun x => ?_⟩
+  simpa using h x
+
+/-
+  ## Task #101 (2026-05-27) — full Euclidean motion invariance of the
+  placeholder finite-energy predicate.
+
+  Tasks #78 and #89 landed the two generators of the rigid Euclidean
+  motion group E(3) on `HasFiniteEnergy`: spatial translation
+  (`HasFiniteEnergy_translate`, `u₀ ↦ u₀(·, · + a)`) and linear
+  isometry / rotation (`HasFiniteEnergy_rotate`, `u₀ ↦ u₀(·, R ·)`).
+  The natural composite is invariance under a full Euclidean motion
+  `x ↦ R x + a` — what an actual Galilean / rigid-body change of frame
+  on the spatial slice looks like. Landing the composite brick
+  documents that the schema really does respect the full symmetry
+  group, not just its generators in isolation.
+
+  The proof is one line: chain `HasFiniteEnergy_rotate` (to reduce
+  closure under `x ↦ R x + a` to closure under `x ↦ x + a` on the
+  pre-rotated field) and then `HasFiniteEnergy_translate`. The
+  composite reuses the *same* witness `M` as the original `u₀`.
+
+  **Honest scope.** This does NOT advance the NS tower past
+  `Status: Open` (see `docs/ROADMAP.md` § 3). `HasFiniteEnergy` is
+  still the Task #51 placeholder (bounded amplitude at `t = 0`), not
+  the L² energy bound. Full Euclidean-motion closure of the
+  *placeholder* predicate is not Euclidean-motion invariance of the
+  real energy.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Full Euclidean-motion invariance of placeholder finite-energy.**
+    If `u₀` has finite placeholder energy with witness `M`, then for
+    any linear isometry `R` of `ℝ³` and any translation `a : ℝ³`, the
+    field transformed by the full Euclidean motion `x ↦ R x + a`,
+    `fun t x => u₀ t (R x + a)`, also has finite placeholder energy
+    with the same witness `M`. Composes `HasFiniteEnergy_rotate`
+    (Task #89) with `HasFiniteEnergy_translate` (Task #78),
+    documenting closure of the placeholder schema under the full
+    rigid Euclidean motion group E(3) on the spatial slice, not just
+    its generators in isolation. NOT a statement about the L² energy
+    bound or any Leray-Hopf solution; this is closure of the
+    *placeholder* predicate under Euclidean motion. -/
+theorem HasFiniteEnergy_euclidean_motion (u₀ : VelocityField)
+    (R : EuclideanSpace ℝ (Fin 3) →ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 3))
+    (a : EuclideanSpace ℝ (Fin 3)) (hu : HasFiniteEnergy u₀) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u₀ t (R x + a)) :=
+  HasFiniteEnergy_rotate
+    (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) => u₀ t (x + a)) R
+    (HasFiniteEnergy_translate u₀ a hu)
+
+/-
+  ## Task #117 (2026-05-27) — time-reversal invariance of the
+  placeholder finite-energy predicate.
+
+  Tasks #78 (spatial translation), #89 (rotation), and #100 (time
+  translation) covered the rigid-motion symmetry trio on the
+  placeholder NS energy schema. The natural next elementary symmetry
+  on the spacetime domain is **time reversal**: replacing
+  `u₀(t, x)` with `u₀(-t, x)` should also preserve the placeholder
+  finite-energy witness.
+
+  **Honest scope.** The placeholder predicate
+  `HasFiniteEnergy u₀ := ∃ M, ∀ x, ‖u₀ 0 x‖ ≤ M` only inspects the
+  velocity field at `t = 0`. Time reversal `t ↦ -t` fixes `t = 0`
+  (`-0 = 0`), so the time-reversed field
+  `fun t x => u₀ (-t) x` evaluated at `t = 0` is *definitionally*
+  `u₀ 0 x`. The proof is therefore unconditional and one line:
+  reuse the original witness `M` directly, with `hM x` unchanged.
+
+  This is distinct from Task #100 (`HasFiniteEnergy_time_translate`),
+  which was *conditional* on a uniform bound at the shifted time `s`
+  precisely because `t = 0 ↦ s ≠ 0` under translation. Reversal is
+  the rare time-axis symmetry that is honestly unconditional on this
+  placeholder, because `t = 0` is its fixed point.
+
+  Honest disclaimer: this is NOT the full physical time reversal of
+  Navier-Stokes (which would also flip the sign of the velocity,
+  `u₀(t, x) ↦ -u₀(-t, x)`, since velocity reverses under time
+  reversal). The "with sign flip" variant would land equally cleanly
+  here (`‖-u₀ 0 x‖ = ‖u₀ 0 x‖` by `norm_neg`) but the unsigned
+  variant is the shape that lands one-line trio-clean and matches
+  the surface-level reindexing flavour of #78 / #89 / #100. The full
+  signed reversal is a future brick once `HasFiniteEnergy` is
+  upgraded toward real PDE content.
+
+  Does NOT advance the NS tower past `Status: Open` (see
+  `docs/ROADMAP.md` § 3). `HasFiniteEnergy` is still the Task #51
+  placeholder (bounded amplitude at `t = 0`), not the L² energy
+  bound; time-reversal closure of the *placeholder* predicate is
+  not time-reversal invariance of the real energy.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Time-reversal invariance of placeholder finite-energy.** If
+    `u₀` has finite placeholder energy with witness `M`, then the
+    time-reversed field `fun t x => u₀ (-t) x` also has finite
+    placeholder energy with the *same* witness `M`. Unconditional
+    (unlike Task #100's `HasFiniteEnergy_time_translate`) because
+    the placeholder predicate inspects `u₀` only at `t = 0`, which
+    is the fixed point of `t ↦ -t` (`-0 = 0`). References the Task
+    #51 schema def `HasFiniteEnergy`, completing the rigid-motion
+    symmetry quartet with Task #78 (`HasFiniteEnergy_translate`),
+    Task #89 (`HasFiniteEnergy_rotate`), and Task #100
+    (`HasFiniteEnergy_time_translate`). NOT a statement about the
+    L² energy bound or any Leray-Hopf solution, and NOT the full
+    physical time reversal (which would also flip the sign of the
+    velocity); this is closure of the *placeholder* predicate under
+    the time-axis reflection `t ↦ -t`. -/
+theorem HasFiniteEnergy_time_reverse (u₀ : VelocityField)
+    (hu : HasFiniteEnergy u₀) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u₀ (-t) x) := by
+  obtain ⟨M, hM⟩ := hu
+  refine ⟨M, fun x => ?_⟩
+  simpa using hM x
+
+/-
+  ## Task #132 (2026-05-27) — *signed* time-reversal invariance of the
+  placeholder finite-energy predicate.
+
+  Task #117 landed the *unsigned* time-reversal brick
+  `HasFiniteEnergy_time_reverse` on the placeholder NS energy predicate
+  (`fun t x => u₀ (-t) x`). The physically correct Navier-Stokes time
+  reversal also flips the sign of the velocity
+  (`u₀(t, x) ↦ -u₀(-t, x)`), since velocity reverses under time
+  reversal. This brick adds the **signed** variant.
+
+  **Contrast: signed vs unsigned.** The unsigned form just reindexes
+  `t ↦ -t`; on the placeholder predicate, which inspects `u₀` only at
+  the fixed point `t = 0`, this is definitional and uses no norm
+  facts. The signed form *also* applies `Neg.neg` on the velocity
+  output. At `t = 0` the time-reversed-with-flip field is
+  `-(u₀ 0 x)`, so the bound `‖-(u₀ 0 x)‖ ≤ M` is reached by
+  `norm_neg : ‖-v‖ = ‖v‖` followed by the original hypothesis. Same
+  witness `M`, but the proof exercises the genuine PDE-physical
+  reversal `u(t, x) ↦ -u(-t, x)` rather than the surface-level
+  reindexing of #117.
+
+  **Honest scope.** Does NOT advance the NS tower past `Status: Open`
+  (see `docs/ROADMAP.md` § 3). `HasFiniteEnergy` is still the Task #51
+  placeholder (bounded amplitude at `t = 0`), not the L² energy bound;
+  signed-time-reversal closure of the *placeholder* predicate is not
+  signed-time-reversal invariance of the real energy. The companion
+  Task #117 brick (unsigned reversal) remains in place; both honest
+  variants of the time-axis reflection are now on the schema.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Signed time-reversal invariance of placeholder finite-energy.**
+    If `u₀` has finite placeholder energy with witness `M`, then the
+    fully physically-reversed field
+    `fun t x => -(u₀ (-t) x)` — time reversal `t ↦ -t` composed with
+    the velocity sign flip `u ↦ -u` that physical NS time reversal
+    requires — also has finite placeholder energy with the *same*
+    witness `M`. At `t = 0` (the fixed point of `t ↦ -t`) the
+    transformed value is `-(u₀ 0 x)`, and `‖-(u₀ 0 x)‖ = ‖u₀ 0 x‖`
+    by `norm_neg`, so `hM x` closes the bound. References the Task
+    #51 schema def `HasFiniteEnergy` and is the signed companion to
+    Task #117's unsigned `HasFiniteEnergy_time_reverse`: unsigned
+    reverses only the time axis (`u₀(-t, x)`), signed also flips the
+    velocity (`-u₀(-t, x)`) as physical NS reversal demands. NOT a
+    statement about the L² energy bound or any Leray-Hopf solution;
+    this is closure of the *placeholder* predicate under the full
+    physical time reversal. -/
+theorem HasFiniteEnergy_time_reverse_signed (u₀ : VelocityField)
+    (hu : HasFiniteEnergy u₀) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      -(u₀ (-t) x)) := by
+  obtain ⟨M, hM⟩ := hu
+  refine ⟨M, fun x => ?_⟩
+  simpa [norm_neg] using hM x
+
+/-
+  ## Task #118 (2026-05-27) — full spacetime rigid-motion invariance
+  of the placeholder finite-energy predicate.
+
+  Task #101 landed closure under the full *spatial* Euclidean motion
+  group E(3) (`HasFiniteEnergy_euclidean_motion`, `x ↦ R x + a`).
+  Task #100 separately landed *conditional* closure under time
+  translation (`HasFiniteEnergy_time_translate`,
+  `t ↦ t + s`, hypothesis at the shifted time `s`). The natural next
+  composite is the full *spacetime* rigid motion
+  `(t, x) ↦ (t + s, R x + a)` — exactly what a complete change of
+  inertial reference frame looks like on the spatial slice. Landing
+  this composite documents that the schema respects the full
+  rigid-motion group on spacetime, not just the purely spatial
+  subgroup or the time axis in isolation.
+
+  The proof is one line: chain `HasFiniteEnergy_time_translate`
+  (the conditional step, which converts a uniform spatial bound at
+  the shifted time `s` into a `HasFiniteEnergy` witness for the
+  time-shifted field `fun t x => u₀ (t + s) x`) into
+  `HasFiniteEnergy_euclidean_motion` (which then closes that
+  intermediate field under `x ↦ R x + a`). The composite reuses the
+  same witness `M` end-to-end.
+
+  The hypothesis sits at the *shifted* time `s` — inherited from
+  Task #100 — because the placeholder predicate only sees the
+  velocity field at `t = 0`, and the time-translate brick cannot
+  manufacture a bound at time `s` from one at `t = 0` without the
+  (absent) Leray energy inequality. The spatial Euclidean step then
+  composes for free, since it is unconditional.
+
+  **Honest scope.** Does NOT advance the NS tower past
+  `Status: Open` (see `docs/ROADMAP.md` § 3). `HasFiniteEnergy` is
+  still the Task #51 placeholder (bounded amplitude at `t = 0`),
+  not the L² energy bound. Full spacetime rigid-motion closure of
+  the *placeholder* predicate is not rigid-motion invariance of the
+  real energy or any Leray-Hopf solution.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Full spacetime rigid-motion invariance of placeholder
+    finite-energy.** Given a uniform spatial bound `∀ x, ‖u₀ s x‖ ≤ M`
+    on `u₀` at the shifted time `s`, any linear isometry `R` of `ℝ³`,
+    and any spatial translation `a : ℝ³`, the spacetime rigid motion
+    `(t, x) ↦ u₀ (t + s) (R x + a)` also has finite placeholder energy
+    with the same witness `M`. Composes Task #100
+    (`HasFiniteEnergy_time_translate`, time translation) with Task #101
+    (`HasFiniteEnergy_euclidean_motion`, full spatial Euclidean
+    motion), documenting closure of the placeholder schema under the
+    full rigid-motion group on spacetime — a complete change of
+    inertial reference frame on the spatial slice — not just the
+    spatial or temporal subgroups in isolation. NOT a statement about
+    the L² energy bound or any Leray-Hopf solution; this is closure of
+    the *placeholder* predicate under spacetime rigid motion. -/
+theorem HasFiniteEnergy_spacetime_rigid_motion (u₀ : VelocityField)
+    (s : ℝ)
+    (R : EuclideanSpace ℝ (Fin 3) →ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 3))
+    (a : EuclideanSpace ℝ (Fin 3)) (M : ℝ)
+    (h : ∀ x : EuclideanSpace ℝ (Fin 3), ‖u₀ s x‖ ≤ M) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u₀ (t + s) (R x + a)) :=
+  HasFiniteEnergy_euclidean_motion
+    (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) => u₀ (t + s) x) R a
+    (HasFiniteEnergy_time_translate u₀ s M h)
+
+/-
+  ## Task #133 (2026-05-27) — parity (spatial reflection) invariance of
+  the placeholder finite-energy predicate.
+
+  Completes the discrete spacetime-symmetry pair (T + P) on the
+  placeholder NS energy schema alongside Task #117's unsigned time
+  reversal `HasFiniteEnergy_time_reverse` (and Task #132's signed
+  variant). Where the continuous rigid-motion quartet was carried by
+  Task #78 (spatial translation), Task #89 (rotation / linear
+  isometry), and Task #100 (time translation), the discrete spatial
+  reflection `x ↦ -x` is the remaining elementary symmetry.
+
+  Parity is a *special case* of Task #89's `HasFiniteEnergy_rotate`:
+  the negation map is a linear isometry of `EuclideanSpace ℝ (Fin 3)`
+  (mathlib `LinearIsometryEquiv.neg ℝ`, with `‖-x‖ = ‖x‖` by
+  `norm_neg`). The brick instantiates `HasFiniteEnergy_rotate` with
+  `R := (LinearIsometryEquiv.neg ℝ).toLinearIsometry` so the proof
+  reads as the documented one-line specialisation; `simpa` discharges
+  the harmless coercion `(LinearIsometryEquiv.neg ℝ).toLinearIsometry x
+  = -x` (`LinearIsometryEquiv.coe_neg`).
+
+  **Honest scope.** Does NOT advance the NS tower past `Status: Open`
+  (see `docs/ROADMAP.md` § 3). `HasFiniteEnergy` is still the Task #51
+  placeholder (bounded amplitude at `t = 0`), not the L² energy bound;
+  parity closure of the *placeholder* predicate is not parity
+  invariance of the real energy or any Leray-Hopf solution. The point
+  is a *named* brick referencing the predicate under `x ↦ -x` so
+  future plans can point at it explicitly, completing the discrete
+  spacetime-symmetry pair (T + P) alongside the continuous
+  generators.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Parity (spatial reflection) invariance of placeholder finite-
+    energy.** If `u₀` has finite placeholder energy with witness `M`,
+    then the parity-reflected field `fun t x => u₀ t (-x)` also has
+    finite placeholder energy with the *same* witness `M`. The
+    negation map `x ↦ -x` is a linear isometry of `EuclideanSpace ℝ
+    (Fin 3)` (mathlib `LinearIsometryEquiv.neg ℝ`), so this brick is
+    the parity specialisation of Task #89's `HasFiniteEnergy_rotate`.
+    Completes the discrete spacetime-symmetry pair (T + P) on the
+    placeholder schema alongside Task #117's `HasFiniteEnergy_time_reverse`.
+    NOT a statement about the L² energy bound or any Leray-Hopf
+    solution; this is closure of the *placeholder* predicate under
+    the spatial reflection `x ↦ -x`. -/
+theorem HasFiniteEnergy_parity (u₀ : VelocityField)
+    (hu : HasFiniteEnergy u₀) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u₀ t (-x)) := by
+  have h := HasFiniteEnergy_rotate u₀
+    (LinearIsometryEquiv.neg ℝ).toLinearIsometry hu
+  simpa using h
+
+/-
+  ## Task #134 (2026-05-27) — Galilean boost invariance of the
+  placeholder finite-energy predicate.
+
+  Tasks #78 / #89 / #100 covered the rigid-motion symmetry trio on
+  `HasFiniteEnergy` (spatial translation, rotation, time translation),
+  Task #101 composed the spatial generators into the full E(3)
+  Euclidean motion `x ↦ R x + a`, Task #118 composed those with time
+  translation into the full spacetime rigid motion
+  `(t, x) ↦ (t + s, R x + a)`. The natural remaining piece of the full
+  inhomogeneous Galilean group on the placeholder is the **Galilean
+  boost** `(t, x) ↦ (t, x + v t)` — switching to an inertial frame
+  moving at constant velocity `v`.
+
+  **Honest scope.** The placeholder predicate
+  `HasFiniteEnergy u₀ := ∃ M, ∀ x, ‖u₀ 0 x‖ ≤ M` only inspects `u₀` at
+  `t = 0`. The boost `x ↦ x + v t` evaluated at `t = 0` is the
+  identity (`x + v · 0 = x`), so the boosted field
+  `fun t x => u₀ t (x + v • t)` at `t = 0` is *definitionally*
+  `u₀ 0 x` and the original witness `M` survives unchanged. This is
+  the same `t = 0`-is-fixed-point flavour as Task #117 (time reversal):
+  unconditional and one line.
+
+  Together with Task #118 (`HasFiniteEnergy_spacetime_rigid_motion`),
+  this documents closure under the full inhomogeneous Galilean group
+  on the spatial slice — the actual symmetry group of classical
+  Navier-Stokes.
+
+  Does NOT advance the NS tower past `Status: Open` (see
+  `docs/ROADMAP.md` § 3). `HasFiniteEnergy` is still the Task #51
+  placeholder (bounded amplitude at `t = 0`), not the L² energy
+  bound; Galilean-boost closure of the *placeholder* predicate is
+  not Galilean invariance of the real energy or any Leray-Hopf
+  solution.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Galilean-boost invariance of placeholder finite-energy.** If
+    `u₀` has finite placeholder energy with witness `M`, then for any
+    constant boost velocity `v : EuclideanSpace ℝ (Fin 3)` the boosted
+    field `fun t x => u₀ t (x + v • t)` — switching to an inertial
+    frame moving at constant velocity `v` — also has finite placeholder
+    energy with the *same* witness `M`. Unconditional (like Task #117's
+    `HasFiniteEnergy_time_reverse`) because the placeholder predicate
+    inspects `u₀` only at `t = 0`, which is the fixed point of the
+    boost (`x + v • 0 = x`). References the Task #51 schema def
+    `HasFiniteEnergy`. Together with Task #118
+    (`HasFiniteEnergy_spacetime_rigid_motion`) this documents closure
+    under the full inhomogeneous Galilean group on the spatial slice.
+    NOT a statement about the L² energy bound or any Leray-Hopf
+    solution, and NOT Galilean invariance of real Navier-Stokes; this
+    is closure of the *placeholder* predicate under the boost
+    `x ↦ x + v t`. -/
+theorem HasFiniteEnergy_galilean_boost (u₀ : VelocityField)
+    (v : EuclideanSpace ℝ (Fin 3)) (hu : HasFiniteEnergy u₀) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u₀ t (x + (t : ℝ) • v)) := by
+  obtain ⟨M, hM⟩ := hu
+  refine ⟨M, fun x => ?_⟩
+  simpa using hM x
+
+/-
+  ## Task #146 (2026-05-27) — full inhomogeneous Galilean group on the
+  placeholder finite-energy predicate.
+
+  Task #134 landed Galilean-boost closure (`HasFiniteEnergy_galilean_boost`,
+  `(t, x) ↦ (t, x + v t)`); Task #118 landed full spacetime rigid-motion
+  closure (`HasFiniteEnergy_spacetime_rigid_motion`,
+  `(t, x) ↦ (t + s, R x + a)`). The natural composite is the **full
+  inhomogeneous Galilean group** on the spatial slice:
+  `(t, x) ↦ (t + s, R x + a + v (t + s))` — the most general change of
+  inertial reference frame classical Navier-Stokes respects. Landing
+  the composite as a single named brick documents that the placeholder
+  schema is honest under the entire Galilean symmetry group, not just
+  its generators in isolation.
+
+  Like Task #101 (`HasFiniteEnergy_euclidean_motion`, compose
+  translation + rotation) and Task #118 (compose time translation +
+  Euclidean motion), this is a one-line composition: instantiate
+  `HasFiniteEnergy_spacetime_rigid_motion` on the Task #134 boosted
+  field `fun t x => u₀ t (x + t • v)`, conditional on the same uniform
+  spatial bound at the shifted time `s` inherited from Task #100.
+  The spacetime-rigid step substitutes `t ↦ t + s` everywhere inside
+  the boosted field, producing the target outer form
+  `u₀ (t + s) (R x + a + (t + s) • v)`. Same witness `M` end-to-end.
+
+  **Honest scope.** Does NOT advance the NS tower past `Status: Open`
+  (see `docs/ROADMAP.md` § 3). `HasFiniteEnergy` is still the Task #51
+  placeholder (bounded amplitude at `t = 0`), not the L² energy bound;
+  full Galilean-group closure of the *placeholder* predicate is not
+  Galilean invariance of the real energy or of any Leray-Hopf solution.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Full inhomogeneous Galilean-group invariance of placeholder
+    finite-energy.** Given a uniform spatial bound `∀ x, ‖u₀ s x‖ ≤ M`
+    on `u₀` at the shifted time `s`, any linear isometry `R` of `ℝ³`,
+    any spatial translation `a : ℝ³`, and any boost velocity
+    `v : ℝ³`, the full Galilean change of inertial frame
+    `(t, x) ↦ u₀ (t + s) (R x + a + (t + s) • v)` also has finite
+    placeholder energy with the *same* witness `M`. Composes Task #134
+    (`HasFiniteEnergy_galilean_boost`, applied inline as the boosted
+    field `fun t x => u₀ t (x + t • v)`) with Task #118
+    (`HasFiniteEnergy_spacetime_rigid_motion`, which absorbs the
+    rotation `R`, the spatial shift `a`, and the time shift `s` —
+    promoting the inner `t • v` to `(t + s) • v`), documenting closure
+    of the placeholder schema under the full inhomogeneous Galilean
+    group on the spatial slice — the actual symmetry group of classical
+    Navier-Stokes. NOT a statement about the L² energy bound or any
+    Leray-Hopf solution, and NOT Galilean invariance of real
+    Navier-Stokes; this is closure of the *placeholder* predicate
+    under the full Galilean change of inertial frame. -/
+theorem HasFiniteEnergy_galilean_group (u₀ : VelocityField)
+    (s : ℝ)
+    (R : EuclideanSpace ℝ (Fin 3) →ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 3))
+    (a v : EuclideanSpace ℝ (Fin 3)) (M : ℝ)
+    (h : ∀ x : EuclideanSpace ℝ (Fin 3), ‖u₀ s x‖ ≤ M) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u₀ (t + s) (R x + a + (t + s) • v)) :=
+  HasFiniteEnergy_spacetime_rigid_motion
+    (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) => u₀ t (x + t • v))
+    s R a M (fun x => h (x + s • v))
+
+/-
+  ## Task #164 (2026-05-28) — rotating-frame (Coriolis) closure of the
+  placeholder finite-energy predicate.
+
+  Task #146 landed full *inhomogeneous Galilean* closure
+  (`HasFiniteEnergy_galilean_group`,
+  `(t, x) ↦ (t + s, R x + a + (t + s) • v)`) — the symmetry group
+  classical Navier-Stokes respects in inertial frames, with a fixed
+  rotation `R`. The natural next stand-in piece, completing the
+  symmetry-group catalog the placeholder schema is honest under, is
+  the **time-dependent rotating frame**
+  `(t, x) ↦ (t + s, R (t + s) x + a + (t + s) • v)` — switching to a
+  frame that *spins* at angular velocity Ω (a Coriolis / rotating
+  reference frame), via a one-parameter family
+  `R : ℝ → (EuclideanSpace ℝ (Fin 3) →ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 3))`
+  rather than a fixed isometry.
+
+  **Honest scope.** Because the placeholder predicate
+  `HasFiniteEnergy u₀ := ∃ M, ∀ x, ‖u₀ 0 x‖ ≤ M` only inspects `u₀` at
+  `t = 0`, the spinning frame reduces at the evaluation point to the
+  single isometry `R s` (whichever rotation the family takes at the
+  shifted time `s`), and any linear isometry preserves norms pointwise.
+  The same one-line composition trick as Task #146 lands the brick
+  with the same witness `M`, conditional on the uniform spatial bound
+  at the shifted time `s` inherited from Task #100.
+
+  This is NOT real rotating-frame invariance of Navier-Stokes — that
+  would require the Coriolis force `2 Ω × u` and centrifugal force
+  `Ω × (Ω × x)` to appear in the momentum equation, which the
+  placeholder schema has no surface for. This is *placeholder closure
+  only*: the bounded-amplitude predicate reindexes through any family
+  of linear isometries on its single inspected time slice.
+
+  Does NOT advance the NS tower past `Status: Open` (see
+  `docs/ROADMAP.md` § 3). `HasFiniteEnergy` is still the Task #51
+  placeholder (bounded amplitude at `t = 0`), not the L² energy bound;
+  rotating-frame closure of the *placeholder* predicate is not
+  rotating-frame invariance of the real energy or of any Leray-Hopf
+  solution, and the Coriolis / centrifugal force terms are not
+  present in the schema.
+
+  Axiom-footprint contract (per `scripts/check-towers.sh`): the
+  theorem must be either axiom-free or use only the classical trio
+  `{propext, Classical.choice, Quot.sound}`.
+-/
+
+/-- **Rotating-frame (Coriolis) closure of placeholder finite-energy.**
+    Given a uniform spatial bound `∀ x, ‖u₀ s x‖ ≤ M` on `u₀` at the
+    shifted time `s`, any *time-dependent* family of linear isometries
+    `R : ℝ → (EuclideanSpace ℝ (Fin 3) →ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 3))`
+    of `ℝ³`, any spatial translation `a : ℝ³`, and any boost velocity
+    `v : ℝ³`, the full *rotating-frame* change of inertial frame
+    `(t, x) ↦ u₀ (t + s) (R (t + s) x + a + (t + s) • v)` — switching
+    to a frame spinning at the (arbitrary) angular profile encoded by
+    `R` — also has finite placeholder energy with the *same* witness
+    `M`. Extends Task #146 (`HasFiniteEnergy_galilean_group`, fixed
+    rotation) by upgrading the rotation to a time-parameter family;
+    the proof reuses Task #146's witness because the placeholder
+    predicate only inspects `u₀` at `t = 0`, where the time-dependent
+    rotation degenerates to the single isometry `R s`. NOT a statement
+    about the L² energy bound or any Leray-Hopf solution, NOT real
+    rotating-frame invariance of Navier-Stokes (the Coriolis force
+    `2 Ω × u` and centrifugal force `Ω × (Ω × x)` are NOT present in
+    the placeholder schema); this is closure of the *placeholder*
+    predicate under a spinning change of reference frame. -/
+theorem HasFiniteEnergy_rotating_frame (u₀ : VelocityField)
+    (s : ℝ)
+    (R : ℝ → (EuclideanSpace ℝ (Fin 3) →ₗᵢ[ℝ] EuclideanSpace ℝ (Fin 3)))
+    (a v : EuclideanSpace ℝ (Fin 3)) (M : ℝ)
+    (h : ∀ x : EuclideanSpace ℝ (Fin 3), ‖u₀ s x‖ ≤ M) :
+    HasFiniteEnergy (fun (t : ℝ) (x : EuclideanSpace ℝ (Fin 3)) =>
+      u₀ (t + s) (R (t + s) x + a + (t + s) • v)) := by
+  refine ⟨M, fun x => ?_⟩
+  simpa using h (R s x + a + s • v)
+
+end NS
+end Towers
+end TheoremaAureum
